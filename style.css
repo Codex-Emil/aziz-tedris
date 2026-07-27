@@ -1000,6 +1000,58 @@ select option {
 }
 
 @media (max-width: 768px) {
+  header.top-navbar {
+    padding: 0.75rem 0.5rem !important;
+    gap: 0.75rem !important;
+  }
+  
+  .nav-links {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+    gap: 0.4rem !important;
+    padding: 0.35rem 0.5rem !important;
+    scrollbar-width: none !important;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .nav-btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    font-size: 0.85rem !important;
+    padding: 0.55rem 0.95rem !important;
+    min-height: 42px !important;
+    border-radius: 10px !important;
+  }
+
+  .btn, .btn-sm {
+    min-height: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 12px !important;
+    margin-bottom: 1rem !important;
+  }
+
+  table th, table td {
+    white-space: nowrap !important;
+    padding: 0.65rem 0.75rem !important;
+    font-size: 0.85rem !important;
+  }
+
   /* Content Area */
   main.main-content {
     padding: 1rem 0.75rem;
@@ -1118,7 +1170,7 @@ select option {
   
   /* Header Title Size */
   .header-title-section h1 {
-    font-size: 1.5rem !important;
+    font-size: 1.4rem !important;
   }
   
   /* Modals Buttons Wrap */

@@ -3230,7 +3230,8 @@ const App = {
       const paidVal = getPaymentRevenue(p);
       const isPartial = p.paymentStatus === "Qismən ödənilib";
       const valStr = isPartial ? `${paidVal} AZN (Qismən / Paket: ${p.fee} AZN)` : `${paidVal} AZN`;
-      const pkgStr = p.packageType === "Seans" ? `Seans (${p.sessionsCount || 8} seans) (${p.groupType === 'Qrup' ? 'Qrup' : 'Fərdi'})` : `Aylıq (${p.groupType === 'Qrup' ? 'Qrup' : 'Fərdi'})`;
+      const renewedTag = p.isRenewed ? ` <span style="font-size:0.75rem; color:#6b7280; font-weight:normal;">(Yenilənmiş paket)</span>` : "";
+      const pkgStr = (p.packageType === "Seans" ? `Seans (${p.sessionsCount || 8} seans) (${p.groupType === 'Qrup' ? 'Qrup' : 'Fərdi'})` : `Aylıq (${p.groupType === 'Qrup' ? 'Qrup' : 'Fərdi'})`) + renewedTag;
       const student = students.find(s => s.id === p.studentId);
       const displayName = student ? `${student.name} ${student.surname || ""}`.trim() : p.studentName;
       return `

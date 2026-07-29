@@ -191,6 +191,13 @@ function getPaymentRevenue(p) {
   return p.paymentStatus === "Ödənildi" ? (Number(p.fee) || 0) : 0;
 }
 
+// Məbləğlərin yuvarlaqlaşdırma xətası olmadan vahid formatda göstərilməsi köməkçisi
+function formatAmount(num) {
+  if (num === null || num === undefined || isNaN(num)) return "0";
+  const val = Number(num);
+  return Number.isInteger(val) ? val.toString() : val.toFixed(1);
+}
+
 // Tarix aralığı üzrə (seans başlama tarixindən bu günə qədər) keçirilmiş seansların sayının hesablanması
 function calculateSessionsOccurred(startDateStr, todayStr, weeklyFrequency, sessionsCount, payment = null) {
   if (!startDateStr || !todayStr) return 0;
@@ -1022,9 +1029,9 @@ const App = {
     const centerShare = totalIncome - totalTeacherPay;
     const netProfit = centerShare - totalExpense;
 
-    document.getElementById("dash-total-income").textContent = totalIncome + " AZN";
-    document.getElementById("dash-pending-income").textContent = totalPending + " AZN";
-    document.getElementById("dash-net-profit").textContent = netProfit.toFixed(1) + " AZN";
+    document.getElementById("dash-total-income").textContent = formatAmount(totalIncome) + " AZN";
+    document.getElementById("dash-pending-income").textContent = formatAmount(totalPending) + " AZN";
+    document.getElementById("dash-net-profit").textContent = formatAmount(netProfit) + " AZN";
 
     // 3. Bildirişlər və Gecikənlər siyahısı
     const today = getTodayStr();
@@ -2411,37 +2418,37 @@ const App = {
 
     const totalAllExpenses = totalTeacherCost + totalExpenses;
 
-    document.getElementById("rep-total-revenue").textContent = Math.round(totalRevenue) + " AZN";
+    document.getElementById("rep-total-revenue").textContent = formatAmount(totalRevenue) + " AZN";
     
     const repTotalAllExpensesEl = document.getElementById("rep-total-all-expenses");
-    if (repTotalAllExpensesEl) repTotalAllExpensesEl.textContent = Math.round(totalAllExpenses) + " AZN";
+    if (repTotalAllExpensesEl) repTotalAllExpensesEl.textContent = formatAmount(totalAllExpenses) + " AZN";
 
-    document.getElementById("rep-net-profit").textContent = Math.round(netProfit) + " AZN";
+    document.getElementById("rep-net-profit").textContent = formatAmount(netProfit) + " AZN";
 
     const repTeacherCostEl = document.getElementById("rep-teacher-cost");
-    if (repTeacherCostEl) repTeacherCostEl.textContent = Math.round(totalTeacherCost) + " AZN";
+    if (repTeacherCostEl) repTeacherCostEl.textContent = formatAmount(totalTeacherCost) + " AZN";
     
-    document.getElementById("rep-center-share").textContent = Math.round(centerShare) + " AZN";
-    document.getElementById("rep-total-expenses").textContent = Math.round(totalExpenses) + " AZN";
+    document.getElementById("rep-center-share").textContent = formatAmount(centerShare) + " AZN";
+    document.getElementById("rep-total-expenses").textContent = formatAmount(totalExpenses) + " AZN";
     
     const repTeacherPaidEl = document.getElementById("rep-teacher-paid");
-    if (repTeacherPaidEl) repTeacherPaidEl.textContent = Math.round(totalTeacherPaid) + " AZN";
+    if (repTeacherPaidEl) repTeacherPaidEl.textContent = formatAmount(totalTeacherPaid) + " AZN";
     
     const repTeacherDueEl = document.getElementById("rep-teacher-due");
-    if (repTeacherDueEl) repTeacherDueEl.textContent = Math.round(totalTeacherDue) + " AZN";
+    if (repTeacherDueEl) repTeacherDueEl.textContent = formatAmount(totalTeacherDue) + " AZN";
     
     const repCashInHandEl = document.getElementById("rep-cash-in-hand");
-    if (repCashInHandEl) repCashInHandEl.textContent = Math.round(cashInHand) + " AZN";
+    if (repCashInHandEl) repCashInHandEl.textContent = formatAmount(cashInHand) + " AZN";
 
     // Köməkçi valyuta göstəriciləri
     document.querySelectorAll(".rep-total-revenue-val").forEach(el => {
-      el.textContent = Math.round(totalRevenue) + " AZN";
+      el.textContent = formatAmount(totalRevenue) + " AZN";
     });
     document.querySelectorAll(".rep-net-profit-val").forEach(el => {
-      el.textContent = Math.round(netProfit) + " AZN";
+      el.textContent = formatAmount(netProfit) + " AZN";
     });
     document.querySelectorAll(".rep-teacher-cost-val").forEach(el => {
-      el.textContent = Math.round(totalTeacherCost) + " AZN";
+      el.textContent = formatAmount(totalTeacherCost) + " AZN";
     });
 
     // 2. Xərclər Cədvəlinin doldurulması (Tarixə görə sıralayırıq)

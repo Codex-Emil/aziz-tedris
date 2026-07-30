@@ -1719,20 +1719,26 @@ const App = {
             actionButtons += `<button class="btn btn-success btn-sm" onclick="App.markPaymentPaid('${p.id}')">Ödəniş et</button>`;
           } else {
             // Ödənildi və ya Qismən ödənilib
-            let statusText = p.paymentStatus === "Qismən ödənilib" ? `Qismən (${p.paidAmount}/${p.fee} AZN)` : "Aktiv";
-            const badgeClass = p.paymentStatus === "Qismən ödənilib" ? "badge-partial" : "badge-paid";
-            if (remaining <= 0) {
-              statusHtml = `<span class="badge badge-unpaid">Seans bitdi! (0 seans qalıb)</span>`;
-              actionButtons += `<button class="btn btn-primary btn-sm" onclick="App.renewSessionPackage('${p.id}')">Paketi Yenilə</button>`;
-            } else if (isExpiredByDate) {
-              statusHtml = `<span class="badge badge-unpaid">Seans bitdi! (Son seans: ${sDueDate})</span>`;
-              actionButtons += `<button class="btn btn-primary btn-sm" onclick="App.renewSessionPackage('${p.id}')">Paketi Yenilə</button>`;
-            } else {
-              statusHtml = `<span class="badge ${badgeClass}">${statusText} (${remaining} seans qalıb)</span>`;
-              if (p.paymentStatus === "Qismən ödənilib") {
-                actionButtons += `<button class="btn btn-success btn-sm" style="margin-right: 5px;" onclick="App.markPaymentPaid('${p.id}')">Ödənişi tamamla</button>`;
+            if (p.paymentStatus === "Qismən ödənilib") {
+              const statusExtra = remaining <= 0 ? " - Seans bitdi" : (isExpiredByDate ? " - Müddət bitdi" : ` (${remaining} seans qalıb)`);
+              statusHtml = `<span class="badge badge-partial">Qismən (${p.paidAmount || 0}/${p.fee} AZN)${statusExtra}</span>`;
+              actionButtons += `<button class="btn btn-success btn-sm" style="margin-right: 5px;" onclick="App.markPaymentPaid('${p.id}')">Ödənişi tamamla</button>`;
+              if (remaining <= 0 || isExpiredByDate) {
+                actionButtons += `<button class="btn btn-primary btn-sm" onclick="App.renewSessionPackage('${p.id}')">Paketi Yenilə</button>`;
+              } else {
+                actionButtons += `<button class="btn btn-secondary btn-sm" onclick="App.renewSessionPackage('${p.id}')">Yeni Paket Əlavə Et</button>`;
               }
-              actionButtons += `<button class="btn btn-secondary btn-sm" onclick="App.renewSessionPackage('${p.id}')">Yeni Paket Əlavə Et</button>`;
+            } else {
+              if (remaining <= 0) {
+                statusHtml = `<span class="badge badge-unpaid">Seans bitdi! (0 seans qalıb)</span>`;
+                actionButtons += `<button class="btn btn-primary btn-sm" onclick="App.renewSessionPackage('${p.id}')">Paketi Yenilə</button>`;
+              } else if (isExpiredByDate) {
+                statusHtml = `<span class="badge badge-unpaid">Seans bitdi! (Son seans: ${sDueDate})</span>`;
+                actionButtons += `<button class="btn btn-primary btn-sm" onclick="App.renewSessionPackage('${p.id}')">Paketi Yenilə</button>`;
+              } else {
+                statusHtml = `<span class="badge badge-paid">Aktiv (${remaining} seans qalıb)</span>`;
+                actionButtons += `<button class="btn btn-secondary btn-sm" onclick="App.renewSessionPackage('${p.id}')">Yeni Paket Əlavə Et</button>`;
+              }
             }
           }
         }

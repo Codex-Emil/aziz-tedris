@@ -3054,9 +3054,29 @@ const App = {
           th, td { border: 1px solid #e2e8f0; padding: 10px 12px; text-align: left; }
           th { background: #f1f5f9; color: #334155; font-weight: 700; }
           tr.total-row { background: #f8fafc; font-weight: 700; }
+          @page {
+            size: auto;
+            margin: 12mm 10mm 12mm 10mm;
+          }
           @media print {
-            body { padding: 0; }
-            .no-print { display: none; }
+            html, body {
+              background: #ffffff !important;
+              color: #000000 !important;
+              padding: 0 !important;
+              margin: 0 !important;
+              width: 100% !important;
+              height: auto !important;
+              overflow: visible !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .no-print {
+              display: none !important;
+            }
+            table, tr, td, th, .card {
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+            }
           }
         </style>
       </head>
@@ -3284,9 +3304,29 @@ const App = {
           tr.total-row { background: #f8fafc; font-weight: 700; }
           .signature-section { margin-top: 50px; display: flex; justify-content: space-between; font-size: 14px; }
           .signature-box { border-top: 1px solid #94a3b8; width: 200px; text-align: center; padding-top: 8px; margin-top: 40px; }
+          @page {
+            size: auto;
+            margin: 12mm 10mm 12mm 10mm;
+          }
           @media print {
-            body { padding: 0; }
-            .no-print { display: none; }
+            html, body {
+              background: #ffffff !important;
+              color: #000000 !important;
+              padding: 0 !important;
+              margin: 0 !important;
+              width: 100% !important;
+              height: auto !important;
+              overflow: visible !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .no-print {
+              display: none !important;
+            }
+            table, tr, td, th, .card {
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+            }
           }
         </style>
       </head>

@@ -1780,6 +1780,53 @@ body.light-theme .badge-passive {
   border: 1px solid rgba(239, 68, 68, 0.25) !important;
 }
 
+/* ==========================================
+   PRINT OPTIMIZATION (@media print)
+   ========================================== */
+@page {
+  size: auto;
+  margin: 10mm;
+}
+
+@media print {
+  header.top-navbar,
+  .no-print,
+  .btn,
+  .modal-overlay,
+  #btn-change-month,
+  .header-actions {
+    display: none !important;
+  }
+
+  body, .app-container, main.main-content {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    box-shadow: none !important;
+  }
+
+  .card, .stat-card, .table-responsive {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  table {
+    color: #0f172a !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+  }
+}
+
 body.light-theme .badge-frozen {
   background: rgba(245, 158, 11, 0.08) !important;
   color: #b45309 !important;

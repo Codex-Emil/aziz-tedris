@@ -3035,136 +3035,87 @@ const App = {
       </tr>
     `).join("");
 
-    const printWin = window.open("", "_blank");
-    printWin.document.write(`
-      <html>
-      <head>
-        <title>Əziz Tədris Mərkəzi - ${formattedMonth} Hesabatı</title>
-        <style>
-          body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; color: #1e293b; background: white; line-height: 1.5; }
-          .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #6366f1; padding-bottom: 15px; }
-          .header h1 { margin: 0; color: #1e1b4b; font-size: 24px; text-transform: uppercase; letter-spacing: 0.5px; }
-          .header p { margin: 5px 0 0 0; color: #64748b; font-size: 14px; }
-          .section-title { font-size: 16px; font-weight: 700; color: #1e1b4b; margin: 25px 0 10px 0; border-left: 4px solid #6366f1; padding-left: 8px; text-transform: uppercase; }
-          .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-          .card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; text-align: center; }
-          .card.highlight { background: #ecfdf5; border-color: #a7f3d0; grid-column: span 4; }
-          .card-title { font-size: 11px; text-transform: uppercase; color: #64748b; margin-bottom: 5px; font-weight: 600; letter-spacing: 0.5px; }
-          .card-value { font-size: 18px; font-weight: 800; color: #0f172a; }
-          .card.highlight .card-value { font-size: 26px; color: #047857; }
-          table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-          th, td { border: 1px solid #e2e8f0; padding: 10px 12px; text-align: left; }
-          th { background: #f1f5f9; color: #334155; font-weight: 700; }
-          tr.total-row { background: #f8fafc; font-weight: 700; }
-          @page {
-            size: auto;
-            margin: 12mm 10mm 12mm 10mm;
-          }
-          @media print {
-            html, body {
-              background: #ffffff !important;
-              color: #000000 !important;
-              padding: 0 !important;
-              margin: 0 !important;
-              width: 100% !important;
-              height: auto !important;
-              overflow: visible !important;
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-            .no-print {
-              display: none !important;
-            }
-            table, tr, td, th, .card {
-              page-break-inside: avoid !important;
-              break-inside: avoid !important;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="no-print" style="margin-bottom: 20px; text-align: right;">
-          <button onclick="window.print()" style="padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">🖨️ Hesabatı Çap Et</button>
-        </div>
-        <div class="header">
-          <h1>Əziz Tədris Mərkəzi</h1>
-          <p>Maliyyə Hesabatı - ${formattedMonth}</p>
+    const container = document.getElementById("print-preview-content");
+    if (container) {
+      container.innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #6366f1; padding-bottom: 12px;">
+          <h2 style="margin: 0; color: #1e1b4b; font-size: 20px; text-transform: uppercase;">Əziz Tədris Mərkəzi</h2>
+          <p style="margin: 4px 0 0 0; color: #64748b; font-size: 13px;">Maliyyə Hesabatı - ${formattedMonth}</p>
         </div>
         
-        <div class="section-title">Mərkəzin Maliyyə Göstəriciləri</div>
-        <div class="grid">
-          <div class="card">
-            <div class="card-title">Ümumi Toplanan Gəlir</div>
-            <div class="card-value">${totalRevenueSum} AZN</div>
+        <div style="font-size: 14px; font-weight: 700; color: #1e1b4b; margin: 20px 0 10px 0; border-left: 4px solid #6366f1; padding-left: 8px; text-transform: uppercase;">Mərkəzin Maliyyə Göstəriciləri</div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; color: #64748b; margin-bottom: 4px; font-weight: 600;">Ümumi Toplanan Gəlir</div>
+            <div style="font-size: 16px; font-weight: 800; color: #0f172a;">${formatAmount(totalRevenueSum)} AZN</div>
           </div>
-          <div class="card">
-            <div class="card-title">Müəllimə Xərcləri</div>
-            <div class="card-value">${totalTeacherShareSum.toFixed(1)} AZN</div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; color: #64748b; margin-bottom: 4px; font-weight: 600;">Müəllimə Xərcləri</div>
+            <div style="font-size: 16px; font-weight: 800; color: #0f172a;">${formatAmount(totalTeacherShareSum)} AZN</div>
           </div>
-          <div class="card">
-            <div class="card-title">Mərkəzin Payı</div>
-            <div class="card-value">${centerShare.toFixed(1)} AZN</div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; color: #64748b; margin-bottom: 4px; font-weight: 600;">Mərkəzin Payı</div>
+            <div style="font-size: 16px; font-weight: 800; color: #0f172a;">${formatAmount(centerShare)} AZN</div>
           </div>
-          <div class="card">
-            <div class="card-title">Tədrisin Digər Xərcləri</div>
-            <div class="card-value">${totalExpenses} AZN</div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; color: #64748b; margin-bottom: 4px; font-weight: 600;">Tədrisin Digər Xərcləri</div>
+            <div style="font-size: 16px; font-weight: 800; color: #0f172a;">${formatAmount(totalExpenses)} AZN</div>
           </div>
-          <div class="card highlight">
-            <div class="card-title">XALİS MƏNFƏƏT (QALIQ MƏBLƏĞ)</div>
-            <div class="card-value">${netProfit.toFixed(1)} AZN</div>
+          <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 14px; border-radius: 8px; text-align: center; grid-column: span 4;">
+            <div style="font-size: 11px; text-transform: uppercase; color: #047857; margin-bottom: 4px; font-weight: 700;">XALİS MƏNFƏƏT (QALIQ MƏBLƏĞ)</div>
+            <div style="font-size: 22px; font-weight: 800; color: #047857;">${formatAmount(netProfit)} AZN</div>
           </div>
         </div>
 
-        <div class="section-title">Müəllimələrin Aylıq Pay Hesabatı</div>
-        <table>
+        <div style="font-size: 14px; font-weight: 700; color: #1e1b4b; margin: 20px 0 10px 0; border-left: 4px solid #6366f1; padding-left: 8px; text-transform: uppercase;">Müəllimələrin Aylıq Pay Hesabatı</div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px;">
           <thead>
-            <tr>
-              <th>Müəllimə</th>
-              <th>Uşaq Sayı</th>
-              <th>Ümumi Cəlb Olunan</th>
-              <th>Pay Faizi</th>
-              <th>Müəllimə Payı</th>
-              <th>Ödənilən</th>
-              <th>Qalıq Borc</th>
+            <tr style="background: #f1f5f9;">
+              <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Müəllimə</th>
+              <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Uşaq Sayı</th>
+              <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Ümumi Cəlb Olunan</th>
+              <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Pay Faizi</th>
+              <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Müəllimə Payı</th>
+              <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Ödənilən</th>
+              <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Qalıq Borc</th>
             </tr>
           </thead>
           <tbody>
             ${teacherRowsHtml}
-            <tr class="total-row">
-              <td>CƏMİ</td>
-              <td>${totalStudentsSum} tələbə</td>
-              <td>${totalRevenueSum} AZN</td>
-              <td>-</td>
-              <td>${totalTeacherShareSum.toFixed(1)} AZN</td>
-              <td>${totalPaidSum} AZN</td>
-              <td>${totalDueSum.toFixed(1)} AZN</td>
+            <tr style="background: #f8fafc; font-weight: 700;">
+              <td style="border: 1px solid #e2e8f0; padding: 8px;">CƏMİ</td>
+              <td style="border: 1px solid #e2e8f0; padding: 8px;">${totalStudentsSum} tələbə</td>
+              <td style="border: 1px solid #e2e8f0; padding: 8px;">${formatAmount(totalRevenueSum)} AZN</td>
+              <td style="border: 1px solid #e2e8f0; padding: 8px;">-</td>
+              <td style="border: 1px solid #e2e8f0; padding: 8px;">${formatAmount(totalTeacherShareSum)} AZN</td>
+              <td style="border: 1px solid #e2e8f0; padding: 8px;">${formatAmount(totalPaidSum)} AZN</td>
+              <td style="border: 1px solid #e2e8f0; padding: 8px;">${formatAmount(totalDueSum)} AZN</td>
             </tr>
           </tbody>
         </table>
 
         ${expenses.length > 0 ? `
-          <div class="section-title">Tədrisin Xərcləri</div>
-          <table>
+          <div style="font-size: 14px; font-weight: 700; color: #1e1b4b; margin: 20px 0 10px 0; border-left: 4px solid #6366f1; padding-left: 8px; text-transform: uppercase;">Tədrisin Xərcləri</div>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px;">
             <thead>
-              <tr>
-                <th>Tarix</th>
-                <th>Təsvir</th>
-                <th>Məbləğ</th>
+              <tr style="background: #f1f5f9;">
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Tarix</th>
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Təsvir</th>
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Məbləğ</th>
               </tr>
             </thead>
             <tbody>
               ${expenseRowsHtml}
-              <tr class="total-row">
-                <td colspan="2">CƏMİ XƏRCLƏR</td>
-                <td>${totalExpenses} AZN</td>
+              <tr style="background: #f8fafc; font-weight: 700;">
+                <td colspan="2" style="border: 1px solid #e2e8f0; padding: 8px;">CƏMİ XƏRCLƏR</td>
+                <td style="border: 1px solid #e2e8f0; padding: 8px;">${formatAmount(totalExpenses)} AZN</td>
               </tr>
             </tbody>
           </table>
         ` : ''}
-      </body>
-      </html>
-    `);
-    printWin.document.close();
+      `;
+    }
+    this.openModal("modal-print-preview");
   },
 
   exportTeacherExcel(teacherId) {
@@ -3282,157 +3233,105 @@ const App = {
       </tr>
     `).join("");
 
-    const printWin = window.open("", "_blank");
-    printWin.document.write(`
-      <html>
-      <head>
-        <title>Əziz Tədris Mərkəzi - ${t.name} - ${formattedMonth} Hesabatı</title>
-        <style>
-          body { font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; color: #1e293b; background: white; line-height: 1.5; }
-          .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6366f1; padding-bottom: 20px; margin-bottom: 25px; }
-          .header h1 { margin: 0; color: #1e1b4b; font-size: 22px; text-transform: uppercase; }
-          .header p { margin: 5px 0 0 0; color: #64748b; font-size: 14px; }
-          .meta-info { text-align: right; }
-          .meta-info div { margin-bottom: 4px; font-size: 13px; color: #475569; }
-          .meta-info strong { color: #0f172a; }
-          .section-title { font-size: 15px; font-weight: 700; color: #1e1b4b; margin: 25px 0 10px 0; border-left: 4px solid #6366f1; padding-left: 8px; text-transform: uppercase; }
-          .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
-          .summary-table td { border: 1px solid #e2e8f0; padding: 12px; font-size: 14px; }
-          .summary-table td.label { background: #f8fafc; font-weight: 600; color: #475569; width: 40%; }
-          .summary-table td.value { font-weight: 700; color: #0f172a; }
-          table.data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-          table.data-table th, table.data-table td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; }
-          table.data-table th { background: #f1f5f9; color: #334155; font-weight: 700; }
-          tr.total-row { background: #f8fafc; font-weight: 700; }
-          .signature-section { margin-top: 50px; display: flex; justify-content: space-between; font-size: 14px; }
-          .signature-box { border-top: 1px solid #94a3b8; width: 200px; text-align: center; padding-top: 8px; margin-top: 40px; }
-          @page {
-            size: auto;
-            margin: 12mm 10mm 12mm 10mm;
-          }
-          @media print {
-            html, body {
-              background: #ffffff !important;
-              color: #000000 !important;
-              padding: 0 !important;
-              margin: 0 !important;
-              width: 100% !important;
-              height: auto !important;
-              overflow: visible !important;
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-            .no-print {
-              display: none !important;
-            }
-            table, tr, td, th, .card {
-              page-break-inside: avoid !important;
-              break-inside: avoid !important;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="no-print" style="margin-bottom: 20px; text-align: right;">
-          <button onclick="window.print()" style="padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">🖨️ Hesabatı Çap Et</button>
-        </div>
-        <div class="header">
+    const container = document.getElementById("print-preview-content");
+    if (container) {
+      container.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6366f1; padding-bottom: 15px; margin-bottom: 20px;">
           <div>
-            <h1>Əziz Tədris Mərkəzi</h1>
-            <p>Müəllimə Aylıq Pay Hesabatı Vərəqi</p>
+            <h2 style="margin: 0; color: #1e1b4b; font-size: 20px; text-transform: uppercase;">Əziz Tədris Mərkəzi</h2>
+            <p style="margin: 4px 0 0 0; color: #64748b; font-size: 13px;">Müəllimə Aylıq Pay Hesabatı Vərəqi</p>
           </div>
-          <div class="meta-info">
+          <div style="text-align: right; font-size: 12px; color: #475569;">
             <div>Müəllimə: <strong>${t.name}</strong></div>
             <div>Dövr: <strong>${formattedMonth}</strong></div>
             <div>Çap Tarixi: <strong>${new Date().toLocaleDateString('az-AZ')}</strong></div>
           </div>
         </div>
 
-        <div class="section-title">Maliyyə Xülasəsi</div>
-        <table class="summary-table">
+        <div style="font-size: 14px; font-weight: 700; color: #1e1b4b; margin: 20px 0 10px 0; border-left: 4px solid #6366f1; padding-left: 8px; text-transform: uppercase;">Maliyyə Xülasəsi</div>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px;">
           <tr>
-            <td class="label">Aktiv Tələbə Sayı</td>
-            <td class="value">${stdCount} tələbə</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; background: #f8fafc; font-weight: 600; color: #475569; width: 40%;">Aktiv Tələbə Sayı</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; font-weight: 700; color: #0f172a;">${stdCount} tələbə</td>
           </tr>
           <tr>
-            <td class="label">Cəlb Olunan Ümumi Məbləğ</td>
-            <td class="value">${revenue} AZN</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; background: #f8fafc; font-weight: 600; color: #475569;">Cəlb Olunan Ümumi Məbləğ</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; font-weight: 700; color: #0f172a;">${formatAmount(revenue)} AZN</td>
           </tr>
           <tr>
-            <td class="label">Müəllimənin Payı (%)</td>
-            <td class="value">${sharePercent}%</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; background: #f8fafc; font-weight: 600; color: #475569;">Müəllimənin Payı (%)</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; font-weight: 700; color: #0f172a;">${sharePercent}%</td>
           </tr>
           <tr>
-            <td class="label">Hesablanmış Müəllimə Qazancı</td>
-            <td class="value" style="color: #6366f1;">${teacherShare.toFixed(1)} AZN</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; background: #f8fafc; font-weight: 600; color: #475569;">Hesablanmış Müəllimə Qazancı</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; font-weight: 700; color: #6366f1;">${formatAmount(teacherShare)} AZN</td>
           </tr>
           <tr>
-            <td class="label">Müəlliməyə Ödənilən Məbləğ (Cəmi)</td>
-            <td class="value" style="color: #10b981;">${paid} AZN</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; background: #f8fafc; font-weight: 600; color: #475569;">Müəlliməyə Ödənilən Məbləğ (Cəmi)</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; font-weight: 700; color: #10b981;">${formatAmount(paid)} AZN</td>
           </tr>
           <tr>
-            <td class="label">Qalıq Borc (Ödəniləcək məbləğ)</td>
-            <td class="value" style="color: ${due > 0 ? '#d97706' : (due < 0 ? '#dc2626' : '#16a34a')};">${due.toFixed(1)} AZN</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; background: #f8fafc; font-weight: 600; color: #475569;">Qalıq Borc (Ödəniləcək məbləğ)</td>
+            <td style="border: 1px solid #e2e8f0; padding: 10px; font-weight: 700; color: ${due > 0 ? '#d97706' : (due < 0 ? '#dc2626' : '#16a34a')};">${formatAmount(due)} AZN</td>
           </tr>
         </table>
 
         ${teacherPayments.length > 0 ? `
-          <div class="section-title">Tələbələr və Dərslərin Siyahısı</div>
-          <table class="data-table">
+          <div style="font-size: 14px; font-weight: 700; color: #1e1b4b; margin: 20px 0 10px 0; border-left: 4px solid #6366f1; padding-left: 8px; text-transform: uppercase;">Tələbələr və Dərslərin Siyahısı</div>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px;">
             <thead>
-              <tr>
-                <th>Tələbə</th>
-                <th>Fənn</th>
-                <th>Paket</th>
-                <th>Tezlik</th>
-                <th>Ödəniş Tarixi</th>
-                <th>Məbləğ</th>
+              <tr style="background: #f1f5f9;">
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Tələbə</th>
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Fənn</th>
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Paket</th>
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Tezlik</th>
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Ödəniş Tarixi</th>
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Məbləğ</th>
               </tr>
             </thead>
             <tbody>
               ${studentRowsHtml}
-              <tr class="total-row">
-                <td colspan="5">CƏMİ</td>
-                <td>${revenue} AZN</td>
+              <tr style="background: #f8fafc; font-weight: 700;">
+                <td colspan="5" style="border: 1px solid #e2e8f0; padding: 8px;">CƏMİ</td>
+                <td style="border: 1px solid #e2e8f0; padding: 8px;">${formatAmount(revenue)} AZN</td>
               </tr>
             </tbody>
           </table>
         ` : ''}
 
         ${teacherPayoutList.length > 0 ? `
-          <div class="section-title">Müəlliməyə Edilən Ödənişlərin Tarixi (Manual)</div>
-          <table class="data-table">
+          <div style="font-size: 14px; font-weight: 700; color: #1e1b4b; margin: 20px 0 10px 0; border-left: 4px solid #6366f1; padding-left: 8px; text-transform: uppercase;">Müəlliməyə Edilən Ödənişlərin Tarixi (Manual)</div>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px;">
             <thead>
-              <tr>
-                <th>Tarix</th>
-                <th>Açıqlama</th>
-                <th>Məbləğ</th>
+              <tr style="background: #f1f5f9;">
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Tarix</th>
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Açıqlama</th>
+                <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left;">Məbləğ</th>
               </tr>
             </thead>
             <tbody>
               ${payoutRowsHtml}
-              <tr class="total-row">
-                <td colspan="2">CƏMİ ÖDƏNİLƏN</td>
-                <td>${paid} AZN</td>
+              <tr style="background: #f8fafc; font-weight: 700;">
+                <td colspan="2" style="border: 1px solid #e2e8f0; padding: 8px;">CƏMİ ÖDƏNİLƏN</td>
+                <td style="border: 1px solid #e2e8f0; padding: 8px;">${formatAmount(paid)} AZN</td>
               </tr>
             </tbody>
           </table>
         ` : ''}
 
-        <div class="signature-section">
+        <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 13px;">
           <div>
-            <p>Məsul şəxsin imzası:</p>
-            <div class="signature-box">Direktor</div>
+            <p style="margin: 0;">Məsul şəxsin imzası:</p>
+            <div style="border-top: 1px solid #94a3b8; width: 180px; text-align: center; padding-top: 6px; margin-top: 35px; font-weight: 600;">Direktor</div>
           </div>
           <div>
-            <p>Təhvil alan müəllimənin imzası:</p>
-            <div class="signature-box">${t.name}</div>
+            <p style="margin: 0;">Təhvil alan müəllimənin imzası:</p>
+            <div style="border-top: 1px solid #94a3b8; width: 180px; text-align: center; padding-top: 6px; margin-top: 35px; font-weight: 600;">${t.name}</div>
           </div>
         </div>
-      </body>
-      </html>
-    `);
-    printWin.document.close();
+      `;
+    }
+    this.openModal("modal-print-preview");
   }
 };
 

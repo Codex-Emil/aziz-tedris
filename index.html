@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="icon" type="image/png" href="logo.png">
   <title>Əziz Tədris Mərkəzi - Ödəniş Sistemi</title>
-  <link rel="stylesheet" href="style.css?v=8.8_print_20260731">
+  <link rel="stylesheet" href="style.css?v=8.9_inapp_print_20260731">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <script>
@@ -1364,8 +1364,31 @@
     </div>
   </div>
 
-  <script src="db_v8.4.js?v=8.8_print_20260731"></script>
-  <script src="app_v8.4.js?v=8.8_print_20260731"></script>
+  <!-- MODAL: PRINT PREVIEW -->
+  <div id="modal-print-preview" class="modal-overlay">
+    <div class="modal-container" style="max-width: 850px; width: 95%;">
+      <div class="modal-header no-print">
+        <h3 class="modal-title">Çap Hesabatına Baxış</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 1.5rem; max-height: 75vh; overflow-y: auto;">
+        <div id="print-preview-content" class="print-paper-view" style="background: white; color: #1e293b; padding: 25px; border-radius: 8px; font-family: 'Segoe UI', Arial, sans-serif;">
+          <!-- Dynamic Print Document Content -->
+        </div>
+      </div>
+      <div class="modal-footer no-print" style="display: flex; justify-content: space-between; align-items: center;">
+        <button type="button" class="btn btn-secondary close-modal-btn">Bağla / İmtina</button>
+        <button type="button" class="btn btn-primary" onclick="window.print()" style="background: #6366f1; color: white;">🖨️ Çapa Göndər</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="db_v8.4.js?v=8.9_inapp_print_20260731"></script>
+  <script src="app_v8.4.js?v=8.9_inapp_print_20260731"></script>
   <script>
     // Canlı vaxt göstəricisi
     function updateClock() {

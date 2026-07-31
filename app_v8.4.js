@@ -584,7 +584,8 @@ const App = {
     document.getElementById("teacher-payout-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const teacherId = document.getElementById("payout-teacher-id").value;
-      const amount = Number(document.getElementById("payout-amount").value) || 0;
+      const rawVal = (document.getElementById("payout-amount").value || "").toString().replace(',', '.');
+      const amount = Number(rawVal) || 0;
       const date = document.getElementById("payout-date").value;
       
       if (!teacherId || amount <= 0 || !date) {
@@ -2491,10 +2492,11 @@ const App = {
     document.getElementById("expense-form").onsubmit = (e) => {
       e.preventDefault();
       const id = document.getElementById("expense-id").value;
+      const rawAmt = (document.getElementById("expense-amount").value || "").toString().replace(',', '.');
       const expense = {
         id: id || null,
         title: document.getElementById("expense-title").value.trim(),
-        amount: Number(document.getElementById("expense-amount").value) || 0,
+        amount: Number(rawAmt) || 0,
         date: document.getElementById("expense-date").value
       };
 

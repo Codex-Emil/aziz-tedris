@@ -3510,8 +3510,27 @@ const App = {
         </div>
       `;
     }
-    this.openModal("modal-print-preview");
-  },
+  exportTeacherExcel(teacherId) {
+    const curMonth = window.DB.getCurrentMonth();
+    const formattedMonth = formatMonth(curMonth);
+    const payments = window.DB.getPayments();
+    const teachers = window.DB.getTeachers();
+    const payouts = window.DB.getTeacherPayouts();
+    
+    const t = teachers.find(teach => teach.id === teacherId);
+    if (!t) return;
+
+    const teacherPayments = payments.filter(p => p.teacherId === t.id && (p.paymentStatus === "Ödənildi" || p.paymentStatus === "Qismən ödənilib") && isDateInMonth(p.paymentDate, curMonth));
+    const students = window.DB.getStudents();
+    const activeStudentIds = new Set(students.filter(s => s.status === "Aktiv").map(s => s.id));
+    const stdCount = [...new Set(payments.filter(p => p.teacherId === t.id && activeStudentIds.has(p.studentId)).map(p => p.studentId))].length;
+    
+    const revenue = teacherPayments.reduce((sum, p) => sum + getPaymentRevenue(p), 0);
+    const sharePercent = t.sharePercent || 50;
+    const teacherShare = revenue * (sharePercent / 100);
+    const teacherPayoutList = payouts[t.id] || [];
+    const paid = teacherPayoutList.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    const due = teacherShare - paid;
 
     const esc = (s) => (s === null || s === undefined) ? "" : String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 

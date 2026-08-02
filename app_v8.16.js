@@ -1101,13 +1101,17 @@ const App = {
       const displayName = student ? `${student.name} ${student.surname || ""}`.trim() : p.studentName;
 
       if (p.packageType === "Aylıq") {
-        if (p.paymentStatus !== "Ödənildi") {
-          const diff = getDaysDiff(p.dueDate, today);
+        const isPaidInCurMonth = (p.paymentStatus === "Ödənildi") && p.paymentDate && p.paymentDate.includes(curMonth);
+        if (!isPaidInCurMonth) {
+          const nextDueDate = getMonthlyPaymentDueDate(p, student, curMonth);
+          const diff = getDaysDiff(nextDueDate, today);
           if (diff < 0) {
             alertList.push({
               name: displayName,
               course: p.courseName,
               details: `${Math.abs(diff)} gün gecikir`,
+              priority: 1,
+              diff: diff,
               badgeClass: "badge-unpaid"
             });
           } else if (diff === 0) {
@@ -1115,6 +1119,17 @@ const App = {
               name: displayName,
               course: p.courseName,
               details: `Bugün ödəniş günüdür`,
+              priority: 2,
+              diff: 0,
+              badgeClass: "badge-pending"
+            });
+          } else if (diff <= 5) {
+            alertList.push({
+              name: displayName,
+              course: p.courseName,
+              details: `Ödənişə ${diff} gün qalıb`,
+              priority: 3,
+              diff: diff,
               badgeClass: "badge-pending"
             });
           }
@@ -1163,6 +1178,9 @@ const App = {
         }
       }
     });
+
+    // Öncəlik sırasına görə çeşidlə (Gecikənlər ən yuxarıda!)
+    alertList.sort((a, b) => (a.priority || 2) - (b.priority || 2) || (a.diff || 0) - (b.diff || 0));
 
     const alertsContainer = document.getElementById("dash-alerts-container");
     alertsContainer.innerHTML = "";

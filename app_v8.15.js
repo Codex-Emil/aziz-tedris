@@ -236,14 +236,40 @@ function calculateSessionsOccurred(startDateStr, todayStr, weeklyFrequency, sess
     sessionDays = payment.sessionDays;
     hasManualDays = true;
   } else {
-    if (freq === 3) {
-      sessionDays = [1, 3, 5];
-    } else if (freq === 1) {
-      sessionDays = [3];
-    } else if (freq === 4) {
-      sessionDays = [1, 2, 4, 5];
-    } else if (freq >= 5) {
-      sessionDays = [1, 2, 3, 4, 5];
+    if (payment && (payment.courseId || payment.courseName) && window.DB && typeof window.DB.getCourses === 'function') {
+      const courses = window.DB.getCourses();
+      const course = courses.find(c => c.id === payment.courseId || c.name === payment.courseName);
+      if (course && course.sessionDays && course.sessionDays.length > 0) {
+        sessionDays = course.sessionDays;
+        hasManualDays = true;
+      }
+    }
+    if (!hasManualDays && payment && payment.courseName) {
+      const cName = payment.courseName.toLowerCase();
+      if (cName.includes("gimnastika")) {
+        sessionDays = [1, 3, 5];
+        hasManualDays = true;
+      } else if (cName.includes("rəsm")) {
+        sessionDays = [2, 5];
+        hasManualDays = true;
+      } else if (cName.includes("psixoloq") || cName.includes("loqoped")) {
+        sessionDays = [1, 4];
+        hasManualDays = true;
+      } else if (cName.includes("rəqs") || cName.includes("şahmat")) {
+        sessionDays = [2, 4];
+        hasManualDays = true;
+      }
+    }
+    if (!hasManualDays) {
+      if (freq === 3) {
+        sessionDays = [1, 3, 5];
+      } else if (freq === 1) {
+        sessionDays = [3];
+      } else if (freq === 4) {
+        sessionDays = [1, 2, 4, 5];
+      } else if (freq >= 5) {
+        sessionDays = [1, 2, 3, 4, 5];
+      }
     }
   }
 
@@ -1046,7 +1072,14 @@ const App = {
     document.getElementById("dash-net-profit").textContent = formatAmount(netProfit) + " AZN";
 
     // 3. Bildirişlər və Gecikənlər siyahısı
-    const today = getTodayStr();
+    const curMonth = window.DB.getCurrentMonth();
+    const activeMonth = window.DB.getCurrentMonth();
+    let today = getTodayStr();
+    if (this.selectedMonth && this.selectedMonth !== activeMonth) {
+      const [year, month] = this.selectedMonth.split("-").map(Number);
+      const lastDay = new Date(year, month, 0).getDate();
+      today = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+    }
     const alertList = []; // { studentName, type, details, badgeClass }
 
     payments.forEach(p => {

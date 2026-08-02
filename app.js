@@ -2956,29 +2956,29 @@ const App = {
 
     const teacherTableRows = teacherRows.map(tr => `
       <tr>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold;">${tr.name}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: center;">${tr.stdCount} tələbə</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right;">${formatAmount(tr.revenue)} AZN</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: center;">${tr.sharePercent}%</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; color: #4f46e5; font-weight: bold;">${formatAmount(tr.teacherShare)} AZN</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; color: #059669; font-weight: bold;">${formatAmount(tr.paid)} AZN</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; color: #b45309; font-weight: bold;">${formatAmount(tr.due)} AZN</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; background-color: #ffffff;">${tr.name}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: center; background-color: #ffffff;">${tr.stdCount} tələbə</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: right; background-color: #ffffff;">${formatAmount(tr.revenue)} AZN</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: center; background-color: #ffffff;">${tr.sharePercent}%</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: right; color: #4f46e5; font-weight: bold; background-color: #ffffff;">${formatAmount(tr.teacherShare)} AZN</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: right; color: #059669; font-weight: bold; background-color: #ffffff;">${formatAmount(tr.paid)} AZN</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: right; color: #b45309; font-weight: bold; background-color: #ffffff;">${formatAmount(tr.due)} AZN</td>
       </tr>
     `).join("");
 
     const expenseTableRows = expenses.map(exp => `
       <tr>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">${exp.date || "-"}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold;">${exp.title || ""}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; font-weight: bold;">${formatAmount(exp.amount)} AZN</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; background-color: #ffffff;">${exp.date || "-"}</td>
+        <td colspan="4" style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; background-color: #ffffff;">${exp.title || ""}</td>
+        <td colspan="2" style="border: 1px solid #cbd5e1; padding: 6px; text-align: right; font-weight: bold; color: #ef4444; background-color: #ffffff;">${formatAmount(exp.amount)} AZN</td>
       </tr>
     `).join("");
 
     const groupedExpenseTableRows = groupedExpensesList.map(g => `
       <tr>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold; color: #0f172a;">${g.title}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: center;">${g.count} əməliyyat</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; font-weight: bold; color: #047857;">${formatAmount(g.total)} AZN</td>
+        <td colspan="3" style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; color: #0f172a; background-color: #ffffff;">${g.title}</td>
+        <td colspan="2" style="border: 1px solid #cbd5e1; padding: 6px; text-align: center; background-color: #ffffff;">${g.count} əməliyyat</td>
+        <td colspan="2" style="border: 1px solid #cbd5e1; padding: 6px; text-align: right; font-weight: bold; color: #047857; background-color: #ffffff;">${formatAmount(g.total)} AZN</td>
       </tr>
     `).join("");
 
@@ -2995,12 +2995,14 @@ const App = {
          <x:ExcelWorksheet>
           <x:Name>Maliyyə Hesabatı</x:Name>
           <x:WorksheetOptions>
+           <x:FitToPage/>
            <x:Print>
             <x:ValidPrinterInfo/>
             <x:PaperSizeIndex>9</x:PaperSizeIndex>
             <x:Orientation>Landscape</x:Orientation>
+            <x:FitWidth>1</x:FitWidth>
+            <x:FitHeight>0</x:FitHeight>
            </x:Print>
-           <x:FitToPage/>
           </x:WorksheetOptions>
          </x:ExcelWorksheet>
         </x:ExcelWorksheets>
@@ -3008,135 +3010,156 @@ const App = {
       </xml>
       <![endif]-->
       <style>
-        body, table, td, th { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #0f172a; }
-        .header-title { font-size: 16pt; font-weight: bold; color: #1e1b4b; text-transform: uppercase; }
-        .subtitle { font-size: 11pt; font-weight: bold; color: #4f46e5; text-transform: uppercase; }
-        .section-header { font-size: 12pt; font-weight: bold; color: #1e1b4b; background-color: #e0e7ff; padding: 6px 10px; margin-top: 15px; border-left: 4px solid #4f46e5; }
-        table { border-collapse: collapse; width: 100%; margin-top: 8px; }
-        th { background-color: #1e1b4b; color: #ffffff; font-weight: bold; padding: 8px; border: 1px solid #0f172a; text-align: left; }
-        td { border: 1px solid #cbd5e1; padding: 6px 8px; }
-        .total-row { background-color: #f1f5f9; font-weight: bold; }
-        .net-profit { background-color: #ecfdf5; color: #047857; font-weight: bold; font-size: 13pt; border: 2px solid #10b981; }
+        body, table, td, th { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #0f172a; }
+        table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+        th { background-color: #1e1b4b; color: #ffffff; font-weight: bold; padding: 8px; border: 1px solid #0f172a; text-align: center; }
+        td { border: 1px solid #cbd5e1; padding: 6px; }
       </style>
       </head>
-      <body>
-        <div class="header-title">ƏZİZ TƏDRİS MƏRKƏZİ</div>
-        <div class="subtitle">RƏSMİ MALİYYƏ VƏ İCRA HESABATI (DİREKTOR BLANKI)</div>
-        <div style="margin-top: 4px; font-size: 10pt; color: #475569;">
-          Dövr: <b>${formattedMonth}</b> | İxrac Tarixi: <b>${new Date().toLocaleDateString('az-AZ')}</b> | Status: <b>TƏSDİQLƏNMİŞ</b>
-        </div>
-        <br>
+      <body style="padding: 10px;">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <col width="220" />
+          <col width="110" />
+          <col width="130" />
+          <col width="100" />
+          <col width="130" />
+          <col width="130" />
+          <col width="140" />
 
-        <div class="section-header">1. İCRAÇI MALİYYƏ GÖSTƏRİCİLƏRİ (KPI)</div>
-        <table>
-          <thead>
+          <!-- HEADER BANNER -->
+          <tr>
+            <td colspan="7" style="background-color: #1e1b4b; color: #ffffff; font-size: 16pt; font-weight: bold; text-align: center; padding: 12px; border: 1px solid #1e1b4b;">
+              ƏZİZ TƏDRİS MƏRKƏZİ - RƏSMİ MALİYYƏ VƏ İCRA HESABATI
+            </td>
+          </tr>
+          <tr>
+            <td colspan="7" style="background-color: #e0e7ff; color: #3730a3; font-size: 10pt; font-weight: bold; text-align: center; padding: 6px; border: 1px solid #c7d2fe;">
+              Hesabat Dövrü: <b>${formattedMonth}</b> &nbsp;|&nbsp; İxrac Tarixi: <b>${new Date().toLocaleDateString('az-AZ')}</b> &nbsp;|&nbsp; Status: <b>TƏSDİQLƏNMİŞ</b>
+            </td>
+          </tr>
+
+          <!-- SPACER -->
+          <tr><td colspan="7" style="border: none; height: 12px;"></td></tr>
+
+          <!-- SECTION 1: FINANCIAL KPI -->
+          <tr>
+            <td colspan="7" style="background-color: #1e1b4b; color: #ffffff; font-size: 11pt; font-weight: bold; padding: 7px 10px; border: 1px solid #1e1b4b;">
+              1. İCRAÇI MALİYYƏ GÖSTƏRİCİLƏRİ (KPI)
+            </td>
+          </tr>
+          <tr>
+            <th colspan="3" style="background-color: #334155; color: #ffffff; text-align: left; padding: 6px;">Göstərici Adı</th>
+            <th colspan="2" style="background-color: #334155; color: #ffffff; text-align: right; padding: 6px;">Məbləğ (AZN)</th>
+            <th colspan="2" style="background-color: #334155; color: #ffffff; text-align: left; padding: 6px;">Qeyd / Açıqlama</th>
+          </tr>
+          <tr>
+            <td colspan="3" style="font-weight: bold;">Ümumi Cəlb Olunan Gəlir</td>
+            <td colspan="2" style="text-align: right; font-weight: bold;">${formatAmount(totalRevenueSum)} AZN</td>
+            <td colspan="2" style="color: #64748b;">Tələbələrdən toplanan ümumi məbləğ</td>
+          </tr>
+          <tr>
+            <td colspan="3" style="font-weight: bold;">Müəllimə Ödənişləri (Payı)</td>
+            <td colspan="2" style="text-align: right; font-weight: bold; color: #4f46e5;">${formatAmount(totalTeacherShareSum)} AZN</td>
+            <td colspan="2" style="color: #64748b;">Müəllimələrin ümumi hesablanmış qazancı</td>
+          </tr>
+          <tr>
+            <td colspan="3" style="font-weight: bold;">Mərkəzin Payı (Brutto)</td>
+            <td colspan="2" style="text-align: right; font-weight: bold; color: #0284c7;">${formatAmount(centerShare)} AZN</td>
+            <td colspan="2" style="color: #64748b;">Toplanan gəlirdən müəllimə payı çıxıldıqdan sonra</td>
+          </tr>
+          <tr>
+            <td colspan="3" style="font-weight: bold;">Tədrisin Digər Xərcləri</td>
+            <td colspan="2" style="text-align: right; font-weight: bold; color: #ef4444;">${formatAmount(totalExpenses)} AZN</td>
+            <td colspan="2" style="color: #64748b;">Mərkəzin bütün əməliyyat xərcləri</td>
+          </tr>
+          <tr style="background-color: #ecfdf5;">
+            <td colspan="3" style="font-size: 11pt; font-weight: bold; color: #047857;">MƏRKƏZİN XALİS MƏNFƏƏTİ (NET QALIQ)</td>
+            <td colspan="2" style="font-size: 13pt; font-weight: bold; color: #047857; text-align: right;">${formatAmount(netProfit)} AZN</td>
+            <td colspan="2" style="font-size: 9pt; color: #065f46; font-weight: bold;">Mərkəzin payından bütün xərclər çıxıldıqdan sonra net mənfəət</td>
+          </tr>
+
+          <!-- SPACER -->
+          <tr><td colspan="7" style="border: none; height: 14px;"></td></tr>
+
+          <!-- SECTION 2: TEACHERS BREAKDOWN -->
+          <tr>
+            <td colspan="7" style="background-color: #1e1b4b; color: #ffffff; font-size: 11pt; font-weight: bold; padding: 7px 10px; border: 1px solid #1e1b4b;">
+              2. MÜƏLLİMƏLƏR ÜZRƏ PAY BÖLGÜSÜ
+            </td>
+          </tr>
+          <tr>
+            <th style="text-align: left;">Müəllimə Adı</th>
+            <th style="text-align: center;">Tələbə Sayı</th>
+            <th style="text-align: right;">Cəlb Olunan</th>
+            <th style="text-align: center;">Pay Faizi</th>
+            <th style="text-align: right;">Müəllimə Payı</th>
+            <th style="text-align: right;">Ödənilən</th>
+            <th style="text-align: right;">Qalıq Borc</th>
+          </tr>
+          ${teacherTableRows}
+          <tr style="background-color: #f1f5f9; font-weight: bold;">
+            <td>CƏMİ YEKUN</td>
+            <td style="text-align: center;">${totalStudentsSum} tələbə</td>
+            <td style="text-align: right;">${formatAmount(totalRevenueSum)} AZN</td>
+            <td style="text-align: center;">-</td>
+            <td style="text-align: right; color: #4f46e5;">${formatAmount(totalTeacherShareSum)} AZN</td>
+            <td style="text-align: right; color: #059669;">${formatAmount(totalPaidSum)} AZN</td>
+            <td style="text-align: right; color: #b45309;">${formatAmount(totalDueSum)} AZN</td>
+          </tr>
+
+          <!-- SPACER -->
+          <tr><td colspan="7" style="border: none; height: 14px;"></td></tr>
+
+          <!-- SECTION 3: EXPENSES DETAILS -->
+          ${expenses.length > 0 ? `
             <tr>
-              <th>Göstərici Adı</th>
-              <th style="text-align: right;">Məbləğ (AZN)</th>
-              <th>Açıqlama / Qeyd</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Ümumi Cəlb Olunan Gəlir</td>
-              <td style="text-align: right; font-weight: bold;">${formatAmount(totalRevenueSum)} AZN</td>
-              <td>Tələbələrdən toplanan ümumi məbləğ</td>
+              <td colspan="7" style="background-color: #334155; color: #ffffff; font-size: 11pt; font-weight: bold; padding: 7px 10px; border: 1px solid #334155;">
+                3. TƏDRİSİN XƏRCLƏRİ (TƏFƏRRÜATLI SİYAHI)
+              </td>
             </tr>
             <tr>
-              <td>Müəllimə Ödənişləri (Payı)</td>
-              <td style="text-align: right; font-weight: bold;">${formatAmount(totalTeacherShareSum)} AZN</td>
-              <td>Müəllimələrin ümumi hesablanmış qazancı</td>
+              <th style="text-align: left;">Tarix</th>
+              <th colspan="4" style="text-align: left;">Xərcin Təsviri / Adı</th>
+              <th colspan="2" style="text-align: right;">Məbləğ (AZN)</th>
+            </tr>
+            ${expenseTableRows}
+            <tr style="background-color: #f1f5f9; font-weight: bold;">
+              <td colspan="5">CƏMİ XƏRCLƏR</td>
+              <td colspan="2" style="text-align: right; color: #ef4444; font-size: 11pt;">${formatAmount(totalExpenses)} AZN</td>
+            </tr>
+
+            <!-- SPACER -->
+            <tr><td colspan="7" style="border: none; height: 14px;"></td></tr>
+
+            <!-- SECTION 4: GROUPED EXPENSES -->
+            <tr>
+              <td colspan="7" style="background-color: #065f46; color: #ffffff; font-size: 11pt; font-weight: bold; padding: 7px 10px; border: 1px solid #065f46;">
+                4. EYNİ ADLI XƏRCLƏRİN ÜMUMİLƏŞDİRİLMİŞ XÜLASƏSİ (QRUPLAŞDIRILMIŞ)
+              </td>
             </tr>
             <tr>
-              <td>Mərkəzin Payı (Brutto)</td>
-              <td style="text-align: right; font-weight: bold;">${formatAmount(centerShare)} AZN</td>
-              <td>Toplanan gəlirdən müəllimə payı çıxıldıqdan sonra</td>
+              <th colspan="3" style="text-align: left; background-color: #047857; color: #ffffff;">Xərc Adı / Kateqoriya</th>
+              <th colspan="2" style="text-align: center; background-color: #047857; color: #ffffff;">Əməliyyat Sayı</th>
+              <th colspan="2" style="text-align: right; background-color: #047857; color: #ffffff;">Cəmi Məbləğ (AZN)</th>
             </tr>
-            <tr>
-              <td>Tədrisin Digər Xərcləri</td>
-              <td style="text-align: right; font-weight: bold;">${formatAmount(totalExpenses)} AZN</td>
-              <td>Mərkəzin bütün əməliyyat xərcləri</td>
+            ${groupedExpenseTableRows}
+            <tr style="background-color: #ecfdf5; font-weight: bold;">
+              <td colspan="3" style="color: #047857;">CƏMİ QRUPLAŞDIRILMIŞ XƏRC</td>
+              <td colspan="2" style="text-align: center; color: #047857;">${expenses.length} əməliyyat</td>
+              <td colspan="2" style="text-align: right; color: #047857; font-size: 11pt;">${formatAmount(totalExpenses)} AZN</td>
             </tr>
-            <tr class="net-profit">
-              <td>MƏRKƏZİN XALİS MƏNFƏƏTİ (NET QALIQ)</td>
-              <td style="text-align: right; font-size: 14pt; font-weight: bold; color: #047857;">${formatAmount(netProfit)} AZN</td>
-              <td>Mərkəzin payından bütün xərclər çıxıldıqdan sonra net qalıq mənfəət</td>
-            </tr>
-          </tbody>
+          ` : ''}
+
+          <!-- SPACER -->
+          <tr><td colspan="7" style="border: none; height: 20px;"></td></tr>
+
+          <!-- SIGNATURE ROW -->
+          <tr>
+            <td colspan="7" style="font-weight: bold; font-size: 11pt; border: none; padding-top: 15px;">
+              Hesabatı Tərtib Etdi (Direktor): ____________________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; İmza / Tarix
+            </td>
+          </tr>
         </table>
-        <br>
-
-        <div class="section-header">2. MÜƏLLİMƏLƏR ÜZRƏ PAY BÖLGÜSÜ</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Müəllimə</th>
-              <th style="text-align: center;">Tələbə Sayı</th>
-              <th style="text-align: right;">Cəlb Olunan Məbləğ</th>
-              <th style="text-align: center;">Pay Faizi (%)</th>
-              <th style="text-align: right;">Müəllimə Payı</th>
-              <th style="text-align: right;">Ödənilən Məbləğ</th>
-              <th style="text-align: right;">Qalıq Borc</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${teacherTableRows}
-            <tr class="total-row">
-              <td>CƏMİ YEKUN</td>
-              <td style="text-align: center;">${totalStudentsSum} tələbə</td>
-              <td style="text-align: right;">${formatAmount(totalRevenueSum)} AZN</td>
-              <td style="text-align: center;">-</td>
-              <td style="text-align: right; color: #4f46e5;">${formatAmount(totalTeacherShareSum)} AZN</td>
-              <td style="text-align: right; color: #059669;">${formatAmount(totalPaidSum)} AZN</td>
-              <td style="text-align: right; color: #b45309;">${formatAmount(totalDueSum)} AZN</td>
-            </tr>
-          </tbody>
-        </table>
-        <br>
-
-        ${expenses.length > 0 ? `
-          <div class="section-header">3. TƏDRİSİN XƏRCLƏRİ (TƏFƏRRÜATLI SİYAHI)</div>
-          <table>
-            <thead>
-              <tr>
-                <th style="width: 120px;">Tarix</th>
-                <th>Xərcin Təsviri / Adı</th>
-                <th style="text-align: right; width: 160px;">Məbləğ (AZN)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${expenseTableRows}
-              <tr class="total-row">
-                <td colspan="2">CƏMİ XƏRCLƏR</td>
-                <td style="text-align: right; color: #ef4444;">${formatAmount(totalExpenses)} AZN</td>
-              </tr>
-            </tbody>
-          </table>
-          <br>
-
-          <div class="section-header">4. EYNİ ADLI XƏRCLƏRİN ÜMUMİLƏŞDİRİLMİŞ XÜLASƏSİ (QRUPLAŞDIRILMIŞ)</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Xərc Adı / Kateqoriya</th>
-                <th style="text-align: center; width: 160px;">Əməliyyat Sayı</th>
-                <th style="text-align: right; width: 180px;">Cəmi Məbləğ (AZN)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${groupedExpenseTableRows}
-              <tr class="total-row" style="background-color: #ecfdf5; color: #047857;">
-                <td style="color: #047857;">CƏMİ QRUPLAŞDIRILMIŞ XƏRC</td>
-                <td style="text-align: center; color: #047857;">${expenses.length} əməliyyat</td>
-                <td style="text-align: right; color: #047857; font-size: 12pt;">${formatAmount(totalExpenses)} AZN</td>
-              </tr>
-            </tbody>
-          </table>
-          <br>
-        ` : ''}
-
-        <br>
-        <div style="font-size: 11pt; font-weight: bold;">Hesabatı Tərtib Etdi (Direktor): _______________________</div>
       </body>
       </html>
     `;
@@ -3404,25 +3427,25 @@ const App = {
       const paidVal = getPaymentRevenue(p);
       const student = students.find(s => s.id === p.studentId);
       const displayName = student ? `${student.name} ${student.surname || ""}`.trim() : p.studentName;
-      const renewedTag = p.isRenewed ? " (Yenilənmiş paket)" : "";
+      const renewedTag = p.isRenewed ? " (Yenilənmiş)" : "";
       const pkgStr = (p.packageType === "Seans" ? `Seans (${p.sessionsCount || 8} seans) (${p.groupType})` : `Aylıq (${p.groupType})`) + renewedTag;
       return `
         <tr>
-          <td style="border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold;">${displayName}</td>
-          <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">${p.courseName}</td>
-          <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">${pkgStr}</td>
-          <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">Həftədə ${p.weeklyFrequency} dəfə</td>
-          <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">${p.paymentDate}</td>
-          <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; font-weight: bold;">${formatAmount(paidVal)} AZN</td>
+          <td style="border: 1px solid #cbd5e1; padding: 6px; font-weight: bold; background-color: #ffffff;">${displayName}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 6px; background-color: #ffffff;">${p.courseName}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 6px; background-color: #ffffff;">${pkgStr}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 6px; background-color: #ffffff;">Həftədə ${p.weeklyFrequency} dəfə</td>
+          <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: center; background-color: #ffffff;">${p.paymentDate}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: right; font-weight: bold; background-color: #ffffff;">${formatAmount(paidVal)} AZN</td>
         </tr>
       `;
     }).join("");
 
     const payoutTableRows = teacherPayoutList.map(log => `
       <tr>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">${log.date}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">Nağd/Köçürmə (Müəllimə ödənişi)</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; font-weight: bold; color: #059669;">${formatAmount(log.amount)} AZN</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; background-color: #ffffff;">${log.date}</td>
+        <td colspan="4" style="border: 1px solid #cbd5e1; padding: 6px; background-color: #ffffff;">Nağd/Köçürmə (Müəllimə ödənişi)</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: right; font-weight: bold; color: #059669; background-color: #ffffff;">${formatAmount(log.amount)} AZN</td>
       </tr>
     `).join("");
 
@@ -3439,12 +3462,14 @@ const App = {
          <x:ExcelWorksheet>
           <x:Name>${t.name} Hesabatı</x:Name>
           <x:WorksheetOptions>
+           <x:FitToPage/>
            <x:Print>
             <x:ValidPrinterInfo/>
             <x:PaperSizeIndex>9</x:PaperSizeIndex>
             <x:Orientation>Landscape</x:Orientation>
+            <x:FitWidth>1</x:FitWidth>
+            <x:FitHeight>0</x:FitHeight>
            </x:Print>
-           <x:FitToPage/>
           </x:WorksheetOptions>
          </x:ExcelWorksheet>
         </x:ExcelWorksheets>
@@ -3452,115 +3477,135 @@ const App = {
       </xml>
       <![endif]-->
       <style>
-        body, table, td, th { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #0f172a; }
-        .header-title { font-size: 16pt; font-weight: bold; color: #1e1b4b; text-transform: uppercase; }
-        .subtitle { font-size: 11pt; font-weight: bold; color: #4f46e5; text-transform: uppercase; }
-        .section-header { font-size: 12pt; font-weight: bold; color: #1e1b4b; background-color: #e0e7ff; padding: 6px 10px; margin-top: 15px; border-left: 4px solid #4f46e5; }
-        table { border-collapse: collapse; width: 100%; margin-top: 8px; }
-        th { background-color: #1e1b4b; color: #ffffff; font-weight: bold; padding: 8px; border: 1px solid #0f172a; text-align: left; }
-        td { border: 1px solid #cbd5e1; padding: 6px 8px; }
-        .total-row { background-color: #f1f5f9; font-weight: bold; }
+        body, table, td, th { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #0f172a; }
+        table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+        th { background-color: #1e1b4b; color: #ffffff; font-weight: bold; padding: 8px; border: 1px solid #0f172a; text-align: center; }
+        td { border: 1px solid #cbd5e1; padding: 6px; }
       </style>
       </head>
-      <body>
-        <div class="header-title">ƏZİZ TƏDRİS MƏRKƏZİ</div>
-        <div class="subtitle">MÜƏLLİMƏ AYLIQ PAY HESABATI VƏRƏQİ</div>
-        <div style="margin-top: 4px; font-size: 10pt; color: #475569;">
-          Müəllimə: <b>${t.name}</b> | Hesabat Dövrü: <b>${formattedMonth}</b> | İxrac Tarixi: <b>${new Date().toLocaleDateString('az-AZ')}</b>
-        </div>
-        <br>
+      <body style="padding: 10px;">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <col width="200" />
+          <col width="140" />
+          <col width="160" />
+          <col width="120" />
+          <col width="120" />
+          <col width="140" />
 
-        <div class="section-header">1. MALİYYƏ XÜLASƏSİ</div>
-        <table>
-          <thead>
+          <!-- HEADER BANNER -->
+          <tr>
+            <td colspan="6" style="background-color: #1e1b4b; color: #ffffff; font-size: 16pt; font-weight: bold; text-align: center; padding: 12px; border: 1px solid #1e1b4b;">
+              ƏZİZ TƏDRİS MƏRKƏZİ - MÜƏLLİMƏ AYLIQ PAY HESABATI VƏRƏQİ
+            </td>
+          </tr>
+          <tr>
+            <td colspan="6" style="background-color: #e0e7ff; color: #3730a3; font-size: 10pt; font-weight: bold; text-align: center; padding: 6px; border: 1px solid #c7d2fe;">
+              Müəllimə: <b>${t.name}</b> &nbsp;|&nbsp; Hesabat Dövrü: <b>${formattedMonth}</b> &nbsp;|&nbsp; İxrac Tarixi: <b>${new Date().toLocaleDateString('az-AZ')}</b>
+            </td>
+          </tr>
+
+          <!-- SPACER -->
+          <tr><td colspan="6" style="border: none; height: 12px;"></td></tr>
+
+          <!-- SECTION 1: FINANCIAL SUMMARY -->
+          <tr>
+            <td colspan="6" style="background-color: #1e1b4b; color: #ffffff; font-size: 11pt; font-weight: bold; padding: 7px 10px; border: 1px solid #1e1b4b;">
+              1. MALİYYƏ XÜLASƏSİ
+            </td>
+          </tr>
+          <tr>
+            <th colspan="3" style="background-color: #334155; color: #ffffff; text-align: left; padding: 6px;">Göstərici Adı</th>
+            <th style="background-color: #334155; color: #ffffff; text-align: right; padding: 6px;">Dəyər (AZN / Say)</th>
+            <th colspan="2" style="background-color: #334155; color: #ffffff; text-align: left; padding: 6px;">Qeyd / Açıqlama</th>
+          </tr>
+          <tr>
+            <td colspan="3" style="font-weight: bold;">Aktiv Tələbə Sayı</td>
+            <td style="text-align: right; font-weight: bold;">${stdCount} tələbə</td>
+            <td colspan="2" style="color: #64748b;">Davam edən tələbələrin sayı</td>
+          </tr>
+          <tr>
+            <td colspan="3" style="font-weight: bold;">Cəlb Olunan Ümumi Məbləğ</td>
+            <td style="text-align: right; font-weight: bold;">${formatAmount(revenue)} AZN</td>
+            <td colspan="2" style="color: #64748b;">Tələbələr tərəfindən ödənilən ümumi məbləğ</td>
+          </tr>
+          <tr>
+            <td colspan="3" style="font-weight: bold;">Müəllimənin Pay Faizi</td>
+            <td style="text-align: right; font-weight: bold;">${sharePercent}%</td>
+            <td colspan="2" style="color: #64748b;">Müəllimənin mərkəz ilə razılaşdırılmış payı</td>
+          </tr>
+          <tr style="background-color: #e0e7ff; font-weight: bold;">
+            <td colspan="3" style="color: #3730a3;">Hesablanmış Müəllimə Qazancı</td>
+            <td style="text-align: right; font-size: 11pt; color: #3730a3;">${formatAmount(teacherShare)} AZN</td>
+            <td colspan="2" style="color: #3730a3;">Cəlb olunan məbləğdən müəlliməyə çatacaq pay</td>
+          </tr>
+          <tr style="background-color: #ecfdf5; font-weight: bold;">
+            <td colspan="3" style="color: #047857;">Müəlliməyə Ödənilən Məbləğ (Cəmi)</td>
+            <td style="text-align: right; font-size: 11pt; color: #047857;">${formatAmount(paid)} AZN</td>
+            <td colspan="2" style="color: #047857;">Təhvil verilmiş nağd və ya köçürmə ödənişlər</td>
+          </tr>
+          <tr style="background-color: ${due > 0 ? '#fffbeb' : (due < 0 ? '#fef2f2' : '#f0fdf4')}; font-weight: bold;">
+            <td colspan="3" style="color: ${due > 0 ? '#b45309' : (due < 0 ? '#991b1b' : '#166534')};">Qalıq Borc (Ödəniləcək Məbləğ)</td>
+            <td style="text-align: right; font-size: 11pt; color: ${due > 0 ? '#b45309' : (due < 0 ? '#991b1b' : '#166534')};">${formatAmount(due)} AZN</td>
+            <td colspan="2" style="color: ${due > 0 ? '#b45309' : (due < 0 ? '#991b1b' : '#166534')};">Mərkəzin müəlliməyə qalan borcu</td>
+          </tr>
+
+          <!-- SPACER -->
+          <tr><td colspan="6" style="border: none; height: 14px;"></td></tr>
+
+          <!-- SECTION 2: STUDENTS LIST -->
+          ${teacherPayments.length > 0 ? `
             <tr>
-              <th>Göstərici Adı</th>
-              <th style="text-align: right;">Dəyər (AZN / Say)</th>
-              <th>Qeyd</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Aktiv Tələbə Sayı</td>
-              <td style="text-align: right; font-weight: bold;">${stdCount} tələbə</td>
-              <td>Davam edən tələbələrin sayı</td>
+              <td colspan="6" style="background-color: #1e1b4b; color: #ffffff; font-size: 11pt; font-weight: bold; padding: 7px 10px; border: 1px solid #1e1b4b;">
+                2. ÖDƏNİŞ EDİLƏN DƏRSLƏR VƏ TƏLƏBƏLƏRİN SİYAHISI
+              </td>
             </tr>
             <tr>
-              <td>Cəlb Olunan Ümumi Məbləğ</td>
-              <td style="text-align: right; font-weight: bold;">${formatAmount(revenue)} AZN</td>
-              <td>Tələbələr tərəfindən ödənilən ümumi məbləğ</td>
+              <th style="text-align: left;">Tələbə Adı Soyadı</th>
+              <th style="text-align: left;">Fənn</th>
+              <th style="text-align: left;">Paket Növü</th>
+              <th style="text-align: left;">Dərs Tezliyi</th>
+              <th style="text-align: center;">Ödəniş Tarixi</th>
+              <th style="text-align: right;">Ödənilən (AZN)</th>
+            </tr>
+            ${studentTableRows}
+            <tr style="background-color: #f1f5f9; font-weight: bold;">
+              <td colspan="5">CƏMİ CƏLB OLUNAN MƏBLƏĞ</td>
+              <td style="text-align: right; color: #4f46e5; font-size: 11pt;">${formatAmount(revenue)} AZN</td>
+            </tr>
+
+            <!-- SPACER -->
+            <tr><td colspan="6" style="border: none; height: 14px;"></td></tr>
+          ` : ''}
+
+          <!-- SECTION 3: PAYOUTS HISTORY -->
+          ${teacherPayoutList.length > 0 ? `
+            <tr>
+              <td colspan="6" style="background-color: #065f46; color: #ffffff; font-size: 11pt; font-weight: bold; padding: 7px 10px; border: 1px solid #065f46;">
+                3. MÜƏLLİMƏYƏ EDİLƏN ÖDƏNİŞLƏRİN TARİXÇƏSİ
+              </td>
             </tr>
             <tr>
-              <td>Müəllimənin Pay Faizi</td>
-              <td style="text-align: right; font-weight: bold;">${sharePercent}%</td>
-              <td>Müəllimənin mərkəz ilə razılaşdırılmış payı</td>
+              <th style="text-align: left;">Tarix</th>
+              <th colspan="4" style="text-align: left;">Ödəniş Açıqlaması / Növü</th>
+              <th style="text-align: right;">Ödənilən (AZN)</th>
             </tr>
-            <tr style="background-color: #e0e7ff; font-weight: bold;">
-              <td style="color: #3730a3;">Hesablanmış Müəllimə Qazancı</td>
-              <td style="text-align: right; font-size: 12pt; color: #3730a3;">${formatAmount(teacherShare)} AZN</td>
-              <td>Cəlb olunan məbləğdən müəlliməyə çatacaq pay</td>
-            </tr>
+            ${payoutTableRows}
             <tr style="background-color: #ecfdf5; font-weight: bold;">
-              <td style="color: #047857;">Müəlliməyə Ödənilən Məbləğ (Cəmi)</td>
-              <td style="text-align: right; font-size: 12pt; color: #047857;">${formatAmount(paid)} AZN</td>
-              <td>Təhvil verilmiş nağd və ya köçürmə ödənişlər</td>
+              <td colspan="5" style="color: #047857;">CƏMİ ÖDƏNİLƏN MƏBLƏĞ</td>
+              <td style="text-align: right; color: #047857; font-size: 11pt;">${formatAmount(paid)} AZN</td>
             </tr>
-            <tr style="background-color: ${due > 0 ? '#fffbeb' : (due < 0 ? '#fef2f2' : '#f0fdf4')}; font-weight: bold;">
-              <td style="color: ${due > 0 ? '#b45309' : (due < 0 ? '#991b1b' : '#166534')};">Qalıq Borc (Ödəniləcək Məbləğ)</td>
-              <td style="text-align: right; font-size: 12pt; color: ${due > 0 ? '#b45309' : (due < 0 ? '#991b1b' : '#166534')};">${formatAmount(due)} AZN</td>
-              <td>Mərkəzin müəlliməyə qalan borcu</td>
-            </tr>
-          </tbody>
+
+            <!-- SPACER -->
+            <tr><td colspan="6" style="border: none; height: 20px;"></td></tr>
+          ` : ''}
+
+          <!-- SIGNATURE ROW -->
+          <tr>
+            <td colspan="6" style="font-weight: bold; font-size: 10pt; border: none; padding-top: 15px;">
+              Təhvil Verən (Direktor): _______________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Təhvil Alan (Müəllimə - ${t.name}): _______________________
+            </td>
+          </tr>
         </table>
-        <br>
-
-        ${teacherPayments.length > 0 ? `
-          <div class="section-header">2. ÖDƏNİŞ EDİLƏN DƏRSLƏR VƏ TƏLƏBƏLƏRİN SİYAHISI</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Tələbə Adı Soyadı</th>
-                <th>Fənn</th>
-                <th>Paket Növü</th>
-                <th>Dərs Tezliyi</th>
-                <th>Ödəniş Tarixi</th>
-                <th style="text-align: right;">Ödənilən Məbləğ (AZN)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${studentTableRows}
-              <tr class="total-row">
-                <td colspan="5">CƏMİ CƏLB OLUNAN</td>
-                <td style="text-align: right; color: #4f46e5; font-size: 12pt;">${formatAmount(revenue)} AZN</td>
-              </tr>
-            </tbody>
-          </table>
-          <br>
-        ` : ''}
-
-        ${teacherPayoutList.length > 0 ? `
-          <div class="section-header">3. MÜƏLLİMƏYƏ EDİLƏN ÖDƏNİŞLƏRİN TARİXÇƏSİ</div>
-          <table>
-            <thead>
-              <tr>
-                <th style="width: 120px;">Tarix</th>
-                <th>Ödəniş Açıqlaması / Növü</th>
-                <th style="text-align: right; width: 160px;">Ödənilən Məbləğ (AZN)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${payoutTableRows}
-              <tr class="total-row" style="background-color: #ecfdf5;">
-                <td colspan="2" style="color: #047857;">CƏMİ ÖDƏNİLƏN MƏBLƏĞ</td>
-                <td style="text-align: right; color: #047857; font-size: 12pt;">${formatAmount(paid)} AZN</td>
-              </tr>
-            </tbody>
-          </table>
-          <br>
-        ` : ''}
-
-        <br>
-        <div style="font-size: 11pt; font-weight: bold;">Təhvil Verən (Direktor): _______________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Təhvil Alan (Müəllimə - ${t.name}): _______________________</div>
       </body>
       </html>
     `;

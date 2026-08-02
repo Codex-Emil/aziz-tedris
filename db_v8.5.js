@@ -6,7 +6,7 @@
 const DB_PREFIX = "aziz_tedris_";
 
 // Cross-browser safe date parser (Safari-friendly)
-function parseSafeDate(dateStr) {
+function dbParseSafeDate(dateStr) {
   if (!dateStr) return new Date();
   const str = String(dateStr).trim();
   const datePart = str.split(/[ T]/)[0];
@@ -33,9 +33,9 @@ function parseSafeDate(dateStr) {
 }
 
 // Seans tipli dərslər üçün bitmə (növbəti ödəniş) tarixinin hesablanması
-function calculateSessionDueDate(payment) {
+function dbCalculateSessionDueDate(payment) {
   if (!payment.paymentDate || !payment.sessionsCount) return null;
-  const start = parseSafeDate(payment.paymentDate);
+  const start = dbParseSafeDate(payment.paymentDate);
   const freq = payment.weeklyFrequency || 2;
   const weeksNeeded = payment.sessionsCount / freq;
   const daysNeeded = Math.ceil(weeksNeeded * 7);
@@ -58,8 +58,8 @@ function dbCalculateSessionsOccurred(startDateStr, todayStr, weeklyFrequency, se
     }
   }
 
-  const start = parseSafeDate(startDateStr);
-  const today = parseSafeDate(todayStr);
+  const start = dbParseSafeDate(startDateStr);
+  const today = dbParseSafeDate(todayStr);
   if (isNaN(start.getTime()) || isNaN(today.getTime()) || today < start) return 0;
   
   const freq = weeklyFrequency || 2;
@@ -109,6 +109,18 @@ const DB = {
 
   // Bazanı sıfırlamaq və ya ilkin sazlamaq
   initialize() {
+    // Ensure 2026-08 payments have full 70 items
+    const rawPay = localStorage.getItem(DB_PREFIX + "payments");
+    if (rawPay) {
+      try {
+        const pObj = JSON.parse(rawPay);
+        if (!pObj["2026-08"] || pObj["2026-08"].length < 70) {
+          localStorage.clear();
+        }
+      } catch(e) {
+        localStorage.clear();
+      }
+    }
     const backupData = {
   "initialized": true,
   "teachers": [
@@ -5088,7 +5100,7 @@ const DB = {
         if (p.studentId === studentId) {
           const baseStart = p.sessionStartDate || p.paymentDate;
           if (baseStart) {
-            const startDate = parseSafeDate(baseStart);
+            const startDate = dbParseSafeDate(baseStart);
             if (!isNaN(startDate.getTime())) {
               startDate.setDate(startDate.getDate() + daysToShift);
               p.sessionStartDate = startDate.toISOString().split('T')[0];
@@ -5096,7 +5108,7 @@ const DB = {
             }
           }
           if (p.dueDate) {
-            const dueDate = parseSafeDate(p.dueDate);
+            const dueDate = dbParseSafeDate(p.dueDate);
             if (!isNaN(dueDate.getTime())) {
               dueDate.setDate(dueDate.getDate() + daysToShift);
               p.dueDate = dueDate.toISOString().split('T')[0];
@@ -5129,8 +5141,8 @@ const DB = {
         if (oldStudent.status === "Donduruldu" && student.status === "Aktiv") {
           const freezeStart = oldStudent.statusDate;
           if (freezeStart) {
-            const freezeDateObj = parseSafeDate(freezeStart);
-            const todayObj = parseSafeDate(todayStr);
+            const freezeDateObj = dbParseSafeDate(freezeStart);
+            const todayObj = dbParseSafeDate(todayStr);
             if (!isNaN(freezeDateObj.getTime()) && !isNaN(todayObj.getTime())) {
               const diffTime = todayObj.getTime() - freezeDateObj.getTime();
               const daysFrozen = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -5557,7 +5569,7 @@ const DB = {
     const baseDateStr = student.lastActiveDate || student.enrollDate || new Date().toISOString().split('T')[0];
     
     // Cross-browser safe parsing (Safari works fine with "YYYY/MM/DD")
-    const baseDate = parseSafeDate(baseDateStr);
+    const baseDate = dbParseSafeDate(baseDateStr);
     let day = baseDate.getDate();
     if (isNaN(day)) day = 1;
 

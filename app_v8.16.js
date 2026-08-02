@@ -1,3 +1,13 @@
+function xmlEscape(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
 /**
  * Əziz Tədris Mərkəzi - Tətbiq Məntiqi (app.js)
  * Tək səhifəli tətbiq (SPA) idarəetməsi və hesablama məntiqləri.
@@ -2904,6 +2914,7 @@ const App = {
     let totalTeacherShareSum = 0;
     let totalPaidSum = 0;
     let totalDueSum = 0;
+    let totalStudentsSum = 0;
     
     const teacherRows = teachers.map(t => {
       const teacherPayments = payments.filter(p => p.teacherId === t.id && (p.paymentStatus === "Ödənildi" || p.paymentStatus === "Qismən ödənilib") && isDateInMonth(p.paymentDate, curMonth));
@@ -2919,6 +2930,7 @@ const App = {
       totalTeacherShareSum += teacherShare;
       totalPaidSum += paid;
       totalDueSum += due;
+      totalStudentsSum += stdCount;
 
       return {
         name: t.name,
@@ -2935,39 +2947,134 @@ const App = {
     const centerShare = totalRevenueSum - totalTeacherShareSum;
     const netProfit = centerShare - totalExpenses;
 
-    let csv = "";
-    csv += `Əziz Tədris Mərkəzi - ${formattedMonth} Hesabatı\n\n`;
-    
-    csv += `MƏRKƏZİN MALIYYƏ GÖSTƏRICILƏRI\n`;
-    csv += `Göstərici;Məbləğ (AZN)\n`;
-    csv += `Ümumi Toplanan Gəlir;${totalRevenueSum}\n`;
-    csv += `Müəllimə Xərcləri (Ümumi);${totalTeacherShareSum.toFixed(1)}\n`;
-    csv += `Mərkəzin Payı;${centerShare.toFixed(1)}\n`;
-    csv += `Tədrisin Digər Xərcləri;${totalExpenses}\n`;
-    csv += `XALIS MƏNFƏƏT;${netProfit.toFixed(1)}\n\n`;
+    let xml = '<?xml version="1.0"?>\n';
+    xml += '<?mso-application progid="Excel.Sheet"?>\n';
+    xml += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"\n';
+    xml += ' xmlns:o="urn:schemas-microsoft-com:office:office"\n';
+    xml += ' xmlns:x="urn:schemas-microsoft-com:office:excel"\n';
+    xml += ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"\n';
+    xml += ' xmlns:html="http://www.w3.org/TR/REC-html40">\n';
+    xml += ' <Styles>\n';
+    xml += '  <Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="11" ss:Color="#000000"/></Style>\n';
+    xml += '  <Style ss:ID="sTitle"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="15" ss:Bold="1" ss:Color="#000000"/></Style>\n';
+    xml += '  <Style ss:ID="sSubTitle"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="11" ss:Italic="1" ss:Color="#333333"/></Style>\n';
+    xml += '  <Style ss:ID="sSection"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="12" ss:Bold="1" ss:Color="#000000"/><Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/></Borders></Style>\n';
+    xml += '  <Style ss:ID="sHeader"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#000000"/><Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/><Borders><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders></Style>\n';
+    xml += '  <Style ss:ID="sLeft"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/></Borders></Style>\n';
+    xml += '  <Style ss:ID="sCenter"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/></Borders></Style>\n';
+    xml += '  <Style ss:ID="sRight"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/></Borders></Style>\n';
+    xml += '  <Style ss:ID="sTotal"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#000000"/><Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/><Borders><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/></Borders></Style>\n';
+    xml += ' </Styles>\n';
 
-    csv += `MÜƏLLİMƏLƏRİN AYLIQ PAY HESABATI\n`;
-    csv += `Müəllimə;Uşaq Sayı;Ümumi Cəlb Olunan;Pay Faizi (%);Müəllimə Payı;Ödənilən;Qalıq Borc\n`;
+    xml += ' <Worksheet ss:Name="Umumi_Hesabat">\n';
+    xml += '  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">\n';
+    xml += '   <PageSetup>\n';
+    xml += '    <Layout x:Orientation="Landscape"/>\n';
+    xml += '    <Header x:Margin="0.3"/>\n';
+    xml += '    <Footer x:Margin="0.3"/>\n';
+    xml += '    <PageMargins x:Bottom="0.5" x:Left="0.5" x:Right="0.5" x:Top="0.5"/>\n';
+    xml += '   </PageSetup>\n';
+    xml += '   <Print>\n';
+    xml += '    <ValidPrinterInfo/>\n';
+    xml += '    <PaperSizeIndex>9</PaperSizeIndex>\n';
+    xml += '    <FitWidth>1</FitWidth>\n';
+    xml += '    <FitHeight>0</FitHeight>\n';
+    xml += '   </Print>\n';
+    xml += '   <FitToPage/>\n';
+    xml += '  </WorksheetOptions>\n';
+
+    xml += '  <Table ss:DefaultRowHeight="20">\n';
+    xml += '   <Column ss:Width="180"/>\n';
+    xml += '   <Column ss:Width="100"/>\n';
+    xml += '   <Column ss:Width="140"/>\n';
+    xml += '   <Column ss:Width="100"/>\n';
+    xml += '   <Column ss:Width="130"/>\n';
+    xml += '   <Column ss:Width="120"/>\n';
+    xml += '   <Column ss:Width="130"/>\n';
+
+    xml += '   <Row ss:Height="28"><Cell ss:MergeAcross="6" ss:StyleID="sTitle"><Data ss:Type="String">ƏZİZ TƏDRİS MƏRKƏZİ - ÜMUMİ MALİYYƏ HESABATI</Data></Cell></Row>\n';
+    xml += '   <Row ss:Height="20"><Cell ss:MergeAcross="6" ss:StyleID="sSubTitle"><Data ss:Type="String">Hesabat Dövrü: ' + xmlEscape(formattedMonth) + ' | Çap Tarixi: ' + xmlEscape(new Date().toLocaleDateString('az-AZ')) + '</Data></Cell></Row>\n';
+    xml += '   <Row ss:Height="12"></Row>\n';
+
+    xml += '   <Row ss:Height="24"><Cell ss:MergeAcross="6" ss:StyleID="sSection"><Data ss:Type="String">1. MƏRKƏZİN MALİYYƏ XÜLASƏSİ</Data></Cell></Row>\n';
+    xml += '   <Row ss:Height="22"><Cell ss:StyleID="sHeader"><Data ss:Type="String">Göstərici Adı</Data></Cell><Cell ss:MergeAcross="5" ss:StyleID="sHeader"><Data ss:Type="String">Məbləğ (AZN)</Data></Cell></Row>\n';
+    xml += '   <Row><Cell ss:StyleID="sLeft"><Data ss:Type="String">Ümumi Toplanan Gəlir</Data></Cell><Cell ss:MergeAcross="5" ss:StyleID="sRight"><Data ss:Type="Number">' + totalRevenueSum + '</Data></Cell></Row>\n';
+    xml += '   <Row><Cell ss:StyleID="sLeft"><Data ss:Type="String">Müəllimə Payları (Ümumi)</Data></Cell><Cell ss:MergeAcross="5" ss:StyleID="sRight"><Data ss:Type="Number">' + Number(totalTeacherShareSum.toFixed(2)) + '</Data></Cell></Row>\n';
+    xml += '   <Row><Cell ss:StyleID="sLeft"><Data ss:Type="String">Mərkəzin Payı (Brutto)</Data></Cell><Cell ss:MergeAcross="5" ss:StyleID="sRight"><Data ss:Type="Number">' + Number(centerShare.toFixed(2)) + '</Data></Cell></Row>\n';
+    xml += '   <Row><Cell ss:StyleID="sLeft"><Data ss:Type="String">Tədrisin Digər Xərcləri</Data></Cell><Cell ss:MergeAcross="5" ss:StyleID="sRight"><Data ss:Type="Number">' + totalExpenses + '</Data></Cell></Row>\n';
+    xml += '   <Row ss:Height="22"><Cell ss:StyleID="sTotal"><Data ss:Type="String">XALİS MƏNFƏƏT (NET QALIQ)</Data></Cell><Cell ss:MergeAcross="5" ss:StyleID="sTotal"><Data ss:Type="Number">' + Number(netProfit.toFixed(2)) + '</Data></Cell></Row>\n';
+    xml += '   <Row ss:Height="14"></Row>\n';
+
+    xml += '   <Row ss:Height="24"><Cell ss:MergeAcross="6" ss:StyleID="sSection"><Data ss:Type="String">2. MÜƏLLİMƏLƏRİN AYLIQ PAY HESABATI</Data></Cell></Row>\n';
+    xml += '   <Row ss:Height="22">\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Müəllimə</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Uşaq Sayı</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Cəlb Olunan (AZN)</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Pay Faizi</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Müəllimə Payı (AZN)</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Ödənilən (AZN)</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Qalıq Borc (AZN)</Data></Cell>\n';
+    xml += '   </Row>\n';
+
     teacherRows.forEach(tr => {
-      csv += `${tr.name};${tr.stdCount};${tr.revenue};${tr.sharePercent}%;${tr.teacherShare.toFixed(1)};${tr.paid};${tr.due.toFixed(1)}\n`;
+      xml += '   <Row>\n';
+      xml += '    <Cell ss:StyleID="sLeft"><Data ss:Type="String">' + xmlEscape(tr.name) + '</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">' + tr.stdCount + '</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sRight"><Data ss:Type="Number">' + tr.revenue + '</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sCenter"><Data ss:Type="String">' + tr.sharePercent + '%</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sRight"><Data ss:Type="Number">' + Number(tr.teacherShare.toFixed(2)) + '</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sRight"><Data ss:Type="Number">' + tr.paid + '</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sRight"><Data ss:Type="Number">' + Number(tr.due.toFixed(2)) + '</Data></Cell>\n';
+      xml += '   </Row>\n';
     });
-    csv += `CƏMİ;;${totalRevenueSum};;${totalTeacherShareSum.toFixed(1)};${totalPaidSum};${totalDueSum.toFixed(1)}\n\n`;
 
-    csv += `TƏDRİSİN XƏRCLƏRİ (${formattedMonth})\n`;
-    csv += `Tarix;Təsvir;Məbləğ (AZN)\n`;
-    expenses.forEach(exp => {
-      csv += `${exp.date || "-"};${(exp.title || "").replace(/;/g, ",")};${exp.amount}\n`;
-    });
-    csv += `CƏMİ XƏRCLƏR;;${totalExpenses}\n`;
+    xml += '   <Row ss:Height="22">\n';
+    xml += '    <Cell ss:StyleID="sTotal"><Data ss:Type="String">CƏMİ YEKUN</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sTotal"><Data ss:Type="String">' + totalStudentsSum + ' tələbə</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sTotal"><Data ss:Type="Number">' + totalRevenueSum + '</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sTotal"><Data ss:Type="String">-</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sTotal"><Data ss:Type="Number">' + Number(totalTeacherShareSum.toFixed(2)) + '</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sTotal"><Data ss:Type="Number">' + totalPaidSum + '</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sTotal"><Data ss:Type="Number">' + Number(totalDueSum.toFixed(2)) + '</Data></Cell>\n';
+    xml += '   </Row>\n';
+    xml += '   <Row ss:Height="14"></Row>\n';
 
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    if (expenses.length > 0) {
+      xml += '   <Row ss:Height="24"><Cell ss:MergeAcross="6" ss:StyleID="sSection"><Data ss:Type="String">3. TƏDRİSİN XƏRCLƏRİ</Data></Cell></Row>\n';
+      xml += '   <Row ss:Height="22">\n';
+      xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Tarix</Data></Cell>\n';
+      xml += '    <Cell ss:MergeAcross="4" ss:StyleID="sHeader"><Data ss:Type="String">Təsvir / Xərc Adı</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Məbləğ (AZN)</Data></Cell>\n';
+      xml += '   </Row>\n';
+
+      expenses.forEach(exp => {
+        xml += '   <Row>\n';
+        xml += '    <Cell ss:StyleID="sCenter"><Data ss:Type="String">' + xmlEscape(exp.date || "-") + '</Data></Cell>\n';
+        xml += '    <Cell ss:MergeAcross="4" ss:StyleID="sLeft"><Data ss:Type="String">' + xmlEscape(exp.title || "") + '</Data></Cell>\n';
+        xml += '    <Cell ss:StyleID="sRight"><Data ss:Type="Number">' + Number(exp.amount || 0) + '</Data></Cell>\n';
+        xml += '   </Row>\n';
+      });
+
+      xml += '   <Row ss:Height="22">\n';
+      xml += '    <Cell ss:MergeAcross="5" ss:StyleID="sTotal"><Data ss:Type="String">CƏMİ XƏRCLƏR</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sTotal"><Data ss:Type="Number">' + totalExpenses + '</Data></Cell>\n';
+      xml += '   </Row>\n';
+    }
+
+    xml += '  </Table>\n';
+    xml += ' </Worksheet>\n';
+    xml += '</Workbook>';
+
+    const blob = new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `Umumi_Hesabat_${curMonth}.csv`);
+    link.setAttribute("download", "Umumi_Hesabat_" + curMonth + ".xls");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   },
+
+
 
   printGeneralReport() {
     const curMonth = window.DB.getCurrentMonth();
@@ -3172,7 +3279,6 @@ const App = {
     const curMonth = window.DB.getCurrentMonth();
     const formattedMonth = formatMonth(curMonth);
     const payments = window.DB.getPayments();
-    const allPaymentsFlat = window.DB.getAllPaymentsFlat();
     const teachers = window.DB.getTeachers();
     const payouts = window.DB.getTeacherPayouts();
     
@@ -3191,46 +3297,128 @@ const App = {
     const paid = teacherPayoutList.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
     const due = teacherShare - paid;
 
-    let csv = "";
-    csv += `Əziz Tədris Mərkəzi - Müəllimə Aylıq Hesabatı\n\n`;
-    csv += `Müəllimə Adı;${t.name}\n`;
-    csv += `Hesabat Ayı;${formattedMonth}\n\n`;
+    let xml = '<?xml version="1.0"?>\n';
+    xml += '<?mso-application progid="Excel.Sheet"?>\n';
+    xml += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"\n';
+    xml += ' xmlns:o="urn:schemas-microsoft-com:office:office"\n';
+    xml += ' xmlns:x="urn:schemas-microsoft-com:office:excel"\n';
+    xml += ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"\n';
+    xml += ' xmlns:html="http://www.w3.org/TR/REC-html40">\n';
+    xml += ' <Styles>\n';
+    xml += '  <Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="11" ss:Color="#000000"/></Style>\n';
+    xml += '  <Style ss:ID="sTitle"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="15" ss:Bold="1" ss:Color="#000000"/></Style>\n';
+    xml += '  <Style ss:ID="sSubTitle"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="11" ss:Italic="1" ss:Color="#333333"/></Style>\n';
+    xml += '  <Style ss:ID="sSection"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="12" ss:Bold="1" ss:Color="#000000"/><Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/></Borders></Style>\n';
+    xml += '  <Style ss:ID="sHeader"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#000000"/><Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/><Borders><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders></Style>\n';
+    xml += '  <Style ss:ID="sLeft"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/></Borders></Style>\n';
+    xml += '  <Style ss:ID="sCenter"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/></Borders></Style>\n';
+    xml += '  <Style ss:ID="sRight"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/></Borders></Style>\n';
+    xml += '  <Style ss:ID="sTotal"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#000000"/><Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/><Borders><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/></Borders></Style>\n';
+    xml += ' </Styles>\n';
 
-    csv += `MALIYYƏ XÜLASƏSI\n`;
-    csv += `Göstərici;Dəyər\n`;
-    csv += `Aktiv Uşaq Sayı;${stdCount} tələbə\n`;
-    csv += `Ümumi Cəlb Olunan Məbləğ;${revenue} AZN\n`;
-    csv += `Müəllimənin Pay Faizi;${sharePercent}%\n`;
-    csv += `Hesablanan Müəllimə Payı;${teacherShare.toFixed(1)} AZN\n`;
-    csv += `Müəlliməyə Ödənilən Məbləğ;${paid} AZN\n`;
-    csv += `Qalıq Borc (Mərkəzin borcu);${due.toFixed(1)} AZN\n\n`;
+    xml += ' <Worksheet ss:Name="Mueillime_Hesabati">\n';
+    xml += '  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">\n';
+    xml += '   <PageSetup>\n';
+    xml += '    <Layout x:Orientation="Landscape"/>\n';
+    xml += '    <Header x:Margin="0.3"/>\n';
+    xml += '    <Footer x:Margin="0.3"/>\n';
+    xml += '    <PageMargins x:Bottom="0.5" x:Left="0.5" x:Right="0.5" x:Top="0.5"/>\n';
+    xml += '   </PageSetup>\n';
+    xml += '   <Print>\n';
+    xml += '    <ValidPrinterInfo/>\n';
+    xml += '    <PaperSizeIndex>9</PaperSizeIndex>\n';
+    xml += '    <FitWidth>1</FitWidth>\n';
+    xml += '    <FitHeight>0</FitHeight>\n';
+    xml += '   </Print>\n';
+    xml += '   <FitToPage/>\n';
+    xml += '  </WorksheetOptions>\n';
 
-    csv += `ÖDƏNİŞ EDİLƏN DƏRSLƏR / TƏLƏBƏLƏRİN SİYAHISI\n`;
-    csv += `Tələbə;Fənn;Paket;Dərs Tezliyi;Ödəniş Tarixi;Ödənilən Məbləğ (AZN)\n`;
+    xml += '  <Table ss:DefaultRowHeight="20">\n';
+    xml += '   <Column ss:Width="160"/>\n';
+    xml += '   <Column ss:Width="130"/>\n';
+    xml += '   <Column ss:Width="160"/>\n';
+    xml += '   <Column ss:Width="110"/>\n';
+    xml += '   <Column ss:Width="110"/>\n';
+    xml += '   <Column ss:Width="130"/>\n';
+
+    xml += '   <Row ss:Height="28"><Cell ss:MergeAcross="5" ss:StyleID="sTitle"><Data ss:Type="String">ƏZİZ TƏDRİS MƏRKƏZİ - MÜƏLLİMƏ HESABATI</Data></Cell></Row>\n';
+    xml += '   <Row ss:Height="20"><Cell ss:MergeAcross="5" ss:StyleID="sSubTitle"><Data ss:Type="String">Müəllimə: ' + xmlEscape(t.name) + ' | Dövr: ' + xmlEscape(formattedMonth) + ' | Çap Tarixi: ' + xmlEscape(new Date().toLocaleDateString('az-AZ')) + '</Data></Cell></Row>\n';
+    xml += '   <Row ss:Height="12"></Row>\n';
+
+    xml += '   <Row ss:Height="24"><Cell ss:MergeAcross="5" ss:StyleID="sSection"><Data ss:Type="String">1. MALİYYƏ XÜLASƏSİ</Data></Cell></Row>\n';
+    xml += '   <Row><Cell ss:StyleID="sLeft"><Data ss:Type="String">Aktiv Uşaq Sayı</Data></Cell><Cell ss:MergeAcross="4" ss:StyleID="sRight"><Data ss:Type="String">' + stdCount + ' tələbə</Data></Cell></Row>\n';
+    xml += '   <Row><Cell ss:StyleID="sLeft"><Data ss:Type="String">Ümumi Cəlb Olunan Məbləğ</Data></Cell><Cell ss:MergeAcross="4" ss:StyleID="sRight"><Data ss:Type="Number">' + revenue + '</Data></Cell></Row>\n';
+    xml += '   <Row><Cell ss:StyleID="sLeft"><Data ss:Type="String">Müəllimənin Pay Faizi</Data></Cell><Cell ss:MergeAcross="4" ss:StyleID="sRight"><Data ss:Type="String">' + sharePercent + '%</Data></Cell></Row>\n';
+    xml += '   <Row><Cell ss:StyleID="sLeft"><Data ss:Type="String">Hesablanan Müəllimə Payı</Data></Cell><Cell ss:MergeAcross="4" ss:StyleID="sRight"><Data ss:Type="Number">' + Number(teacherShare.toFixed(2)) + '</Data></Cell></Row>\n';
+    xml += '   <Row><Cell ss:StyleID="sLeft"><Data ss:Type="String">Müəlliməyə Ödənilən Məbləğ</Data></Cell><Cell ss:MergeAcross="4" ss:StyleID="sRight"><Data ss:Type="Number">' + paid + '</Data></Cell></Row>\n';
+    xml += '   <Row ss:Height="22"><Cell ss:StyleID="sTotal"><Data ss:Type="String">QALİQ BORC (MƏRKƏZİN BORCU)</Data></Cell><Cell ss:MergeAcross="4" ss:StyleID="sTotal"><Data ss:Type="Number">' + Number(due.toFixed(2)) + '</Data></Cell></Row>\n';
+    xml += '   <Row ss:Height="14"></Row>\n';
+
+    xml += '   <Row ss:Height="24"><Cell ss:MergeAcross="5" ss:StyleID="sSection"><Data ss:Type="String">2. ÖDƏNİŞ EDİLƏN DƏRSLƏR VƏ TƏLƏBƏ SİYAHISI</Data></Cell></Row>\n';
+    xml += '   <Row ss:Height="22">\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Tələbə</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Fənn</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Paket Və Qrup</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Dərs Tezliyi</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Ödəniş Tarixi</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Məbləğ (AZN)</Data></Cell>\n';
+    xml += '   </Row>\n';
+
     teacherPayments.forEach(p => {
       const paidVal = getPaymentRevenue(p);
       const student = students.find(s => s.id === p.studentId);
-      const displayName = student ? `${student.name} ${student.surname || ""}`.trim() : p.studentName;
-      const pkgStr = p.packageType === "Seans" ? `Seans (${p.sessionsCount || 8} seans) (${p.groupType})` : `Aylıq (${p.groupType})`;
-      csv += `${displayName};${p.courseName};${pkgStr};Həftədə ${p.weeklyFrequency} dəfə;${p.paymentDate};${paidVal}\n`;
+      const displayName = student ? (student.name + " " + (student.surname || "")).trim() : p.studentName;
+      const pkgStr = p.packageType === "Seans" ? ("Seans (" + (p.sessionsCount || 8) + " seans) (" + p.groupType + ")") : ("Aylıq (" + p.groupType + ")");
+      xml += '   <Row>\n';
+      xml += '    <Cell ss:StyleID="sLeft"><Data ss:Type="String">' + xmlEscape(displayName) + '</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sLeft"><Data ss:Type="String">' + xmlEscape(p.courseName) + '</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sLeft"><Data ss:Type="String">' + xmlEscape(pkgStr) + '</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Həftədə ' + p.weeklyFrequency + ' dəfə</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sCenter"><Data ss:Type="String">' + xmlEscape(p.paymentDate) + '</Data></Cell>\n';
+      xml += '    <Cell ss:StyleID="sRight"><Data ss:Type="Number">' + paidVal + '</Data></Cell>\n';
+      xml += '   </Row>\n';
     });
-    csv += `CƏMİ;;;;;${revenue} AZN\n\n`;
 
-    csv += `MÜƏLLİMƏYƏ EDİLƏN ÖDƏNİŞLƏRİN TARİXÇƏSİ\n`;
-    csv += `Tarix;Məbləğ (AZN)\n`;
-    teacherPayoutList.forEach(log => {
-      csv += `${log.date};${log.amount}\n`;
-    });
-    csv += `CƏMİ ÖDƏNİLƏN;;${paid} AZN\n`;
+    xml += '   <Row ss:Height="22">\n';
+    xml += '    <Cell ss:MergeAcross="4" ss:StyleID="sTotal"><Data ss:Type="String">CƏMİ CƏLB OLUNAN</Data></Cell>\n';
+    xml += '    <Cell ss:StyleID="sTotal"><Data ss:Type="Number">' + revenue + '</Data></Cell>\n';
+    xml += '   </Row>\n';
+    xml += '   <Row ss:Height="14"></Row>\n';
 
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    if (teacherPayoutList.length > 0) {
+      xml += '   <Row ss:Height="24"><Cell ss:MergeAcross="5" ss:StyleID="sSection"><Data ss:Type="String">3. MÜƏLLİMƏYƏ EDİLƏN ÖDƏNİŞLƏRİN TARİXÇƏSİ</Data></Cell></Row>\n';
+      xml += '   <Row ss:Height="22">\n';
+      xml += '    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Tarix</Data></Cell>\n';
+      xml += '    <Cell ss:MergeAcross="4" ss:StyleID="sHeader"><Data ss:Type="String">Verilən Məbləğ (AZN)</Data></Cell>\n';
+      xml += '   </Row>\n';
+
+      teacherPayoutList.forEach(log => {
+        xml += '   <Row>\n';
+        xml += '    <Cell ss:StyleID="sCenter"><Data ss:Type="String">' + xmlEscape(log.date || "-") + '</Data></Cell>\n';
+        xml += '    <Cell ss:MergeAcross="4" ss:StyleID="sRight"><Data ss:Type="Number">' + Number(log.amount || 0) + '</Data></Cell>\n';
+        xml += '   </Row>\n';
+      });
+
+      xml += '   <Row ss:Height="22">\n';
+      xml += '    <Cell ss:StyleID="sTotal"><Data ss:Type="String">CƏMİ ÖDƏNİLƏN</Data></Cell>\n';
+      xml += '    <Cell ss:MergeAcross="4" ss:StyleID="sTotal"><Data ss:Type="Number">' + paid + '</Data></Cell>\n';
+      xml += '   </Row>\n';
+    }
+
+    xml += '  </Table>\n';
+    xml += ' </Worksheet>\n';
+    xml += '</Workbook>';
+
+    const blob = new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `${t.name.replace(/\s+/g, "_")}_Hesabat_${curMonth}.csv`);
+    link.setAttribute("download", (t.name.replace(/\s+/g, "_")) + "_Hesabat_" + curMonth + ".xls");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   },
+
+
 
   printTeacherReport(teacherId) {
     const curMonth = window.DB.getCurrentMonth();

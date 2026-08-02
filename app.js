@@ -1811,21 +1811,7 @@ const App = {
         if (!effDueDate) {
           effDueDate = `${curMonth}-15`;
         }
-
-        if (p.paymentStatus === "Ödənildi" && p.paymentDate && p.paymentDate.includes(curMonth)) {
-          dueDateDisplay = `<div><strong>${effDueDate}</strong></div><div style="font-size: 0.78rem; color: #10b981; font-weight: 700; margin-top: 3px;">Ödənildi (${p.paymentDate})</div>`;
-        } else {
-          const diff = getDaysDiff(effDueDate, today);
-          if (isNaN(diff)) {
-            dueDateDisplay = `<div><strong>${effDueDate}</strong></div>`;
-          } else if (diff < 0) {
-            dueDateDisplay = `<div><strong>${effDueDate}</strong></div><div style="font-size: 0.78rem; color: #ef4444; font-weight: 700; margin-top: 3px;">${Math.abs(diff)} gün gecikir</div>`;
-          } else if (diff === 0) {
-            dueDateDisplay = `<div><strong>${effDueDate}</strong></div><div style="font-size: 0.78rem; color: #f59e0b; font-weight: 700; margin-top: 3px;">Ödəniş günüdür</div>`;
-          } else {
-            dueDateDisplay = `<div><strong>${effDueDate}</strong></div><div style="font-size: 0.78rem; color: #3b82f6; font-weight: 700; margin-top: 3px;">Ödənişə ${diff} gün qalıb</div>`;
-          }
-        }
+        dueDateDisplay = effDueDate;
       } else {
         dueDateDisplay = sDueDate || p.sessionStartDate || p.paymentDate || "-";
       }

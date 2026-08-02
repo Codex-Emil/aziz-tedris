@@ -1798,9 +1798,36 @@ const App = {
 
       let dueDateDisplay = "";
       if (p.packageType === "Aylıq") {
-        dueDateDisplay = p.dueDate || "-";
+        let effDueDate = p.dueDate;
+        if (!effDueDate && p.paymentDate) {
+          const pDate = parseSafeDate(p.paymentDate);
+          if (!isNaN(pDate.getTime())) {
+            const m = pDate.getMonth() % 12 + 1;
+            const y = pDate.getFullYear() + (pDate.getMonth() === 11 ? 1 : 0);
+            const d = Math.min(pDate.getDate(), 28);
+            effDueDate = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          }
+        }
+        if (!effDueDate) {
+          effDueDate = `${curMonth}-15`;
+        }
+
+        if (p.paymentStatus === "Ödənildi" && p.paymentDate && p.paymentDate.includes(curMonth)) {
+          dueDateDisplay = `<div><strong>${effDueDate}</strong></div><div style="font-size: 0.78rem; color: #10b981; font-weight: 700; margin-top: 3px;">Ödənildi (${p.paymentDate})</div>`;
+        } else {
+          const diff = getDaysDiff(effDueDate, today);
+          if (isNaN(diff)) {
+            dueDateDisplay = `<div><strong>${effDueDate}</strong></div>`;
+          } else if (diff < 0) {
+            dueDateDisplay = `<div><strong>${effDueDate}</strong></div><div style="font-size: 0.78rem; color: #ef4444; font-weight: 700; margin-top: 3px;">${Math.abs(diff)} gün gecikir</div>`;
+          } else if (diff === 0) {
+            dueDateDisplay = `<div><strong>${effDueDate}</strong></div><div style="font-size: 0.78rem; color: #f59e0b; font-weight: 700; margin-top: 3px;">Ödəniş günüdür</div>`;
+          } else {
+            dueDateDisplay = `<div><strong>${effDueDate}</strong></div><div style="font-size: 0.78rem; color: #3b82f6; font-weight: 700; margin-top: 3px;">Ödənişə ${diff} gün qalıb</div>`;
+          }
+        }
       } else {
-        dueDateDisplay = sDueDate || "-";
+        dueDateDisplay = sDueDate || p.sessionStartDate || p.paymentDate || "-";
       }
 
       const displayName = student ? `${student.name} ${student.surname || ""}`.trim() : p.studentName;

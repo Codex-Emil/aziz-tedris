@@ -2903,6 +2903,7 @@ const App = {
     let totalTeacherShareSum = 0;
     let totalPaidSum = 0;
     let totalDueSum = 0;
+    let totalStudentsSum = 0;
     
     const teacherRows = teachers.map(t => {
       const teacherPayments = payments.filter(p => p.teacherId === t.id && (p.paymentStatus === "Ödənildi" || p.paymentStatus === "Qismən ödənilib") && isDateInMonth(p.paymentDate, curMonth));
@@ -2918,6 +2919,7 @@ const App = {
       totalTeacherShareSum += teacherShare;
       totalPaidSum += paid;
       totalDueSum += due;
+      totalStudentsSum += stdCount;
 
       return {
         name: t.name,
@@ -2934,35 +2936,74 @@ const App = {
     const centerShare = totalRevenueSum - totalTeacherShareSum;
     const netProfit = centerShare - totalExpenses;
 
+    // Eyni adlı xərclərin qruplaşdırılması
+    const groupedExpensesMap = {};
+    expenses.forEach(e => {
+      const title = (e.title || "Adsız xərc").trim();
+      const amt = Number(e.amount) || 0;
+      if (!groupedExpensesMap[title]) {
+        groupedExpensesMap[title] = { count: 0, total: 0 };
+      }
+      groupedExpensesMap[title].count += 1;
+      groupedExpensesMap[title].total += amt;
+    });
+
+    const groupedExpensesList = Object.keys(groupedExpensesMap).map(title => ({
+      title,
+      count: groupedExpensesMap[title].count,
+      total: groupedExpensesMap[title].total
+    })).sort((a, b) => b.total - a.total);
+
     let csv = "";
-    csv += `Əziz Tədris Mərkəzi - ${formattedMonth} Hesabatı\n\n`;
+    // HEADER BANNER
+    csv += `ƏZİZ TƏDRİS MƏRKƏZİ - RƏSMİ MALİYYƏ VƏ İCRA HESABATI (DİREKTOR BLANKI)\n`;
+    csv += `Hesabat Dövrü;${formattedMonth}\n`;
+    csv += `İxrac Tarixi;${new Date().toLocaleDateString('az-AZ')}\n`;
+    csv += `Status;TƏSDİQLƏNMİŞ\n\n`;
     
-    csv += `MƏRKƏZİN MALIYYƏ GÖSTƏRICILƏRI\n`;
-    csv += `Göstərici;Məbləğ (AZN)\n`;
-    csv += `Ümumi Toplanan Gəlir;${totalRevenueSum}\n`;
-    csv += `Müəllimə Xərcləri (Ümumi);${totalTeacherShareSum.toFixed(1)}\n`;
-    csv += `Mərkəzin Payı;${centerShare.toFixed(1)}\n`;
-    csv += `Tədrisin Digər Xərcləri;${totalExpenses}\n`;
-    csv += `XALIS MƏNFƏƏT;${netProfit.toFixed(1)}\n\n`;
+    // SECTION 1: FINANCIAL KPI SUMMARY
+    csv += `1. İCRAÇI MALİYYƏ GÖSTƏRİCİLƏRİ (KPI)\n`;
+    csv += `Göstərici Adı;Məbləğ (AZN);Qeyd\n`;
+    csv += `Ümumi Cəlb Olunan Gəlir;${formatAmount(totalRevenueSum)} AZN;Tələbələrdən toplanan ümumi məbləğ\n`;
+    csv += `Müəllimə Ödənişləri (Payı);${formatAmount(totalTeacherShareSum)} AZN;Müəllimələrin ümumi hesablanmış qazancı\n`;
+    csv += `Mərkəzin Payı (Brutto);${formatAmount(centerShare)} AZN;Toplanan gəlirdən müəllimə payı çıxıldıqdan sonra\n`;
+    csv += `Tədrisin Digər Xərcləri;${formatAmount(totalExpenses)} AZN;Mərkəzin bütün əməliyyat xərcləri\n`;
+    csv += `MƏRKƏZİN XALİS MƏNFƏƏTİ (NET QALIQ);${formatAmount(netProfit)} AZN;Mərkəzin payından bütün xərclər çıxıldıqdan sonra net qalıq\n\n`;
 
-    csv += `MÜƏLLİMƏLƏRİN AYLIQ PAY HESABATI\n`;
-    csv += `Müəllimə;Uşaq Sayı;Ümumi Cəlb Olunan;Pay Faizi (%);Müəllimə Payı;Ödənilən;Qalıq Borc\n`;
+    // SECTION 2: TEACHERS BREAKDOWN
+    csv += `2. MÜƏLLİMƏLƏR ÜZRƏ PAY BÖLGÜSÜ\n`;
+    csv += `Müəllimə;Aktiv Tələbə Sayı;Cəlb Olunan Məbləğ (AZN);Pay Faizi (%);Müəllimə Payı (AZN);Ödənilən Məbləğ (AZN);Qalıq Borc (AZN)\n`;
     teacherRows.forEach(tr => {
-      csv += `${tr.name};${tr.stdCount};${tr.revenue};${tr.sharePercent}%;${tr.teacherShare.toFixed(1)};${tr.paid};${tr.due.toFixed(1)}\n`;
+      csv += `${tr.name};${tr.stdCount};${formatAmount(tr.revenue)} AZN;${tr.sharePercent}%;${formatAmount(tr.teacherShare)} AZN;${formatAmount(tr.paid)} AZN;${formatAmount(tr.due)} AZN\n`;
     });
-    csv += `CƏMİ;;${totalRevenueSum};;${totalTeacherShareSum.toFixed(1)};${totalPaidSum};${totalDueSum.toFixed(1)}\n\n`;
+    csv += `CƏMİ YEKUN;${totalStudentsSum} tələbə;${formatAmount(totalRevenueSum)} AZN;-;${formatAmount(totalTeacherShareSum)} AZN;${formatAmount(totalPaidSum)} AZN;${formatAmount(totalDueSum)} AZN\n\n`;
 
-    csv += `TƏDRİSİN XƏRCLƏRİ (${formattedMonth})\n`;
-    csv += `Tarix;Təsvir;Məbləğ (AZN)\n`;
-    expenses.forEach(exp => {
-      csv += `${exp.date || "-"};${(exp.title || "").replace(/;/g, ",")};${exp.amount}\n`;
-    });
-    csv += `CƏMİ XƏRCLƏR;;${totalExpenses}\n`;
+    // SECTION 3: EXPENSES LIST
+    if (expenses.length > 0) {
+      csv += `3. TƏDRİSİN XƏRCLƏRİ (TƏFƏRRÜATLI SİYAHI)\n`;
+      csv += `Tarix;Xərcin Təsviri / Adı;Məbləğ (AZN)\n`;
+      expenses.forEach(exp => {
+        csv += `${exp.date || "-"};${(exp.title || "").replace(/;/g, ",")};${formatAmount(exp.amount)} AZN\n`;
+      });
+      csv += `CƏMİ XƏRCLƏR;;${formatAmount(totalExpenses)} AZN\n\n`;
+
+      // SECTION 4: GROUPED EXPENSES SUMMARY
+      csv += `4. EYNİ ADLI XƏRCLƏRİN ÜMUMİLƏŞDİRİLMİŞ XÜLASƏSİ (QRUPLAŞDIRILMIŞ)\n`;
+      csv += `Xərc Adı / Kateqoriya;Əməliyyat Sayı;Cəmi Məbləğ (AZN)\n`;
+      groupedExpensesList.forEach(g => {
+        csv += `${g.title.replace(/;/g, ",")};${g.count} əməliyyat;${formatAmount(g.total)} AZN\n`;
+      });
+      csv += `CƏMİ QRUPLAŞDIRILMIŞ XƏRC;${expenses.length} əməliyyat;${formatAmount(totalExpenses)} AZN\n\n`;
+    }
+
+    // SECTION 5: FOOTER & SIGNATURE
+    csv += `RƏSMİ TƏSDİQ\n`;
+    csv += `Hesabatı Tərtib Etdi (Direktor);İmza / Tarix\n`;
 
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `Umumi_Hesabat_${curMonth}.csv`);
+    link.setAttribute("download", `Umumi_Maliyyə_Hesabatı_${curMonth}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -3200,7 +3241,6 @@ const App = {
     const curMonth = window.DB.getCurrentMonth();
     const formattedMonth = formatMonth(curMonth);
     const payments = window.DB.getPayments();
-    const allPaymentsFlat = window.DB.getAllPaymentsFlat();
     const teachers = window.DB.getTeachers();
     const payouts = window.DB.getTeacherPayouts();
     
@@ -3220,41 +3260,54 @@ const App = {
     const due = teacherShare - paid;
 
     let csv = "";
-    csv += `Əziz Tədris Mərkəzi - Müəllimə Aylıq Hesabatı\n\n`;
+    // HEADER BANNER
+    csv += `ƏZİZ TƏDRİS MƏRKƏZİ - MÜƏLLİMƏ AYLIQ PAY HESABATI VƏRƏQİ\n`;
     csv += `Müəllimə Adı;${t.name}\n`;
-    csv += `Hesabat Ayı;${formattedMonth}\n\n`;
+    csv += `Hesabat Dövrü;${formattedMonth}\n`;
+    csv += `İxrac Tarixi;${new Date().toLocaleDateString('az-AZ')}\n\n`;
 
-    csv += `MALIYYƏ XÜLASƏSI\n`;
-    csv += `Göstərici;Dəyər\n`;
-    csv += `Aktiv Uşaq Sayı;${stdCount} tələbə\n`;
-    csv += `Ümumi Cəlb Olunan Məbləğ;${revenue} AZN\n`;
-    csv += `Müəllimənin Pay Faizi;${sharePercent}%\n`;
-    csv += `Hesablanan Müəllimə Payı;${teacherShare.toFixed(1)} AZN\n`;
-    csv += `Müəlliməyə Ödənilən Məbləğ;${paid} AZN\n`;
-    csv += `Qalıq Borc (Mərkəzin borcu);${due.toFixed(1)} AZN\n\n`;
+    // SECTION 1: FINANCIAL KPI SUMMARY
+    csv += `1. MALİYYƏ XÜLASƏSİ\n`;
+    csv += `Göstərici Adı;Dəyər (AZN / Say);Qeyd\n`;
+    csv += `Aktiv Tələbə Sayı;${stdCount} tələbə;Davam edən tələbələrin sayı\n`;
+    csv += `Cəlb Olunan Ümumi Məbləğ;${formatAmount(revenue)} AZN;Tələbələr tərəfindən ödənilən ümumi məbləğ\n`;
+    csv += `Müəllimənin Pay Faizi;${sharePercent}%;Müəllimənin mərkəz ilə razılaşdırılmış payı\n`;
+    csv += `Hesablanmış Müəllimə Qazancı;${formatAmount(teacherShare)} AZN;Cəlb olunan məbləğdən müəlliməyə çatacaq pay\n`;
+    csv += `Müəlliməyə Ödənilən Məbləğ (Cəmi);${formatAmount(paid)} AZN;Təhvil verilmiş nağd və ya köçürmə ödənişlər\n`;
+    csv += `Qalıq Borc (Ödəniləcək Məbləğ);${formatAmount(due)} AZN;Mərkəzin müəlliməyə qalan borcu\n\n`;
 
-    csv += `ÖDƏNİŞ EDİLƏN DƏRSLƏR / TƏLƏBƏLƏRİN SİYAHISI\n`;
-    csv += `Tələbə;Fənn;Paket;Dərs Tezliyi;Ödəniş Tarixi;Ödənilən Məbləğ (AZN)\n`;
+    // SECTION 2: STUDENTS & COURSES LIST
+    csv += `2. ÖDƏNİŞ EDİLƏN DƏRSLƏR VƏ TƏLƏBƏLƏRİN SİYAHISI\n`;
+    csv += `Tələbə Adı Soyadı;Fənn;Paket Növü;Dərs Tezliyi;Ödəniş Tarixi;Ödənilən Məbləğ (AZN)\n`;
     teacherPayments.forEach(p => {
       const paidVal = getPaymentRevenue(p);
       const student = students.find(s => s.id === p.studentId);
       const displayName = student ? `${student.name} ${student.surname || ""}`.trim() : p.studentName;
-      const pkgStr = p.packageType === "Seans" ? `Seans (${p.sessionsCount || 8} seans) (${p.groupType})` : `Aylıq (${p.groupType})`;
-      csv += `${displayName};${p.courseName};${pkgStr};Həftədə ${p.weeklyFrequency} dəfə;${p.paymentDate};${paidVal}\n`;
+      const renewedTag = p.isRenewed ? " (Yenilənmiş paket)" : "";
+      const pkgStr = (p.packageType === "Seans" ? `Seans (${p.sessionsCount || 8} seans) (${p.groupType})` : `Aylıq (${p.groupType})`) + renewedTag;
+      csv += `${displayName};${p.courseName};${pkgStr};Həftədə ${p.weeklyFrequency} dəfə;${p.paymentDate};${formatAmount(paidVal)} AZN\n`;
     });
-    csv += `CƏMİ;;;;;${revenue} AZN\n\n`;
+    csv += `CƏMİ CƏLB OLUNAN;;;;;${formatAmount(revenue)} AZN\n\n`;
 
-    csv += `MÜƏLLİMƏYƏ EDİLƏN ÖDƏNİŞLƏRİN TARİXÇƏSİ\n`;
-    csv += `Tarix;Məbləğ (AZN)\n`;
-    teacherPayoutList.forEach(log => {
-      csv += `${log.date};${log.amount}\n`;
-    });
-    csv += `CƏMİ ÖDƏNİLƏN;;${paid} AZN\n`;
+    // SECTION 3: MANUAL PAYOUTS HISTORY
+    if (teacherPayoutList.length > 0) {
+      csv += `3. MÜƏLLİMƏYƏ EDİLƏN ÖDƏNİŞLƏRİN TARİXÇƏSİ\n`;
+      csv += `Tarix;Ödəniş Açıqlaması / Növü;Ödənilən Məbləğ (AZN)\n`;
+      teacherPayoutList.forEach(log => {
+        csv += `${log.date};Nağd/Köçürmə (Müəllimə ödənişi);${formatAmount(log.amount)} AZN\n`;
+      });
+      csv += `CƏMİ ÖDƏNİLƏN MƏBLƏĞ;;${formatAmount(paid)} AZN\n\n`;
+    }
+
+    // SECTION 4: FOOTER & SIGNATURE
+    csv += `RƏSMİ TƏSDİQ VƏ İMZA\n`;
+    csv += `Təhvil Verən (Direktor);İmza / Tarix\n`;
+    csv += `Təhvil Alan (Müəllimə);${t.name}\n`;
 
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `${t.name.replace(/\s+/g, "_")}_Hesabat_${curMonth}.csv`);
+    link.setAttribute("download", `${t.name.replace(/\s+/g, "_")}_Aylıq_Hesabatı_${curMonth}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

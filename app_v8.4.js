@@ -1724,8 +1724,10 @@ const App = {
         if (p.packageType === "Aylıq") {
           const nextDueDate = getMonthlyPaymentDueDate(p, student, curMonth);
           const diff = getDaysDiff(nextDueDate, today);
-          if (p.paymentStatus === "Ödənildi") {
-            statusHtml = `<span class="badge badge-paid">Ödənildi (${p.paymentDate || ""})</span>`;
+          const isPaidInCurrentMonth = (p.paymentStatus === "Ödənildi") && p.paymentDate && p.paymentDate.includes(curMonth);
+          
+          if (isPaidInCurrentMonth) {
+            statusHtml = `<span class="badge badge-paid">Ödənildi (${p.paymentDate})</span>`;
           } else if (p.paymentStatus === "Qismən ödənilib") {
             let debtText = "";
             let badgeClass = "badge-partial";

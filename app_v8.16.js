@@ -1797,23 +1797,15 @@ const App = {
       }
 
       let dueDateDisplay = "";
-      if (p.packageType === "Aylıq") {
-        let effDueDate = p.dueDate;
-        if (!effDueDate && p.paymentDate) {
-          const pDate = parseSafeDate(p.paymentDate);
-          if (!isNaN(pDate.getTime())) {
-            const m = pDate.getMonth() % 12 + 1;
-            const y = pDate.getFullYear() + (pDate.getMonth() === 11 ? 1 : 0);
-            const d = Math.min(pDate.getDate(), 28);
-            effDueDate = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-          }
-        }
-        if (!effDueDate) {
-          effDueDate = `${curMonth}-15`;
-        }
-        dueDateDisplay = effDueDate;
+      if (isPassiveOrFrozen) {
+        dueDateDisplay = "-";
       } else {
-        dueDateDisplay = sDueDate || p.sessionStartDate || p.paymentDate || "-";
+        if (p.packageType === "Aylıq") {
+          const monthlySessionDueDate = calculateSessionDueDate(p);
+          dueDateDisplay = monthlySessionDueDate || p.sessionStartDate || "-";
+        } else {
+          dueDateDisplay = sDueDate || p.sessionStartDate || p.paymentDate || "-";
+        }
       }
 
       const displayName = student ? `${student.name} ${student.surname || ""}`.trim() : p.studentName;

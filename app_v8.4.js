@@ -82,15 +82,7 @@ function formatDateToYYYYMMDD(dateStr) {
   return `${y}-${m}-${d}`;
 }
 
-// Tarixin verilmiş ay daxilində olub-olmadığını yoxlayan funksiya (Safari uyğunluğu üçün)
-function isDateInMonth(dateStr, monthStr) {
-  if (!dateStr || !monthStr) return false;
-  const date = parseSafeDate(dateStr);
-  if (isNaN(date.getTime())) return false;
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  return `${y}-${m}` === monthStr;
-}
+
 
 // Tarix fərqi tapmaq üçün köməkçi (günlərlə)
 function getDaysDiff(d1Str, d2Str) {

@@ -1724,17 +1724,26 @@ const App = {
             statusHtml = `<span class="badge ${badgeClass}">Qismən (${p.paidAmount}/${p.fee} AZN)${debtText}</span>`;
             actionButtons += `<button class="btn btn-success btn-sm" onclick="App.markPaymentPaid('${p.id}')">Ödənişi tamamla</button>`;
           } else {
-            if (!p.dueDate) {
-              statusHtml = `<span class="badge badge-pending">Ödəniş gözlənilir</span>`;
-            } else {
-              const diff = getDaysDiff(p.dueDate, today);
-              if (diff < 0) {
-                statusHtml = `<span class="badge badge-late-dark">${Math.abs(diff)} gün gecikir</span>`;
-              } else if (diff === 0) {
-                statusHtml = `<span class="badge badge-unpaid">Ödəniş günüdür</span>`;
-              } else {
-                statusHtml = `<span class="badge badge-pending">Ödənişə ${diff} gün qalıb</span>`;
+            let effDueDate = p.dueDate;
+            if (!effDueDate && p.paymentDate) {
+              const pDate = parseSafeDate(p.paymentDate);
+              if (!isNaN(pDate.getTime())) {
+                const m = pDate.getMonth() % 12 + 1;
+                const y = pDate.getFullYear() + (pDate.getMonth() === 11 ? 1 : 0);
+                const d = Math.min(pDate.getDate(), 28);
+                effDueDate = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
               }
+            }
+            if (!effDueDate) {
+              effDueDate = `${curMonth}-15`;
+            }
+            const diff = getDaysDiff(effDueDate, today);
+            if (diff < 0) {
+              statusHtml = `<span class="badge badge-late-dark">${Math.abs(diff)} gün gecikir</span>`;
+            } else if (diff === 0) {
+              statusHtml = `<span class="badge badge-unpaid">Ödəniş günüdür</span>`;
+            } else {
+              statusHtml = `<span class="badge badge-pending">Ödənişə ${diff} gün qalıb</span>`;
             }
             actionButtons += `<button class="btn btn-success btn-sm" onclick="App.markPaymentPaid('${p.id}')">Ödəniş et</button>`;
           }

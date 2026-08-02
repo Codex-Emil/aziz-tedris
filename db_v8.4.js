@@ -3177,7 +3177,8 @@ const DB = {
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-15"
       },
       {
         "id": "pay_202608_pay_1783370008659_9jk63",
@@ -3190,15 +3191,16 @@ const DB = {
         "packageType": "Aylıq",
         "weeklyFrequency": 2,
         "fee": 60,
-        "paymentStatus": "Ödənildi",
-        "paymentDate": "2026-07-02",
-        "paidAmount": 60,
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "paidAmount": 0,
         "notes": "",
         "sessionsCount": null,
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-02"
       },
       {
         "id": "pay_202608_pay_1783370008659_p2fuk",
@@ -3211,15 +3213,16 @@ const DB = {
         "packageType": "Aylıq",
         "weeklyFrequency": 2,
         "fee": 60,
-        "paymentStatus": "Ödənildi",
-        "paymentDate": "2026-07-29",
-        "paidAmount": 60,
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "paidAmount": 0,
         "notes": "",
         "sessionsCount": null,
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-28"
       },
       {
         "id": "pay_202608_pay_1783370008659_krdhg",
@@ -3232,15 +3235,16 @@ const DB = {
         "packageType": "Aylıq",
         "weeklyFrequency": 2,
         "fee": 90,
-        "paymentStatus": "Ödənildi",
-        "paymentDate": "2026-07-30",
-        "paidAmount": 90,
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "paidAmount": 0,
         "notes": "",
         "sessionsCount": null,
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-28"
       },
       {
         "id": "pay_202608_pay_1783370008659_y6fft",
@@ -3261,7 +3265,8 @@ const DB = {
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-15"
       },
       {
         "id": "pay_202608_pay_1783370008659_ui43f",
@@ -3282,7 +3287,8 @@ const DB = {
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-15"
       },
       {
         "id": "pay_202608_pay_1783370008659_3mbpe",
@@ -3303,7 +3309,8 @@ const DB = {
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-15"
       },
       {
         "id": "pay_202608_pay_1783370008659_x6rew",
@@ -3316,15 +3323,16 @@ const DB = {
         "packageType": "Aylıq",
         "weeklyFrequency": 2,
         "fee": 50,
-        "paymentStatus": "Ödənildi",
-        "paymentDate": "2026-07-14",
-        "paidAmount": 50,
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "paidAmount": 0,
         "notes": "",
         "sessionsCount": null,
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-14"
       },
       {
         "id": "pay_202608_pay_1783370008659_xgjx7",
@@ -3337,15 +3345,16 @@ const DB = {
         "packageType": "Aylıq",
         "weeklyFrequency": 2,
         "fee": 50,
-        "paymentStatus": "Ödənildi",
-        "paymentDate": "2026-07-28",
-        "paidAmount": 50,
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "paidAmount": 0,
         "notes": "",
         "sessionsCount": null,
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-28"
       },
       {
         "id": "pay_202608_pay_1783370008659_6xrvo",
@@ -3511,7 +3520,8 @@ const DB = {
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-15"
       },
       {
         "id": "pay_202608_pay_1783370008660_7fal2",
@@ -4711,15 +4721,16 @@ const DB = {
         "packageType": "Aylıq",
         "weeklyFrequency": 2,
         "fee": 70,
-        "paymentStatus": "Ödənildi",
-        "paymentDate": "2026-07-28",
-        "paidAmount": 70,
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "paidAmount": 0,
         "notes": "",
         "sessionsCount": null,
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-28"
       },
       {
         "id": "pay_202608_pay_1785269051269_e2cvp",
@@ -4756,15 +4767,16 @@ const DB = {
         "packageType": "Aylıq",
         "weeklyFrequency": 2,
         "fee": 70,
-        "paymentStatus": "Ödənildi",
-        "paymentDate": "2026-07-30",
-        "paidAmount": 70,
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "paidAmount": 0,
         "notes": "",
         "sessionsCount": null,
         "sessionStartDate": null,
         "sessionsLogged": 0,
         "isManualSessions": false,
-        "sessionDays": null
+        "sessionDays": null,
+        "dueDate": "2026-08-28"
       },
       {
         "id": "pay_202608_pay_1785350972386_hfrbz",

@@ -1232,8 +1232,10 @@ const App = {
         barGradient2.addColorStop(1, "rgba(5, 150, 105, 0.15)");
       }
 
-      this.teacherChart = new Chart(ctx, {
-        plugins: [ChartDataLabels],
+      if (typeof Chart !== "undefined") {
+        const pluginsList = (typeof ChartDataLabels !== "undefined") ? [ChartDataLabels] : [];
+        this.teacherChart = new Chart(ctx, {
+          plugins: pluginsList,
         data: {
           labels: chartLabels,
           datasets: [
@@ -1389,8 +1391,8 @@ const App = {
               }
             }
           }
-        }
-      });
+        });
+      }
     }
   },
 

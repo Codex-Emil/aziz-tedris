@@ -15,7 +15,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <script>
     window.onerror = function(msg, url, line) {
-      alert("Sistem Xətası:\n" + msg + "\n\nFayl: " + url.split('/').pop() + "\nSətir: " + line);
+      if (!msg || msg === "Script error." || String(msg).includes("Script error")) return true;
+      alert("Sistem Xətası:\n" + msg + "\n\nFayl: " + (url ? url.split('/').pop() : '') + "\nSətir: " + line);
       return false;
     };
   </script>

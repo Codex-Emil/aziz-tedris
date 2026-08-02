@@ -3090,6 +3090,24 @@ const DB = {
     ],
     "2026-08": [
       {
+        "id": "pay_202608_pay_1783370008659_l0wds",
+        "studentId": "std_1783365786841",
+        "studentName": "Rauf",
+        "courseId": "c1",
+        "courseName": "İbtidai sinif qrup (rus)",
+        "teacherName": "Pərvanə m.",
+        "teacherId": "t1",
+        "packageType": "Aylıq",
+        "groupType": "Qrup",
+        "sessionsCount": null,
+        "weeklyFrequency": 2,
+        "fee": 90,
+        "dueDate": "2026-08-12",
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "sessionsLogged": 0
+      },
+      {
         "id": "pay_1784232368714_of01g",
         "studentId": "std_1783365865574",
         "studentName": "Nihad",
@@ -3234,6 +3252,179 @@ const DB = {
         "sessionsLogged": 0
       },
       {
+        "id": "pay_202608_pay_1783370008659_6xrvo",
+        "studentId": "std_1783367888279",
+        "studentName": "Emiliya",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-08-22",
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "sessionsLogged": 0,
+        "isManualSessions": true
+      },
+      {
+        "id": "pay_202608_pay_1783370008660_r12hb",
+        "studentId": "std_1783367958062",
+        "studentName": "Murad",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-07-14",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-06-18",
+        "sessionsLogged": 0,
+        "paidAmount": 30,
+        "sessionStartDate": "2026-06-18"
+      },
+      {
+        "id": "pay_1784232368715_jk7gg",
+        "studentId": "std_1783367986409",
+        "studentName": "Nərgiz",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-08-11",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-16",
+        "sessionsLogged": 0,
+        "paidAmount": 30,
+        "sessionStartDate": "2026-07-16",
+        "isManualSessions": false,
+        "isRenewed": false,
+        "sessionDays": [
+          2,
+          4
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1783370008660_pyhri",
+        "studentId": "std_1783368069311",
+        "studentName": "Xədicə",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 40,
+        "dueDate": "2026-08-22",
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "sessionsLogged": 0,
+        "isManualSessions": true
+      },
+      {
+        "id": "pay_202608_pay_1783370008660_ao1cw",
+        "studentId": "std_1783368110528",
+        "studentName": "Afaq xanım",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Fərdi",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 50,
+        "dueDate": "2026-08-22",
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "sessionsLogged": 0,
+        "isManualSessions": true
+      },
+      {
+        "id": "pay_202608_pay_1783370008660_ug2u5",
+        "studentId": "std_1783368333279",
+        "studentName": "Milana",
+        "courseId": "c6",
+        "courseName": "Gimnastika",
+        "teacherName": "Nərminə m.",
+        "teacherId": "t_1783363759267",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 12,
+        "weeklyFrequency": 3,
+        "fee": 40,
+        "dueDate": "2026-07-01",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-06-05",
+        "sessionsLogged": 0,
+        "paidAmount": 40,
+        "sessionStartDate": "2026-06-05",
+        "sessionDays": [
+          1,
+          3,
+          5
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1783370008660_qz1zk",
+        "studentId": "std_1783368416308",
+        "studentName": "Diana",
+        "courseId": "c6",
+        "courseName": "Gimnastika",
+        "teacherName": "Nərminə m.",
+        "teacherId": "t_1783363759267",
+        "packageType": "Aylıq",
+        "groupType": "Qrup",
+        "sessionsCount": null,
+        "weeklyFrequency": 2,
+        "fee": 40,
+        "dueDate": "2026-08-02",
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "sessionsLogged": 0
+      },
+      {
+        "id": "pay_1784232368715_nxnt1",
+        "studentId": "std_1783366161874",
+        "studentName": "Aliyə",
+        "courseId": "c6",
+        "courseName": "Gimnastika",
+        "teacherName": "Nərminə m.",
+        "teacherId": "t_1783363759267",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 12,
+        "weeklyFrequency": 3,
+        "fee": 40,
+        "dueDate": "2026-08-10",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-16",
+        "sessionsLogged": 0,
+        "paidAmount": 40,
+        "sessionStartDate": "2026-07-15",
+        "sessionDays": [
+          1,
+          3,
+          5
+        ],
+        "isManualSessions": false,
+        "isRenewed": false
+      },
+      {
         "id": "pay_1784232368715_pqnax",
         "studentId": "std_1783368485694",
         "studentName": "İnci",
@@ -3259,6 +3450,70 @@ const DB = {
         ]
       },
       {
+        "id": "pay_202608_pay_1783370008660_8r669",
+        "studentId": "std_1783365786841",
+        "studentName": "Rauf",
+        "courseId": "c6",
+        "courseName": "Gimnastika",
+        "teacherName": "Nərminə m.",
+        "teacherId": "t_1783363759267",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 12,
+        "weeklyFrequency": 3,
+        "fee": 40,
+        "dueDate": "2026-08-12",
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "sessionsLogged": 0,
+        "isManualSessions": true
+      },
+      {
+        "id": "pay_1784232368715_3d85b",
+        "studentId": "std_1783368720538",
+        "studentName": "Xədicə Məmmədli",
+        "courseId": "c7",
+        "courseName": "Rəsm",
+        "teacherName": "Fatimə m.",
+        "teacherId": "t5",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-08-06",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-14",
+        "sessionsLogged": 0,
+        "paidAmount": 30,
+        "sessionStartDate": "2026-07-14",
+        "isManualSessions": false,
+        "sessionDays": [
+          2,
+          4
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1783370008660_aezb1",
+        "studentId": "std_1783368766556",
+        "studentName": "Milana Əliyeva",
+        "courseId": "c7",
+        "courseName": "Rəsm",
+        "teacherName": "Fatimə m.",
+        "teacherId": "t5",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-06-25",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-06-01",
+        "sessionsLogged": 0,
+        "paidAmount": 30,
+        "sessionStartDate": "2026-06-01"
+      },
+      {
         "id": "pay_1784232368715_dtjtz",
         "studentId": "std_1783368818211",
         "studentName": "Diana Əlicanova",
@@ -3277,6 +3532,148 @@ const DB = {
         "sessionsLogged": 0,
         "paidAmount": 30,
         "sessionStartDate": "2026-07-09"
+      },
+      {
+        "id": "pay_1784232368715_rqlj2",
+        "studentId": "std_1783368899840",
+        "studentName": "Çiçək",
+        "courseId": "c7",
+        "courseName": "Rəsm",
+        "teacherName": "Fatimə m.",
+        "teacherId": "t5",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-08-07",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-15",
+        "sessionsLogged": 0,
+        "paidAmount": 30,
+        "sessionStartDate": "2026-07-14",
+        "isManualSessions": false,
+        "isRenewed": false,
+        "sessionDays": [
+          2,
+          5
+        ]
+      },
+      {
+        "id": "pay_1784232368715_pknog",
+        "studentId": "std_1783366161874",
+        "studentName": "Aliyə",
+        "courseId": "c7",
+        "courseName": "Rəsm",
+        "teacherName": "Fatimə m.",
+        "teacherId": "t5",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-08-07",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-15",
+        "sessionsLogged": 0,
+        "paidAmount": 30,
+        "sessionStartDate": "2026-07-14",
+        "isManualSessions": false,
+        "isRenewed": false,
+        "sessionDays": [
+          2,
+          5
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1783370008660_f7twe",
+        "studentId": "std_1783368960243",
+        "studentName": "Ayan",
+        "courseId": "c7",
+        "courseName": "Rəsm",
+        "teacherName": "Fatimə m.",
+        "teacherId": "t5",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-08-26",
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "sessionsLogged": 0,
+        "isManualSessions": true
+      },
+      {
+        "id": "pay_1784232368715_85x3u",
+        "studentId": "std_1783366161874",
+        "studentName": "Aliyə",
+        "courseId": "c8",
+        "courseName": "Şahmat",
+        "teacherName": "Səba m.",
+        "teacherId": "t4",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 35,
+        "dueDate": "2026-08-11",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-16",
+        "sessionsLogged": 0,
+        "paidAmount": 35,
+        "sessionStartDate": "2026-07-16",
+        "sessionDays": [
+          2,
+          4
+        ],
+        "isManualSessions": false,
+        "isRenewed": false
+      },
+      {
+        "id": "pay_1784232368715_8233c",
+        "studentId": "std_1783369229905",
+        "studentName": "Şamil",
+        "courseId": "c8",
+        "courseName": "Şahmat",
+        "teacherName": "Səba m.",
+        "teacherId": "t4",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 35,
+        "dueDate": "2026-08-11",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-16",
+        "sessionsLogged": 0,
+        "paidAmount": 35,
+        "sessionStartDate": "2026-07-16",
+        "sessionDays": [
+          2,
+          4
+        ],
+        "isManualSessions": false,
+        "isRenewed": false
+      },
+      {
+        "id": "pay_202608_pay_1783445352542_3azu9",
+        "studentId": "std_1783445352542",
+        "studentName": "Alisa",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-08-02",
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "sessionsLogged": 0,
+        "isManualSessions": true
       },
       {
         "id": "pay_1784232368715_ptajo",
@@ -3300,6 +3697,54 @@ const DB = {
         "sessionDays": [
           1,
           3,
+          5
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1783446164431_wyns1",
+        "studentId": "std_1783446164431",
+        "studentName": "Duyğu",
+        "courseId": "c7",
+        "courseName": "Rəsm",
+        "teacherName": "Fatimə m.",
+        "teacherId": "t5",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-07-31",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-07",
+        "sessionsLogged": 0,
+        "paidAmount": 30,
+        "sessionStartDate": "2026-07-07",
+        "sessionDays": [
+          2,
+          5
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1783446336579_209gh",
+        "studentId": "std_1783446336579",
+        "studentName": "Məhəmməd",
+        "courseId": "c7",
+        "courseName": "Rəsm",
+        "teacherName": "Fatimə m.",
+        "teacherId": "t5",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 40,
+        "dueDate": "2026-07-31",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-07",
+        "sessionsLogged": 0,
+        "paidAmount": 40,
+        "sessionStartDate": "2026-07-07",
+        "sessionDays": [
+          2,
           5
         ]
       },
@@ -3342,6 +3787,52 @@ const DB = {
         "sessionsLogged": 0,
         "sessionStartDate": "2026-07-14",
         "paidAmount": 120
+      },
+      {
+        "id": "pay_1784232368715_83ptp",
+        "studentId": "std_1783376322807",
+        "studentName": "Tunar",
+        "courseId": "c10",
+        "courseName": "Loqoped",
+        "teacherName": "Rövşanə m.",
+        "teacherId": "t3",
+        "packageType": "Seans",
+        "groupType": "Fərdi",
+        "sessionsCount": 12,
+        "weeklyFrequency": 3,
+        "fee": 180,
+        "dueDate": "2026-08-14",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-16",
+        "sessionsLogged": 0,
+        "sessionStartDate": "2026-07-21",
+        "isManualSessions": false,
+        "isRenewed": false,
+        "paidAmount": 180,
+        "sessionDays": [
+          2,
+          4,
+          5
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1783535463759_ayax7",
+        "studentId": "std_1783441283898",
+        "studentName": "Ayaz ",
+        "courseId": "c9",
+        "courseName": "Psixoloq",
+        "teacherName": "Aynur m.",
+        "teacherId": "t_1783363774084",
+        "packageType": "Seans",
+        "groupType": "Fərdi",
+        "sessionsCount": 4,
+        "weeklyFrequency": 2,
+        "fee": 60,
+        "dueDate": "2026-08-12",
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "sessionsLogged": 0,
+        "isManualSessions": false
       },
       {
         "id": "pay_1784232368715_ghqg6",
@@ -3497,6 +3988,27 @@ const DB = {
         ]
       },
       {
+        "id": "pay_202608_pay_1784042583685_t9tkj",
+        "studentId": "std_1783441283898",
+        "studentName": "Ayaz ",
+        "courseId": "c9",
+        "courseName": "Psixoloq",
+        "teacherName": "Aynur m.",
+        "teacherId": "t_1783363774084",
+        "packageType": "Seans",
+        "groupType": "Fərdi",
+        "sessionsCount": 4,
+        "weeklyFrequency": 2,
+        "fee": 60,
+        "dueDate": "2026-07-23",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-14",
+        "sessionsLogged": 0,
+        "paidAmount": 60,
+        "sessionStartDate": "2026-07-14",
+        "isManualSessions": false
+      },
+      {
         "id": "pay_1784232368715_hc828",
         "studentId": "std_1784131042760",
         "studentName": "Rüqəyya Rəhimli",
@@ -3630,6 +4142,33 @@ const DB = {
         "paymentDate": "2026-07-16",
         "sessionsLogged": 0,
         "paidAmount": 40,
+        "sessionStartDate": "2026-07-15",
+        "sessionDays": [
+          1,
+          3,
+          5
+        ],
+        "isManualSessions": false,
+        "isRenewed": false
+      },
+      {
+        "id": "pay_202608_pay_1784134189461_artmj",
+        "studentId": "std_1783365786841",
+        "studentName": "Rauf",
+        "courseId": "c6",
+        "courseName": "Gimnastika",
+        "teacherName": "Nərminə m.",
+        "teacherId": "t_1783363759267",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 12,
+        "weeklyFrequency": 3,
+        "fee": 40,
+        "dueDate": null,
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "sessionsLogged": 0,
+        "paidAmount": 0,
         "sessionStartDate": "2026-07-15",
         "sessionDays": [
           1,
@@ -3794,40 +4333,340 @@ const DB = {
         ]
       },
       {
-        "id": "pay_1784232368715_atoz6",
-        "studentId": "std_1783367709542",
-        "studentName": "Əbülfəz",
+        "id": "pay_202608_pay_1784309973982_omyb0",
+        "studentId": "std_1784309929508",
+        "studentName": "Xədicə",
+        "courseId": "c6",
+        "courseName": "Gimnastika",
+        "teacherName": "Nərminə m.",
+        "teacherId": "t_1783363759267",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 12,
+        "weeklyFrequency": 3,
+        "fee": 40,
+        "dueDate": "2026-08-12",
+        "sessionStartDate": "2026-07-17",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-17",
+        "paidAmount": 40,
+        "sessionsLogged": 0,
+        "sessionDays": [
+          1,
+          3,
+          5
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1784622464262_cpmob",
+        "studentId": "std_1783367888279",
+        "studentName": "Emiliya",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-08-13",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-21",
+        "sessionsLogged": 0,
+        "paidAmount": 30,
+        "sessionStartDate": "2026-07-21",
+        "sessionDays": [
+          2,
+          4
+        ],
+        "isManualSessions": false,
+        "isRenewed": false
+      },
+      {
+        "id": "pay_202608_pay_1784625540936_6jqcq",
+        "studentId": "std_1783368110528",
+        "studentName": "Afaq xanım",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Fərdi",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 50,
+        "dueDate": "2026-08-13",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-21",
+        "sessionsLogged": 0,
+        "paidAmount": 50,
+        "sessionStartDate": "2026-07-21",
+        "sessionDays": [
+          2,
+          4
+        ],
+        "isManualSessions": false,
+        "isRenewed": false
+      },
+      {
+        "id": "pay_202608_pay_1784626670842_ypdfd",
+        "studentId": "std_1784626548869",
+        "studentName": "Hüseyn Haqverdiyev",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Fərdi",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 35,
+        "dueDate": "2026-08-20",
+        "sessionStartDate": "2026-07-28",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-28",
+        "paidAmount": 35,
+        "sessionsLogged": 0,
+        "sessionDays": [
+          2,
+          4
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1784818319894_r11jy",
+        "studentId": "std_1783368069311",
+        "studentName": "Xədicə",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 40,
+        "dueDate": "2026-08-18",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-23",
+        "sessionsLogged": 0,
+        "paidAmount": 40,
+        "sessionStartDate": "2026-07-23",
+        "isManualSessions": false,
+        "isRenewed": false,
+        "sessionDays": [
+          2,
+          4
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1784880996418_42p1w",
+        "studentId": "std_1784880938189",
+        "studentName": "Mətanət Babazadə",
+        "courseId": "c6",
+        "courseName": "Gimnastika",
+        "teacherName": "Nərminə m.",
+        "teacherId": "t_1783363759267",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 12,
+        "weeklyFrequency": 3,
+        "fee": 40,
+        "dueDate": null,
+        "sessionStartDate": "2026-07-27",
+        "paymentStatus": "Ödənilməyib",
+        "paymentDate": null,
+        "paidAmount": 0,
+        "sessionsLogged": 0,
+        "sessionDays": [
+          1,
+          3,
+          5
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1785003092854_uxgdv",
+        "studentId": "std_1783368960243",
+        "studentName": "Ayan",
+        "courseId": "c7",
+        "courseName": "Rəsm",
+        "teacherName": "Fatimə m.",
+        "teacherId": "t5",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-08-18",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-29",
+        "sessionsLogged": 0,
+        "paidAmount": 30,
+        "sessionStartDate": "2026-07-24",
+        "sessionDays": [
+          2,
+          5
+        ],
+        "isManualSessions": false,
+        "isRenewed": false
+      },
+      {
+        "id": "pay_202608_pay_1785164953022_vuftw",
+        "studentId": "std_1785164921358",
+        "studentName": "Həmid",
+        "courseId": "c9",
+        "courseName": "Psixoloq",
+        "teacherName": "Aynur m.",
+        "teacherId": "t_1783363774084",
+        "packageType": "Seans",
+        "groupType": "Fərdi",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 120,
+        "dueDate": "2026-08-20",
+        "sessionStartDate": "2026-07-27",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-27",
+        "paidAmount": 120,
+        "sessionsLogged": 0,
+        "sessionDays": [
+          1,
+          4
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1785165196112_fv822",
+        "studentId": "std_1785165138971",
+        "studentName": "Ümüd",
+        "courseId": "c9",
+        "courseName": "Psixoloq",
+        "teacherName": "Aynur m.",
+        "teacherId": "t_1783363774084",
+        "packageType": "Seans",
+        "groupType": "Fərdi",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 120,
+        "dueDate": "2026-08-20",
+        "sessionStartDate": "2026-07-27",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-27",
+        "paidAmount": 120,
+        "sessionsLogged": 0,
+        "sessionDays": [
+          1,
+          4
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1785224872916_8lew5",
+        "studentId": "std_1785224754231",
+        "studentName": "Zoya",
         "courseId": "c3",
         "courseName": "İngilis dili (az)",
         "teacherName": "Nərmin m.",
         "teacherId": "t_1783363696932",
         "packageType": "Aylıq",
-        "groupType": "Qrup",
+        "groupType": "Fərdi",
         "sessionsCount": null,
         "weeklyFrequency": 2,
-        "fee": 50,
-        "dueDate": "2026-08-22",
+        "fee": 70,
+        "dueDate": "2026-08-28",
         "paymentStatus": "Ödənilməyib",
         "paymentDate": null,
         "sessionsLogged": 0
       },
       {
-        "id": "pay_1784232368715_zaufj",
-        "studentId": "std_1784216840133",
-        "studentName": "Tamerlan",
+        "id": "pay_202608_pay_1785269051269_e2cvp",
+        "studentId": "std_1783445352542",
+        "studentName": "Alisa",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-08-25",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-29",
+        "sessionsLogged": 0,
+        "isManualSessions": false,
+        "isRenewed": false,
+        "paidAmount": 30,
+        "sessionStartDate": "2026-07-30",
+        "sessionDays": [
+          2,
+          4
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1785349580230_m3s5f",
+        "studentId": "std_1783366161874",
+        "studentName": "Aliyə Cəfərzadə",
         "courseId": "c3",
         "courseName": "İngilis dili (az)",
         "teacherName": "Nərmin m.",
         "teacherId": "t_1783363696932",
         "packageType": "Aylıq",
-        "groupType": "Qrup",
+        "groupType": "Fərdi",
         "sessionsCount": null,
         "weeklyFrequency": 2,
-        "fee": 50,
-        "dueDate": "2026-08-20",
+        "fee": 70,
+        "dueDate": "2026-08-30",
         "paymentStatus": "Ödənilməyib",
         "paymentDate": null,
         "sessionsLogged": 0
+      },
+      {
+        "id": "pay_202608_pay_1785350972386_hfrbz",
+        "studentId": "std_1785350910182",
+        "studentName": "Aysu Dadıyeva",
+        "courseId": "c5",
+        "courseName": "Rəqs",
+        "teacherName": "Sevinc m.",
+        "teacherId": "t_1783363738768",
+        "packageType": "Seans",
+        "groupType": "Qrup",
+        "sessionsCount": 8,
+        "weeklyFrequency": 2,
+        "fee": 30,
+        "dueDate": "2026-08-20",
+        "sessionStartDate": "2026-07-28",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-29",
+        "paidAmount": 30,
+        "sessionsLogged": 0,
+        "sessionDays": [
+          2,
+          4
+        ]
+      },
+      {
+        "id": "pay_202608_pay_1785426989854_ky3fm",
+        "studentId": "std_1785426941710",
+        "studentName": "Mehdi",
+        "courseId": "c10",
+        "courseName": "Loqoped",
+        "teacherName": "Rövşanə m.",
+        "teacherId": "t3",
+        "packageType": "Seans",
+        "groupType": "Fərdi",
+        "sessionsCount": 4,
+        "weeklyFrequency": 2,
+        "fee": 60,
+        "dueDate": "2026-08-03",
+        "sessionStartDate": "2026-07-23",
+        "paymentStatus": "Ödənildi",
+        "paymentDate": "2026-07-23",
+        "paidAmount": 60,
+        "sessionsLogged": 0,
+        "sessionDays": [
+          1,
+          4
+        ]
       }
     ],
     "2026-09": []
@@ -4074,37 +4913,66 @@ const DB = {
       if (!allPayments[targetMonth]) allPayments[targetMonth] = [];
       const targetPayments = allPayments[targetMonth];
       
-      const [year, month] = sourceMonth.split("-").map(Number);
-      const lastDayStr = `${year}-${String(month).padStart(2, '0')}-${new Date(year, month, 0).getDate()}`;
+      const [year, month] = targetMonth.split("-").map(Number);
       
       sourcePayments.forEach(oldPay => {
-        if (oldPay.packageType === "Seans") {
+        const hasRecord = targetPayments.some(tp => tp.studentId === oldPay.studentId && (tp.courseId === oldPay.courseId || tp.courseName === oldPay.courseName));
+        if (!hasRecord) {
           const student = students.find(s => s.id === oldPay.studentId);
-          if (student && student.status === "Aktiv") {
-            let isExpired = false;
-            if (oldPay.paymentStatus === "Ödənildi") {
-              const loggedAtEndOfMonth = dbCalculateSessionsOccurred(
-                oldPay.sessionStartDate || oldPay.paymentDate,
-                lastDayStr,
-                oldPay.weeklyFrequency || 2,
-                oldPay.sessionsCount
-              );
-              if (loggedAtEndOfMonth >= oldPay.sessionsCount) {
-                isExpired = true;
-              }
+          const dueDate = this.calculateNextMonthlyDueDate(student, targetMonth);
+          
+          let newPay = null;
+          if (oldPay.packageType === "Aylıq") {
+            newPay = {
+              id: "pay_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
+              studentId: oldPay.studentId,
+              studentName: oldPay.studentName,
+              courseId: oldPay.courseId || null,
+              courseName: oldPay.courseName,
+              teacherName: oldPay.teacherName,
+              teacherId: oldPay.teacherId,
+              packageType: "Aylıq",
+              groupType: oldPay.groupType || "Qrup",
+              sessionsCount: null,
+              weeklyFrequency: oldPay.weeklyFrequency || 2,
+              fee: oldPay.fee,
+              dueDate: dueDate,
+              paymentStatus: "Ödənilməyib",
+              paymentDate: null,
+              sessionsLogged: 0
+            };
+          } else { // Seans
+            const isCompleted = (oldPay.paymentStatus === "Ödənildi" && (oldPay.sessionsLogged || 0) >= (oldPay.sessionsCount || 8));
+            if (isCompleted) {
+              newPay = {
+                id: "pay_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
+                studentId: oldPay.studentId,
+                studentName: oldPay.studentName,
+                courseId: oldPay.courseId || null,
+                courseName: oldPay.courseName,
+                teacherName: oldPay.teacherName,
+                teacherId: oldPay.teacherId,
+                packageType: "Seans",
+                groupType: oldPay.groupType || "Qrup",
+                sessionsCount: oldPay.sessionsCount || 8,
+                weeklyFrequency: oldPay.weeklyFrequency || 2,
+                fee: oldPay.fee,
+                dueDate: dueDate,
+                paymentStatus: "Ödənilməyib",
+                paymentDate: null,
+                sessionsLogged: 0,
+                isManualSessions: oldPay.isManualSessions || false
+              };
+            } else {
+              newPay = {
+                ...oldPay,
+                id: "pay_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5)
+              };
             }
-            
-            if (!isExpired) {
-              const hasRecord = targetPayments.some(tp => tp.studentId === oldPay.studentId && tp.courseId === oldPay.courseId);
-              if (!hasRecord) {
-                const newPay = {
-                  ...oldPay,
-                  id: "pay_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
-                };
-                targetPayments.push(newPay);
-                changed = true;
-              }
-            }
+          }
+          if (newPay) {
+            targetPayments.push(newPay);
+            changed = true;
           }
         }
       });
@@ -4114,6 +4982,8 @@ const DB = {
       this._set("payments", allPayments);
     }
   },
+
+
 
   // 1. Tələbə Əməliyyatları (Students)
   getStudents() {
@@ -4524,20 +5394,39 @@ const DB = {
 
     const allPayments = this._get("payments", {});
 
-    // Əgər hədəf ay yoxdursa və ya boşdursa, həmin ayı cari aktiv uşaqların məlumatlarına görə kopyalaya bilərik.
     if (!allPayments[newMonth] || allPayments[newMonth].length === 0) {
       const students = this.getStudents();
       const currentPayments = this.getPayments(currentMonth);
       allPayments[newMonth] = [];
 
-      // Aktiv uşaqların əvvəlki aydakı ödəniş qeydlərini analiz edək
       currentPayments.forEach(oldPay => {
         const student = students.find(s => s.id === oldPay.studentId);
-        // Uşaq hələ də aktivdirsə, yeni aya keçiririk
-        if (student && student.status === "Aktiv") {
-          if (oldPay.packageType === "Aylıq") {
-            // Aylıq paketlər yeni aya həmişə unpaid olaraq keçir
-            const newPay = {
+        const dueDate = this.calculateNextMonthlyDueDate(student, newMonth);
+        let newPay = null;
+
+        if (oldPay.packageType === "Aylıq") {
+          newPay = {
+            id: "pay_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
+            studentId: oldPay.studentId,
+            studentName: oldPay.studentName,
+            courseId: oldPay.courseId || null,
+            courseName: oldPay.courseName,
+            teacherName: oldPay.teacherName,
+            teacherId: oldPay.teacherId,
+            packageType: "Aylıq",
+            groupType: oldPay.groupType || "Qrup",
+            sessionsCount: null,
+            weeklyFrequency: oldPay.weeklyFrequency || 2,
+            fee: oldPay.fee,
+            dueDate: dueDate,
+            paymentStatus: "Ödənilməyib",
+            paymentDate: null,
+            sessionsLogged: 0
+          };
+        } else { // Seans
+          const isCompleted = (oldPay.paymentStatus === "Ödənildi" && (oldPay.sessionsLogged || 0) >= (oldPay.sessionsCount || 8));
+          if (isCompleted) {
+            newPay = {
               id: "pay_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
               studentId: oldPay.studentId,
               studentName: oldPay.studentName,
@@ -4545,44 +5434,26 @@ const DB = {
               courseName: oldPay.courseName,
               teacherName: oldPay.teacherName,
               teacherId: oldPay.teacherId,
-              packageType: "Aylıq",
-              groupType: oldPay.groupType,
-              sessionsCount: null,
-              weeklyFrequency: oldPay.weeklyFrequency,
+              packageType: "Seans",
+              groupType: oldPay.groupType || "Qrup",
+              sessionsCount: oldPay.sessionsCount || 8,
+              weeklyFrequency: oldPay.weeklyFrequency || 2,
               fee: oldPay.fee,
-              dueDate: this.calculateNextMonthlyDueDate(student, newMonth),
+              dueDate: dueDate,
               paymentStatus: "Ödənilməyib",
               paymentDate: null,
-              sessionsLogged: 0
+              sessionsLogged: 0,
+              isManualSessions: oldPay.isManualSessions || false
             };
-            allPayments[newMonth].push(newPay);
-          } else if (oldPay.packageType === "Seans") {
-            // Köhnə ayın son günü etibarı ilə neçə seansın keçirildiyini hesablayaq
-            let isExpired = false;
-            if (oldPay.paymentStatus === "Ödənildi") {
-              const [year, month] = currentMonth.split("-").map(Number);
-              const lastDayStr = `${year}-${String(month).padStart(2, '0')}-${new Date(year, month, 0).getDate()}`;
-              const loggedAtEndOfMonth = dbCalculateSessionsOccurred(
-                oldPay.sessionStartDate || oldPay.paymentDate,
-                lastDayStr,
-                oldPay.weeklyFrequency || 2,
-                oldPay.sessionsCount
-              );
-
-              if (loggedAtEndOfMonth >= oldPay.sessionsCount) {
-                isExpired = true;
-              }
-            }
-            
-            // Əgər seans dərsləri köhnə ayın sonuna qədər hələ bitməyibsə, yeni aya keçiririk
-            if (!isExpired) {
-              const newPay = {
-                ...oldPay,
-                id: "pay_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
-              };
-              allPayments[newMonth].push(newPay);
-            }
+          } else {
+            newPay = {
+              ...oldPay,
+              id: "pay_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5)
+            };
           }
+        }
+        if (newPay) {
+          allPayments[newMonth].push(newPay);
         }
       });
       this._set("payments", allPayments);
@@ -4590,6 +5461,8 @@ const DB = {
 
     this.setCurrentMonth(newMonth);
   },
+
+
 
   // Aylıq ödəniş gününün hesablanması (Qeydiyyat gününə görə)
   calculateNextMonthlyDueDate(student, targetMonth) {

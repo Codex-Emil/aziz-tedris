@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Əziz Tədris">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="icon" type="image/png" href="logo.png">
+  <title>Əziz Tədris Mərkəzi - Ödəniş Sistemi</title>
+  <link rel="stylesheet" href="style.css?v=8.8_print_20260731">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <script>
+    window.onerror = function(msg, url, line) {
+      alert("Sistem Xətası:\n" + msg + "\n\nFayl: " + url.split('/').pop() + "\nSətir: " + line);
+      return false;
+    };
+  </script>
+</head>
+<body>
+  <!-- LOGIN OVERLAY -->
+  <div id="login-overlay" class="login-overlay" style="display: flex;">
+    <div class="login-container">
+      <div class="login-header">
+        <img src="logo.png" alt="Əziz Tədris Mərkəzi" style="width: 100px; height: 100px; object-fit: contain; margin: 0 auto 1.25rem auto; display: block; border-radius: 12px; background: white; padding: 5px; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <h2>Əziz Tədris Mərkəzi</h2>
+        <p>Maliyyə və Tədris İdarəetmə Sistemi</p>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-username">İstifadəçi Adı</label>
+          <input type="text" id="login-username" value="admin" readonly style="background: rgba(255,255,255,0.02); color: var(--text-muted); cursor: not-allowed;">
+        </div>
+        <div class="form-group" style="margin-top: 1rem;">
+          <label for="login-password">Şifrə</label>
+          <input type="password" id="login-password" required placeholder="•••••">
+        </div>
+        <div id="login-error-msg" class="login-error" style="display: none; color: var(--danger); font-size: 0.8rem; margin-top: 0.75rem; text-align: center; font-weight: 600;">
+          ❌ Daxil edilən şifrə yanlışdır!
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; height: 42px; font-size: 0.9rem; border-radius: 20px; font-weight: 600;">
+          Sistemə Giriş 🔑
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="app-container">
+    
+    <!-- TOP NAVBAR -->
+    <header class="top-navbar">
+      <div class="logo-container" onclick="App.switchScreen('dashboard-screen')" style="cursor: pointer;">
+        <div style="width: 44px; height: 44px; border-radius: 8px; background: white; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.05); flex-shrink: 0;">
+          <img src="logo.png" alt="Əziz Tədris Mərkəzi" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.25);">
+        </div>
+        <div class="logo-text">
+          <span>Əziz</span>
+          <span>Tədris</span>
+          <span>Mərkəzi</span>
+          <small style="font-size: 0.65rem; opacity: 0.6; color: var(--primary); display: block; margin-top: 2px;">v8.6</small>
+        </div>
+      </div>
+      
+      <ul class="nav-links">
+        <li class="nav-item">
+          <a class="nav-link active" data-screen="dashboard-screen">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-screen="students-screen">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+            <span>Uşaqlar (Baza)</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-screen="payments-screen">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+            </svg>
+            <span>Ödəniş Cədvəli</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-screen="teachers-report-screen">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+            </svg>
+            <span>Müəllimə Hesabatı</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-screen="center-report-screen">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m9-9H3M12 5.25a3 3 0 110 6 3 3 0 010-6zm0 7.5a3 3 0 110 6 3 3 0 010-6z" />
+            </svg>
+            <span>Tədris Hesabatı</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-screen="settings-screen">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.936 6.936 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>Ayarlar</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-screen="archive-screen">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+            </svg>
+            <span>Arxiv / Tarixçə</span>
+          </a>
+        </li>
+      </ul>
+      
+      <div class="top-navbar-right">
+        <button id="btn-logout" class="nav-logout-btn" onclick="App.handleLogout()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+          </svg>
+          <span>Çıxış</span>
+        </button>
+      </div>
+    </header>
+    
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      
+      <!-- TOP HEADER -->
+      <div class="top-header">
+        <div class="header-title-section">
+          <h1 id="screen-main-title">İdarəetmə Paneli</h1>
+          <p id="screen-sub-title">Xoş gəlmisiniz. Sistemin cari vəziyyəti aşağıdakı kimidir.</p>
+        </div>
+        <div class="header-actions" style="display: flex; align-items: center; gap: 1rem;">
+          <span style="font-size: 0.9rem; color: var(--text-muted); margin-right: 0.5rem;" id="live-time"></span>
+          
+          <div class="current-month-indicator">
+            <span>Aktiv Ay:</span>
+            <strong id="active-month-text" style="color: var(--primary);">...</strong>
+            <span id="viewed-month-container" style="display: none; font-size: 0.75rem; opacity: 0.85; margin-left: 5px;">
+              (Arxiv: <strong id="viewed-month-text">...</strong>)
+            </span>
+          </div>
+          
+          <button id="btn-change-month">
+            Yeni Aya Keçid
+          </button>
+        </div>
+      </div>
+      
+      <!-- SCREEN: DASHBOARD -->
+      <div id="dashboard-screen" class="screen active-screen">
+        <div class="stats-grid">
+          <div class="stat-card primary">
+            <div class="stat-icon">👥</div>
+            <div class="stat-title">Aktiv Uşaqlar</div>
+            <div class="stat-value" id="dash-active-count">0</div>
+          </div>
+          <div class="stat-card success">
+            <div class="stat-icon">💰</div>
+            <div class="stat-title">Toplanan Ödəniş</div>
+            <div class="stat-value" id="dash-total-income">0 AZN</div>
+          </div>
+          <div class="stat-card warning">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-title">Gözləyən Ödəniş</div>
+            <div class="stat-value" id="dash-pending-income">0 AZN</div>
+          </div>
+          <div class="stat-card danger">
+            <div class="stat-icon">📈</div>
+            <div class="stat-title">Təxmini Xalis Qazanc</div>
+            <div class="stat-value" id="dash-net-profit">0 AZN</div>
+          </div>
+        </div>
+        
+        <div class="dashboard-row">
+          <!-- Sol Sütun (Bildirişlər və Qrafik) -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Gecikənlər və Bildirişlər -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">🚨 Vacib Ödəniş Bildirişləri</h3>
+              </div>
+              <div class="activity-list" id="dash-alerts-container">
+                <!-- JS ilə dolacaq -->
+              </div>
+            </div>
+
+            <!-- Müəllimə Qrafiki (Cari Ay) -->
+            <div class="card">
+              <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem;">
+                <h3 class="card-title">📊 Müəllimə Maliyyə və Tələbə Qrafiki</h3>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Cari Ay</span>
+              </div>
+              <div style="position: relative; width: 100%; height: 260px; margin-top: 1rem;">
+                <canvas id="teacherFinancialChart"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Müəllimə Statistikası (Sağ Sütun) -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">👩‍🏫 Müəllimə Statistikası</h3>
+            </div>
+            <div class="activity-list" id="dash-teacher-stats">
+              <!-- JS ilə dolacaq -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Passiv/Dondurulan uşaqların xülasəsi -->
+        <div class="card" style="padding: 1.25rem 1.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-size: 1.5rem;">❄️</span>
+              <div>
+                <h4 style="font-size: 1rem; font-weight: 600;">Passiv və ya Dondurulmuş Tələbələr</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);" id="dash-passive-count">0 Passiv / 0 Dondurulub</p>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="App.switchScreen('students-screen')">Siyahıya bax</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SCREEN: STUDENTS -->
+      <div id="students-screen" class="screen">
+        <div class="card">
+          <div class="card-header">
+            <div class="table-title-bar">
+              <h3 class="card-title">Tələbə Qeydiyyatı və Bazası</h3>
+              <button id="btn-add-student" class="btn btn-primary">
+                + Yeni Uşaq Əlavə Et
+              </button>
+            </div>
+          </div>
+          
+          <div class="toolbar" style="display: flex; gap: 1rem; align-items: center; width: 100%;">
+            <div class="search-wrapper" style="flex: 1; max-width: 350px;">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
+              </svg>
+              <input type="text" id="search-students" class="search-input" placeholder="Tələbə adına görə axtar...">
+            </div>
+            <div class="filter-wrapper" style="width: 220px;">
+              <select id="filter-students-course" class="search-input" style="padding-left: 1rem;">
+                <!-- JS ilə doldurulacaq -->
+              </select>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table class="data-table" id="students-table">
+              <thead>
+                <tr>
+                  <th>Ad, Soyad</th>
+                  <th>Fənn / Müəllimə</th>
+                  <th>Valideyn Adı</th>
+                  <th>Telefon</th>
+                  <th>Daxil Olduğu Tarix</th>
+                  <th>Status</th>
+                  <th>Əməliyyatlar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- JS ilə dolacaq -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SCREEN: PAYMENTS -->
+      <div id="payments-screen" class="screen">
+        <div class="card">
+          <div class="card-header">
+            <div class="table-title-bar">
+              <h3 class="card-title" id="payments-table-title">Cari Ayın Ödəniş Cədvəli</h3>
+              <button id="btn-add-payment" class="btn btn-primary">
+                + Fənn/Ödəniş Təyin Et
+              </button>
+            </div>
+          </div>
+          
+          <div class="toolbar" style="display: flex; gap: 1rem; align-items: center; width: 100%;">
+            <div class="search-wrapper" style="flex: 1; max-width: 350px;">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
+              </svg>
+              <input type="text" id="search-payments" class="search-input" placeholder="Tələbə adına görə axtar...">
+            </div>
+            <div class="filter-wrapper" style="width: 220px;">
+              <select id="filter-payments-course" class="search-input" style="padding-left: 1rem;">
+                <!-- JS ilə doldurulacaq -->
+              </select>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table class="data-table" id="payments-table">
+              <thead>
+                <tr>
+                  <th>Tələbə</th>
+                  <th>Tədris Növü & Müəllimə</th>
+                  <th>Paket & Qrup</th>
+                  <th>Məbləğ</th>
+                  <th>Sonuncu seans tarixi</th>
+                  <th>Status</th>
+                  <th>Əməliyyatlar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- JS ilə dolacaq -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SCREEN: TEACHERS REPORT -->
+      <div id="teachers-report-screen" class="screen">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Müəllimələrin Aylıq Pay Hesabatı</h3>
+          </div>
+          
+          <div class="table-container">
+            <table class="data-table" id="teachers-report-table">
+              <thead>
+                <tr>
+                  <th>Müəllimə</th>
+                  <th>Uşaq Sayı</th>
+                  <th>Ümumi Cəlb Olunan Məbləğ</th>
+                  <th>Pay Faizı (%)</th>
+                  <th>Müəllimənin Payı</th>
+                  <th>Ödənilən Məbləğ (Manual)</th>
+                  <th>Qalıq Borc</th>
+                  <th>Əməliyyat</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- JS ilə dolacaq -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SCREEN: CENTER REPORT -->
+      <div id="center-report-screen" class="screen">
+        <div class="report-actions-bar" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap;">
+          <h2 style="font-size: 1.3rem; font-weight: 700; margin: 0; color: var(--text-light);">🏢 Tədris Mərkəzinin Ümumi Hesabatı</h2>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-success" onclick="App.exportGeneralExcel()" style="display: inline-flex; align-items: center; gap: 8px;">
+              🟢 Excel-ə İxrac (Ümumi)
+            </button>
+            <button class="btn btn-primary" onclick="App.printGeneralReport()" style="display: inline-flex; align-items: center; gap: 8px;">
+              🖨️ Hesabatı Çap Et (Direktor üçün)
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 ƏSAS MALİYYƏ GÖSTƏRİCİSİ -->
+        <div class="stats-grid" style="margin-bottom: 2rem;">
+          <div class="stat-card success" style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.15);">
+            <div class="stat-icon">📥</div>
+            <div class="stat-title" style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">ÜMUMİ TOPLANAN ÖDƏNİŞLƏR</div>
+            <div class="stat-value" id="rep-total-revenue" style="color: #10b981; font-size: 2rem;">0 AZN</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">Şagirdlərdən toplanan cəmi ödənişlər</div>
+          </div>
+          <div class="stat-card danger" style="background: rgba(239, 68, 68, 0.04); border: 1px solid rgba(239, 68, 68, 0.15);">
+            <div class="stat-icon">📤</div>
+            <div class="stat-title" style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">CƏMİ XƏRCLƏR</div>
+            <div class="stat-value" id="rep-total-all-expenses" style="color: #ef4444; font-size: 2rem;">0 AZN</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">Müəllimə payı + Ofis xərcləri</div>
+          </div>
+          <div class="stat-card primary" style="background: rgba(59, 130, 246, 0.04); border: 1px solid rgba(59, 130, 246, 0.15);">
+            <div class="stat-icon">📈</div>
+            <div class="stat-title" style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">MƏRKƏZİN XALİS MƏNFƏƏTİ</div>
+            <div class="stat-value" id="rep-net-profit" style="color: #3b82f6; font-size: 2rem;">0 AZN</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">Mərkəzə qalan təmiz qazanc</div>
+          </div>
+        </div>
+
+        <!-- DETALLI HESABAT BLOKU -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+          
+          <!-- Sol Panel: Gəlir və Mənfəətin Hesablanması -->
+          <div class="card" style="background: rgba(30, 41, 59, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-top: 4px solid var(--primary); padding: 24px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+            <h3 style="font-size: 1.05rem; margin: 0 0 15px 0; color: var(--primary); font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
+              Gəlir və Mənfəətin Hesablanması
+            </h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="font-size: 0.95rem; font-weight: 600; display: flex; gap: 6px; align-items: baseline;">
+                <span style="color: var(--text-muted);">Ümumi toplanan ödənişlər:</span>
+                <strong style="color: #10b981;" class="rep-total-revenue-val">0 AZN</strong>
+              </div>
+              <div style="font-size: 0.95rem; font-weight: 600; display: flex; gap: 6px; align-items: baseline;">
+                <span style="color: var(--text-muted);">Mərkəzin payı:</span>
+                <strong style="color: #3b82f6;" id="rep-center-share">0 AZN</strong>
+              </div>
+              <div style="font-size: 0.95rem; font-weight: 600; display: flex; gap: 6px; align-items: baseline;">
+                <span style="color: var(--text-muted);">Digər xərclər (Ofis və s.):</span>
+                <strong style="color: #ef4444;" id="rep-total-expenses">0 AZN</strong>
+              </div>
+              <div style="font-size: 1rem; font-weight: 700; display: flex; gap: 6px; align-items: baseline; margin-top: 5px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.12);">
+                <span style="color: var(--text-light);">Mərkəzin xalis mənfəəti:</span>
+                <strong style="color: #10b981;" class="rep-net-profit-val">0 AZN</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sağ Panel: Kassa və Maaş Hesablaşması -->
+          <div class="card" style="background: rgba(30, 41, 59, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-top: 4px solid #f59e0b; padding: 24px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+            <h3 style="font-size: 1.05rem; margin: 0 0 15px 0; color: #f59e0b; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
+              Kassa Balansı və Maaş Ödənişləri
+            </h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="font-size: 0.95rem; font-weight: 600; display: flex; gap: 6px; align-items: baseline;">
+                <span style="color: var(--text-muted);">Müəllimə payı (Cəmi borc):</span>
+                <strong style="color: var(--text-light);" class="rep-teacher-cost-val">0 AZN</strong>
+              </div>
+              <div style="font-size: 0.95rem; font-weight: 600; display: flex; gap: 6px; align-items: baseline;">
+                <span style="color: var(--text-muted);">Müəllimələrə ödənilib (Maaş):</span>
+                <strong style="color: #10b981;" id="rep-teacher-paid">0 AZN</strong>
+              </div>
+              <div style="font-size: 0.95rem; font-weight: 600; display: flex; gap: 6px; align-items: baseline;">
+                <span style="color: var(--text-muted);">Müəllimələrə qalıq borc:</span>
+                <strong style="color: #ef4444;" id="rep-teacher-due">0 AZN</strong>
+              </div>
+              <div style="font-size: 1rem; font-weight: 700; display: flex; gap: 6px; align-items: baseline; margin-top: 5px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.12);">
+                <span style="color: var(--text-light);">Kassada olan nağd pul:</span>
+                <strong style="color: #3b82f6;" id="rep-cash-in-hand">0 AZN</strong>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="table-title-bar">
+              <h3 class="card-title">Tədrisin Xərcləri</h3>
+              <button id="btn-add-expense" class="btn btn-secondary btn-sm">
+                + Yeni Xərc Əlavə Et
+              </button>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table class="data-table" id="expenses-table">
+              <thead>
+                <tr>
+                  <th>Tarix</th>
+                  <th>Xərcin Təsviri</th>
+                  <th>Məbləğ</th>
+                  <th>Əməliyyat</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- JS ilə dolacaq -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SCREEN: SETTINGS -->
+      <div id="settings-screen" class="screen">
+        <div class="dashboard-row">
+          
+          <!-- Fənn/Kurs Ayarları -->
+          <div class="card">
+            <div class="card-header">
+              <div class="table-title-bar">
+                <h3 class="card-title">📚 Tədris Növləri (Fənlər)</h3>
+                <button id="btn-add-course-settings" class="btn btn-secondary btn-sm">+ Əlavə et</button>
+              </div>
+            </div>
+            <div class="settings-list" id="settings-courses-list">
+              <!-- JS ilə dolacaq -->
+            </div>
+          </div>
+
+          <!-- Müəllimə Ayarları -->
+          <div class="card">
+            <div class="card-header">
+              <div class="table-title-bar">
+                <h3 class="card-title">👩‍🏫 Müəllimələr</h3>
+                <button id="btn-add-teacher-settings" class="btn btn-secondary btn-sm">+ Əlavə et</button>
+              </div>
+            </div>
+            <div class="settings-list" id="settings-teachers-list">
+              <!-- JS ilə dolacaq -->
+            </div>
+          </div>
+          
+        </div>
+
+        <!-- Backup və Reset -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">⚙️ Təhlükəsizlik və Sistem Ayarları</h3>
+          </div>
+          
+          <!-- Görünüş Teması -->
+          <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">
+            <h4 style="margin: 0 0 1rem 0; font-size: 0.95rem; color: var(--primary); font-weight: 600;">🎨 Görünüş Teması</h4>
+            <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+              <span style="font-size: 0.85rem; color: var(--text-muted);">Sistem Görünüşü:</span>
+              <div class="toggle-group" id="theme-toggle-group">
+                <button class="toggle-btn active" id="btn-theme-dark" onclick="App.setTheme('dark')">🌙 Qaranlıq (Dark)</button>
+                <button class="toggle-btn" id="btn-theme-light" onclick="App.setTheme('light')">☀️ Açıq (Light)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin Şifrə Dəyişdirilməsi -->
+          <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">
+            <h4 style="margin: 0 0 1rem 0; font-size: 0.95rem; color: var(--primary); font-weight: 600;">🔒 Admin Şifrəsinin Dəyişdirilməsi</h4>
+            <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+              <div class="form-group" style="margin: 0; min-width: 200px;">
+                <label for="settings-admin-password" style="font-size: 0.75rem;">Yeni Admin Şifrəsi *</label>
+                <input type="password" id="settings-admin-password" placeholder="Yeni şifrə daxil edin" style="margin: 0;">
+              </div>
+              <button id="btn-save-admin-password" class="btn btn-primary" onclick="App.changeAdminPassword()">
+                Şifrəni Yenilə
+              </button>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+            <button id="btn-backup-export" class="btn btn-success">
+              📥 Ehtiyat Nüsxə Yarat (Backup JSON)
+            </button>
+            <button id="btn-backup-import" class="btn btn-primary">
+              📤 Məlumatları Bərpa Et (Import JSON)
+            </button>
+            <button id="btn-database-reset" class="btn btn-danger" style="margin-left: auto;">
+              ⚠️ Sistemi Tamamilə Sıfırla
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SCREEN: ARCHIVE -->
+      <div id="archive-screen" class="screen">
+        <div class="card">
+          <div class="card-header">
+            <div class="table-title-bar">
+              <h3 class="card-title">Arxivləşmiş Ayların Tarixçəsi</h3>
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <label for="archive-month-select" style="white-space: nowrap;">Ay seçin:</label>
+                <select id="archive-month-select" style="width: 200px;">
+                  <!-- JS ilə dolacaq -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="archive-data-wrapper">
+            <!-- Maliyyə Xülasəsi -->
+            <div class="stats-grid" style="margin-bottom: 1.5rem;">
+              <div class="stat-card success">
+                <div class="stat-title">Ümumi Gəlir</div>
+                <div class="stat-value" id="arch-total-revenue">0 AZN</div>
+              </div>
+              <div class="stat-card danger">
+                <div class="stat-title">Müəllimə Xərcləri</div>
+                <div class="stat-value" id="arch-teacher-cost">0 AZN</div>
+              </div>
+              <div class="stat-card primary">
+                <div class="stat-title">Mərkəzin Payı</div>
+                <div class="stat-value" id="arch-center-share">0 AZN</div>
+              </div>
+              <div class="stat-card warning">
+                <div class="stat-title">Tədrisin Xərcləri</div>
+                <div class="stat-value" id="arch-total-expenses">0 AZN</div>
+              </div>
+            </div>
+            
+            <div class="card" style="margin-bottom: 1.5rem; border-color: var(--primary);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="font-weight: 700;">ARXİV AY ÜZRƏ XALİS MƏNFƏƏT</h4>
+                <div style="font-size: 1.85rem; font-weight: 800; color: var(--success);" id="arch-net-profit">0 AZN</div>
+              </div>
+            </div>
+
+            <div class="dashboard-row">
+              <!-- Ödənişlərin dondurulmuş halı -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">📋 Həmin Ayın Ödənişləri</h3>
+                </div>
+                <div class="table-container">
+                  <table class="data-table" id="archive-payments-table">
+                    <thead>
+                      <tr>
+                        <th>Tələbə</th>
+                        <th>Tədris & Müəllimə</th>
+                        <th>Paket</th>
+                        <th>Ödəniş</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- JS ilə dolacaq -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Müəllimələrin payı -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">👩‍🏫 Müəllimə Hesabatı</h3>
+                </div>
+                <div class="table-container">
+                  <table class="data-table" id="archive-teachers-table">
+                    <thead>
+                      <tr>
+                        <th>Müəllimə</th>
+                        <th>Gəlir</th>
+                        <th>Müəllimə Payı</th>
+                        <th>Ödənilən</th>
+                        <th>Qalıq</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- JS ilə dolacaq -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </main>
+  </div>
+
+  <!-- MODAL: ADD/EDIT STUDENT -->
+  <div id="modal-student" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="student-modal-title">Yeni Uşaq Qeydiyyatı</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="student-form">
+        <input type="hidden" id="student-id">
+        <div class="modal-body">
+          <!-- SECTION 1: Personal Info -->
+          <div class="form-section">
+            <h4 class="form-section-title">👤 Şəxsi Məlumatlar</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="student-name">Uşağın Adı *</label>
+                <input type="text" id="student-name" required placeholder="Məsələn: Əli">
+              </div>
+              <div class="form-group">
+                <label for="student-surname">Soyadı</label>
+                <input type="text" id="student-surname" placeholder="Məsələn: Məmmədov">
+              </div>
+              <div class="form-group">
+                <label for="student-parent-name">Valideynin Adı</label>
+                <input type="text" id="student-parent-name" placeholder="Məsələn: Vüsal">
+              </div>
+              <div class="form-group">
+                <label for="student-phone">Əlaqə nömrəsi</label>
+                <input type="text" id="student-phone" placeholder="Məsələn: +994 50 123 45 67">
+              </div>
+              <div class="form-group">
+                <label for="student-enroll-date">Daxil Olduğu Tarix *</label>
+                <input type="date" id="student-enroll-date" required>
+              </div>
+              <div class="form-group">
+                <label for="student-status">Status *</label>
+                <select id="student-status">
+                  <option value="Aktiv" selected>Aktiv</option>
+                  <option value="Passiv">Passiv</option>
+                  <option value="Donduruldu">Donduruldu</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn">İmtina</button>
+          <button type="submit" class="btn btn-primary">Yadda Saxla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD/LINK PAYMENT -->
+  <div id="modal-pay" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Tələbəyə Tədris və Ödəniş Təyin Et</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="pay-form">
+        <div class="modal-body">
+          <!-- SECTION 1: Selection -->
+          <div class="form-section">
+            <h4 class="form-section-title">👤 Tələbə & Fənn Seçimi</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="pay-student-select">Tələbə (Aktivlər) *</label>
+                <select id="pay-student-select" required>
+                  <!-- JS ilə yüklənəcək -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="pay-course-select">Tədris Növü *</label>
+                <select id="pay-course-select" required>
+                  <!-- JS ilə yüklənəcək -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="pay-teacher-name">Müəllimə (Avtomatik)</label>
+                <input type="text" id="pay-teacher-name" readonly style="background: rgba(255,255,255,0.02); color: var(--text-muted);">
+              </div>
+              <div class="form-group">
+                <label for="pay-package-type">Paket Növü *</label>
+                <select id="pay-package-type" required>
+                  <option value="Aylıq" selected>Aylıq</option>
+                  <option value="Seans">Seans</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- SECTION 2: Settings -->
+          <div class="form-section" style="margin-top: 1.25rem; margin-bottom: 0;">
+            <h4 class="form-section-title">⚙️ Paket və Ödəniş Ayarları</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="pay-group-type">Grup / Fərdi *</label>
+                <select id="pay-group-type" required>
+                  <option value="Qrup" selected>Qrup</option>
+                  <option value="Fərdi">Fərdi</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="pay-fee">Ödəniş Məbləği (AZN) *</label>
+                <input type="number" id="pay-fee" required placeholder="Məsələn: 80">
+              </div>
+              <div class="form-group">
+                <label for="pay-status">Ödəniş Statusu *</label>
+                <select id="pay-status" required>
+                  <option value="Ödənilməyib" selected>Ödənilməyib</option>
+                  <option value="Ödənildi">Ödənildi</option>
+                </select>
+              </div>
+              
+              <!-- Dinamik Tarix sahələri -->
+              <div class="form-group" id="pay-date-group" style="display: none;">
+                <label for="pay-date">Ödəniş Tarixi *</label>
+                <input type="date" id="pay-date">
+              </div>
+              <div class="form-group" id="pay-session-start-group" style="display: none;">
+                <label for="pay-session-start-date">Seansa Başlama Tarixi *</label>
+                <input type="date" id="pay-session-start-date">
+              </div>
+              
+              <!-- Aylıq sahələr -->
+              <div class="form-group full-width" id="monthly-fields" style="margin-bottom: 0;">
+                <label for="pay-weekly-freq-monthly">Aylıq Paket üçün Həftəlik Tezlik *</label>
+                <select id="pay-weekly-freq-monthly">
+                  <option value="2" selected>Həftədə 2 dəfə</option>
+                  <option value="3">Həftədə 3 dəfə</option>
+                </select>
+              </div>
+              
+              <!-- Seans sahələri -->
+              <div class="form-group" id="session-fields" style="display: none;">
+                <label for="pay-sessions-count">Seans Sayı *</label>
+                <select id="pay-sessions-count">
+                  <option value="1">1 Seans</option>
+                  <option value="2">2 Seans</option>
+                  <option value="3">3 Seans</option>
+                  <option value="4">4 Seans</option>
+                  <option value="5">5 Seans</option>
+                  <option value="6">6 Seans</option>
+                  <option value="7">7 Seans</option>
+                  <option value="8" selected>8 Seans</option>
+                  <option value="10">10 Seans</option>
+                  <option value="12">12 Seans</option>
+                </select>
+              </div>
+              <div class="form-group" id="session-freq-field" style="display: none;">
+                <label for="pay-weekly-freq-session">Seans üzrə Həftəlik Tezlik</label>
+                <select id="pay-weekly-freq-session">
+                  <option value="1">Həftədə 1 dəfə</option>
+                  <option value="2" selected>Həftədə 2 dəfə</option>
+                  <option value="3">Həftədə 3 dəfə</option>
+                  <option value="4">Həftədə 4 dəfə</option>
+                </select>
+              </div>
+              <div class="form-group full-width" id="pay-session-days-group" style="display: none;">
+                <label style="margin-bottom: 8px; display: block; font-weight: 500;">Seans Günləri (Şagirdin gəldiyi günlər) *</label>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 8px; padding: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px;">
+                  <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                    <input type="checkbox" name="pay-session-day" value="1" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> B.erəsi
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                    <input type="checkbox" name="pay-session-day" value="2" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Ç.axşamı
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                    <input type="checkbox" name="pay-session-day" value="3" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Çərşənbə
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                    <input type="checkbox" name="pay-session-day" value="4" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> C.axşamı
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                    <input type="checkbox" name="pay-session-day" value="5" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Cümə
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                    <input type="checkbox" name="pay-session-day" value="6" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Şənbə
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                    <input type="checkbox" name="pay-session-day" value="0" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Bazar
+                  </label>
+                </div>
+                <small id="pay-session-days-hint" style="display: block; color: var(--text-muted); margin-top: 6px; font-size: 0.8rem;"></small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn">İmtina</button>
+          <button type="submit" class="btn btn-primary">Cədvələ Əlavə Et</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT PAYMENT -->
+  <div id="modal-edit-payment" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Ödəniş Məlumatlarını Redaktə Et</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="edit-payment-form">
+        <input type="hidden" id="edit-pay-id">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label>Tələbə</label>
+              <input type="text" id="edit-pay-student-name" readonly style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-muted);">
+            </div>
+            <div class="form-group full-width">
+              <label>Tədris Növü (Fənn)</label>
+              <input type="text" id="edit-pay-course-name" readonly style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-muted);">
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-pay-package-type">Paket Növü</label>
+              <select id="edit-pay-package-type" required>
+                <option value="Aylıq">Aylıq</option>
+                <option value="Seans">Seans</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-pay-group-type">Qrup / Fərdi</label>
+              <select id="edit-pay-group-type" required>
+                <option value="Qrup">Qrup</option>
+                <option value="Fərdi">Fərdi</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-pay-fee">Ödəniş Məbləği (AZN) *</label>
+              <input type="number" id="edit-pay-fee" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-pay-status">Ödəniş Statusu</label>
+              <select id="edit-pay-status" required>
+                <option value="Ödənilməyib">Ödənilməyib</option>
+                <option value="Qismən ödənilib">Qismən ödənilib</option>
+                <option value="Ödənildi">Ödənildi</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="edit-pay-paid-amount-group" style="display: none;">
+              <label for="edit-pay-paid-amount">Ödənilən Məbləğ (AZN)</label>
+              <input type="number" id="edit-pay-paid-amount" min="0" step="any">
+            </div>
+
+            <div class="form-group" id="edit-pay-date-group">
+              <label for="edit-pay-date">Ödəniş Tarixi</label>
+              <input type="date" id="edit-pay-date">
+            </div>
+            <div class="form-group" id="edit-pay-session-start-group" style="display: none;">
+              <label for="edit-pay-session-start-date">Seansa Başlama Tarixi</label>
+              <input type="date" id="edit-pay-session-start-date">
+            </div>
+            
+            <!-- Aylıq sahəsi -->
+            <div class="form-group" id="edit-pay-freq-monthly-group">
+              <label for="edit-pay-weekly-freq-monthly">Həftəlik Tezlik</label>
+              <select id="edit-pay-weekly-freq-monthly">
+                <option value="2">Həftədə 2 dəfə</option>
+                <option value="3">Həftədə 3 dəfə</option>
+              </select>
+            </div>
+
+            <!-- Seans sahələri -->
+            <div class="form-group" id="edit-pay-sessions-count-group" style="display: none;">
+              <label for="edit-pay-sessions-count">Cəmi Seans Sayı</label>
+              <input type="number" id="edit-pay-sessions-count" min="1">
+            </div>
+            <div class="form-group" id="edit-pay-sessions-logged-group" style="display: none;">
+              <label for="edit-pay-sessions-logged">Keçilən Seans Sayı</label>
+              <input type="number" id="edit-pay-sessions-logged" min="0">
+            </div>
+            <div class="form-group" id="edit-pay-freq-session-group" style="display: none;">
+              <label for="edit-pay-weekly-freq-session">Həftəlik Tezlik</label>
+              <select id="edit-pay-weekly-freq-session">
+                <option value="1">Həftədə 1 dəfə</option>
+                <option value="2">Həftədə 2 dəfə</option>
+                <option value="3">Həftədə 3 dəfə</option>
+                <option value="4">Həftədə 4 dəfə</option>
+              </select>
+            </div>
+            <div class="form-group full-width" id="edit-pay-session-days-group" style="display: none;">
+              <label style="margin-bottom: 8px; display: block; font-weight: 500;">Seans Günləri (Şagirdin gəldiyi günlər) *</label>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 8px; padding: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px;">
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="edit-pay-session-day" value="1" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> B.erəsi
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="edit-pay-session-day" value="2" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Ç.axşamı
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="edit-pay-session-day" value="3" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Çərşənbə
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="edit-pay-session-day" value="4" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> C.axşamı
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="edit-pay-session-day" value="5" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Cümə
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="edit-pay-session-day" value="6" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Şənbə
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="edit-pay-session-day" value="0" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Bazar
+                </label>
+              </div>
+              <small id="edit-pay-session-days-hint" style="display: block; color: var(--text-muted); margin-top: 6px; font-size: 0.8rem;"></small>
+            </div>
+            
+            <div class="form-group" id="edit-pay-due-group">
+              <label for="edit-pay-due-date">Son Ödəniş Tarixi (Due Date)</label>
+              <input type="date" id="edit-pay-due-date">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn">İmtina</button>
+          <button type="submit" class="btn btn-primary">Dəyişiklikləri Saxla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: RENEW SESSION PACKAGE -->
+  <div id="modal-renew-package" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Yeni Seans Paketi Əlavə Et (Yenilə)</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="renew-package-form">
+        <input type="hidden" id="renew-pay-id">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label>Tələbə</label>
+              <input type="text" id="renew-student-name" readonly style="background: rgba(255, 255, 255, 0.05); color: var(--text-muted);">
+            </div>
+            <div class="form-group">
+              <label>Fənn</label>
+              <input type="text" id="renew-course-name" readonly style="background: rgba(255, 255, 255, 0.05); color: var(--text-muted);">
+            </div>
+            <div class="form-group">
+              <label for="renew-session-start-date">Yeni Seansa Başlama Tarixi *</label>
+              <input type="date" id="renew-session-start-date" required>
+            </div>
+            <div class="form-group">
+              <label for="renew-fee">Paket Qiyməti (AZN) *</label>
+              <input type="number" id="renew-fee" required min="0">
+            </div>
+            <div class="form-group">
+              <label for="renew-status">Ödəniş Statusu *</label>
+              <select id="renew-status">
+                <option value="Ödənilməyib" selected>Ödənilməyib</option>
+                <option value="Ödənildi">Ödənildi</option>
+                <option value="Qismən ödənilib">Qismən ödənilib</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="renew-paid-amount-group" style="display: none;">
+              <label for="renew-paid-amount">Ödənilən Məbləğ (AZN) *</label>
+              <input type="number" id="renew-paid-amount" min="0">
+            </div>
+            <div class="form-group" id="renew-due-date-group">
+              <label for="renew-due-date">Növbəti Ödəniş Tarixi (Due Date)</label>
+              <input type="date" id="renew-due-date">
+            </div>
+            <div class="form-group full-width" id="renew-pay-session-days-group">
+              <label style="margin-bottom: 8px; display: block; font-weight: 500;">Seans Günləri (Şagirdin gəldiyi günlər) *</label>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 8px; padding: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px;">
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="renew-pay-session-day" value="1" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> B.erəsi
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="renew-pay-session-day" value="2" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Ç.axşamı
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="renew-pay-session-day" value="3" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Çərşənbə
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="renew-pay-session-day" value="4" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> C.axşamı
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="renew-pay-session-day" value="5" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Cümə
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="renew-pay-session-day" value="6" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Şənbə
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 0.85rem; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.2s; user-select: none;">
+                  <input type="checkbox" name="renew-pay-session-day" value="0" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary);"> Bazar
+                </label>
+              </div>
+              <small id="renew-pay-session-days-hint" style="display: block; color: var(--text-muted); margin-top: 6px; font-size: 0.8rem;"></small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn">İmtina</button>
+          <button type="submit" class="btn btn-success">Paketi Yenilə</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD EXPENSE -->
+  <div id="modal-expense" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Yeni Xərc Əlavə Et</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="expense-form">
+        <input type="hidden" id="expense-id">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="expense-title">Xərcin Təsviri *</label>
+              <input type="text" id="expense-title" required placeholder="Məsələn: Ofis icarə haqqı, Elektrik ödənişi">
+            </div>
+            <div class="form-group">
+              <label for="expense-amount">Məbləğ (AZN) *</label>
+              <input type="number" id="expense-amount" required step="any" placeholder="Məsələn: 150">
+            </div>
+            <div class="form-group">
+              <label for="expense-date">Tarix *</label>
+              <input type="date" id="expense-date" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn">İmtina</button>
+          <button type="submit" class="btn btn-primary">Əlavə et</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN PASSWORD PROMPT -->
+  <div id="modal-admin-password" class="modal-overlay">
+    <div class="modal-container" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Admin Parolu Tələb Olunur</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="admin-password-form">
+        <div class="modal-body">
+          <div class="form-group full-width">
+            <label for="admin-pass-input">Admin Parolu *</label>
+            <input type="password" id="admin-pass-input" required placeholder="•••••">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn">İmtina</button>
+          <button type="submit" class="btn btn-primary">Təsdiqlə</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SETTINGS - ADD/EDIT TEACHER -->
+  <div id="modal-set-teacher" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="set-teacher-title">Yeni Müəllimə</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="set-teacher-form">
+        <input type="hidden" id="set-teacher-id">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="set-teacher-name">Müəllimənin Adı, Soyadı *</label>
+              <input type="text" id="set-teacher-name" required placeholder="Məsələn: Lalə Məmmədova">
+            </div>
+            <div class="form-group full-width">
+              <label for="set-teacher-percent">Tədris Payı (%) *</label>
+              <input type="number" id="set-teacher-percent" required value="50" min="0" max="100">
+          </div>
+        </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn">İmtina</button>
+          <button type="submit" class="btn btn-primary">Yadda Saxla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SETTINGS - ADD/EDIT COURSE -->
+  <div id="modal-set-course" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="set-course-title">Yeni Tədris Növü</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="set-course-form">
+        <input type="hidden" id="set-course-id">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="set-course-name">Tədris Növünün Adı *</label>
+              <input type="text" id="set-course-name" required placeholder="Məsələn: İngilis dili (az)">
+            </div>
+            <div class="form-group full-width">
+              <label for="set-course-teacher">Müəllimə *</label>
+              <select id="set-course-teacher" required>
+                <!-- JS ilə doldurulacaq -->
+              </select>
+            </div>
+            <div class="form-group full-width" style="display: none;">
+              <label for="set-course-fee">Varsayılan Ödəniş Məbləği (AZN) *</label>
+              <input type="number" id="set-course-fee" required value="0">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn">İmtina</button>
+          <button type="submit" class="btn btn-primary">Yadda Saxla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CHANGE CARI AY / NEW MONTH -->
+  <div id="modal-change-month" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Yeni Aktiv Aya Keçid</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="form-change-month">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="new-month-select">Keçmək İstədiyiniz Aktiv Ayı Seçin:</label>
+              <select id="new-month-select" required>
+                <!-- Növbəti ayları hesablayaq drop-down üçün -->
+                <option value="2026-06">İyun 2026</option>
+                <option value="2026-07">İyul 2026</option>
+                <option value="2026-08">Avqust 2026</option>
+                <option value="2026-09">Sentyabr 2026</option>
+                <option value="2026-10">Oktyabr 2026</option>
+                <option value="2026-11">Noyabr 2026</option>
+                <option value="2026-12">Dekabr 2026</option>
+                <option value="2027-01">Yanvar 2027</option>
+                <option value="2027-02">Fevral 2027</option>
+                <option value="2027-03">Mart 2027</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            💡 <strong>Məlumat:</strong> Yeni aya keçid zamanı bütün "Aktiv" statuslu uşaqların dərsləri növbəti ayın ödəniş cədvəlinə avtomatik daşınacaqdır:
+            <ul style="margin-left: 1.25rem; margin-top: 0.25rem;">
+              <li>Aylıq dərslər "Ödənilməyib" olaraq yenidən yaranacaq.</li>
+              <li>Seans dərsləri isə əgər bitməyibsə qalan seans sayı ilə birlikdə növbəti aya keçiriləcək.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn">İmtina</button>
+          <button type="submit" class="btn btn-primary">Aktiv Ayı Dəyiş</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: LOG TEACHER PAYOUT -->
+  <div id="modal-teacher-payout" class="modal-overlay">
+    <div class="modal-container" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Müəlliməyə Ödəniş Logu</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="teacher-payout-form">
+        <input type="hidden" id="payout-teacher-id">
+        <div class="modal-body">
+          <div class="form-grid" style="grid-template-columns: 1fr;">
+            <div class="form-group">
+              <label>Müəllimə</label>
+              <input type="text" id="payout-teacher-name" readonly style="background: rgba(255,255,255,0.02); color: var(--text-muted);">
+            </div>
+            <div class="form-group">
+              <label for="payout-amount">Ödənilən Məbləğ (AZN) *</label>
+              <input type="number" id="payout-amount" required step="any" min="0.01" placeholder="Məsələn: 0.5 və ya 100">
+            </div>
+            <div class="form-group">
+              <label for="payout-date">Ödəniş Tarixi *</label>
+              <input type="date" id="payout-date" required>
+            </div>
+          </div>
+          
+          <!-- Mövcud ödənişlərin siyahısı -->
+          <div style="margin-top: 1.5rem;">
+            <h4 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted);">Cari aydakı ödənişlər:</h4>
+            <div id="teacher-payouts-history-list" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;">
+              <!-- JS ilə doldurulacaq -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn">İmtina</button>
+          <button type="submit" class="btn btn-success">Ödənişi Qeyd Et</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: MARK PAYMENT AS PAID (CONFIRM) -->
+  <div id="modal-confirm-paid" class="modal-overlay">
+    <div class="modal-container" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Ödənişi Tamamla</h3>
+        <button class="close-btn close-modal-btn">
+          <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="confirm-paid-form">
+        <input type="hidden" id="confirm-payment-id">
+        <div class="modal-body">
+          <div class="form-grid" style="grid-template-columns: 1fr;">
+            <div class="form-group">
+              <label>Tələbə</label>
+              <input type="text" id="confirm-payment-student-name" readonly style="background: rgba(255,255,255,0.02); color: var(--text-muted);">
+            </div>
+            <div class="form-group">
+              <label>Fənn</label>
+              <input type="text" id="confirm-payment-course-name" readonly style="background: rgba(255,255,255,0.02); color: var(--text-muted);">
+            </div>
+            <div class="form-group">
+              <label for="confirm-payment-date">Ödəniş Tarixi *</label>
+              <input type="date" id="confirm-payment-date" required>
+            </div>
+            <div class="form-group" style="margin-top: 0.5rem;">
+              <label>Paket Qiyməti (AZN)</label>
+              <input type="text" id="confirm-payment-total-fee" readonly style="background: rgba(255,255,255,0.02); color: var(--text-muted);">
+            </div>
+            <div class="form-group" style="margin-top: 0.5rem;" id="confirm-payment-previously-paid-group">
+              <label>Əvvəl Ödənilən Məbləğ (AZN)</label>
+              <input type="text" id="confirm-payment-previously-paid" readonly style="background: rgba(255,255,255,0.02); color: var(--text-muted);">
+            </div>
+            <div class="form-group" style="margin-top: 0.5rem;">
+              <label for="confirm-payment-amount-to-pay">Ödənilən Məbləğ (AZN) *</label>
+              <input type="number" id="confirm-payment-amount-to-pay" min="1" step="any" required>
+              <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 3px; display: block;" id="confirm-payment-debt-hint"></small>
+            </div>
+            <div class="form-group" id="confirm-payment-next-due-group" style="display: none; margin-top: 0.5rem;">
+              <label for="confirm-payment-next-due-date">Növbəti Ödəniş Tarixi (Qalıq Borc üçün) *</label>
+              <input type="date" id="confirm-payment-next-due-date">
+            </div>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn">İmtina</button>
+          <button type="submit" class="btn btn-success">Təsdiqlə</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="db_v8.4.js?v=8.8_print_20260731"></script>
+  <script src="app_v8.4.js?v=8.8_print_20260731"></script>
+  <script>
+    // Canlı vaxt göstəricisi
+    function updateClock() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      document.getElementById("live-time").textContent = now.toLocaleDateString('az-AZ', options);
+    }
+    updateClock();
+    setInterval(updateClock, 60000);
+  </script>
+</body>
+</html>

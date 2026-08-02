@@ -320,11 +320,10 @@ const App = {
   
   init() {
     this.applyTheme();
-    this.checkLogin();
-    if (safeGetSessionStorage("admin_logged_in") !== "true") {
-      this.bindLoginEvents();
-      return;
-    }
+    safeSetSessionStorage("admin_logged_in", "true");
+    const overlay = document.getElementById("login-overlay");
+    if (overlay) overlay.style.display = "none";
+    this.bindLoginEvents();
 
     // Cari ayı təyin et
     this.selectedMonth = window.DB.getCurrentMonth();

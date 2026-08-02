@@ -287,6 +287,31 @@ function getTodayStr() {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
 
+function safeGetSessionStorage(key) {
+  try {
+    return sessionStorage.getItem(key);
+  } catch (e) {
+    return window._safeSessionStorage ? window._safeSessionStorage[key] : null;
+  }
+}
+
+function safeSetSessionStorage(key, val) {
+  try {
+    sessionStorage.setItem(key, val);
+  } catch (e) {
+    window._safeSessionStorage = window._safeSessionStorage || {};
+    window._safeSessionStorage[key] = val;
+  }
+}
+
+function safeRemoveSessionStorage(key) {
+  try {
+    sessionStorage.removeItem(key);
+  } catch (e) {
+    if (window._safeSessionStorage) delete window._safeSessionStorage[key];
+  }
+}
+
 // Tətbiq Durumu (App State)
 const App = {
   currentScreen: "dashboard-screen",
@@ -296,7 +321,7 @@ const App = {
   init() {
     this.applyTheme();
     this.checkLogin();
-    if (sessionStorage.getItem("admin_logged_in") !== "true") {
+    if (safeGetSessionStorage("admin_logged_in") !== "true") {
       this.bindLoginEvents();
       return;
     }
@@ -471,7 +496,7 @@ const App = {
   },
 
   checkLogin() {
-    const isLoggedIn = sessionStorage.getItem("admin_logged_in") === "true";
+    const isLoggedIn = safeGetSessionStorage("admin_logged_in") === "true";
     const overlay = document.getElementById("login-overlay");
     if (isLoggedIn) {
       if (overlay) overlay.style.display = "none";
@@ -504,7 +529,7 @@ const App = {
     const passwordInput = document.getElementById("login-password");
     
     if (password === correctPassword) {
-      sessionStorage.setItem("admin_logged_in", "true");
+      safeSetSessionStorage("admin_logged_in", "true");
       if (errorMsg) errorMsg.style.display = "none";
       if (passwordInput) passwordInput.value = "";
       this.checkLogin();
@@ -527,7 +552,7 @@ const App = {
   },
 
   handleLogout() {
-    sessionStorage.removeItem("admin_logged_in");
+    safeRemoveSessionStorage("admin_logged_in");
     this.checkLogin();
   },
 

@@ -556,12 +556,13 @@ const App = {
   bindEvents() {
     // Naviqasiya linkləri
     document.querySelectorAll(".nav-link").forEach(link => {
-      link.addEventListener("click", (e) => {
-        const screenId = link.getAttribute("data-screen");
+      link.onclick = (e) => {
+        const target = e.currentTarget || link;
+        const screenId = target.getAttribute("data-screen");
         if (screenId) {
           this.switchScreen(screenId);
         }
-      });
+      };
     });
 
     // Cari Ayın Dəyişdirilməsi / Yeni Aya Keçid

@@ -732,7 +732,8 @@ const DB = {
   },
 
   getAdminPassword() {
-    return this._get("admin_password", "12345");
+    const p = this._get("admin_password", "12345");
+    return String(p || "12345").trim();
   },
 
   setAdminPassword(password) {

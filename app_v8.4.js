@@ -3391,6 +3391,49 @@ const App = {
       </tr>
     `).join("");
 
+    let expensesHtml = "";
+    if (expenses.length > 0) {
+      expensesHtml = `
+        <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 22px 0 10px 0; border-left: 4px solid #ef4444; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">3. Tədrisin Xərcləri (Təfərrüatlı Siyahı)</div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px;">
+          <thead>
+            <tr style="background: #334155; color: white;">
+              <th style="border: 1px solid #334155; padding: 7px 10px; text-align: left; width: 110px;">Tarix</th>
+              <th style="border: 1px solid #334155; padding: 7px 10px; text-align: left;">Xərcin Təsviri / Adı</th>
+              <th style="border: 1px solid #334155; padding: 7px 10px; text-align: right; width: 140px;">Məbləğ</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${expenseRowsHtml}
+            <tr style="background: #f1f5f9; font-weight: 800; border-top: 2px solid #0f172a;">
+              <td colspan="2" style="border: 1px solid #cbd5e1; padding: 8px 10px;">CƏMİ XƏRCLƏR</td>
+              <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right; color: #ef4444;">${formatAmount(totalExpenses)} AZN</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 22px 0 8px 0; border-left: 4px solid #10b981; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">4. Eyni Adlı Xərclərin Ümumiləşdirilmiş Xülasəsi</div>
+        <div style="font-size: 10px; color: #64748b; margin-bottom: 8px; font-style: italic;">* Eyni adda olan bütün xərclər avtomatik qruplaşdırılaraq ümumiləşdirilmişdir:</div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+          <thead>
+            <tr style="background: #065f46; color: white;">
+              <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: left;">Xərc Adı / Kateqoriya</th>
+              <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: center; width: 150px;">Əməliyyat Sayı</th>
+              <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: right; width: 160px;">Cəmi Məbləğ</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${groupedExpensesRowsHtml}
+            <tr style="background: #ecfdf5; font-weight: 800; border-top: 2px solid #047857;">
+              <td style="border: 1px solid #a7f3d0; padding: 8px 10px; color: #047857;">CƏMİ QRUPLAŞDIRILMIŞ XƏRC</td>
+              <td style="border: 1px solid #a7f3d0; padding: 8px 10px; text-align: center; color: #047857;">${expenses.length} əməliyyat</td>
+              <td style="border: 1px solid #a7f3d0; padding: 8px 10px; text-align: right; color: #047857;">${formatAmount(totalExpenses)} AZN</td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+    }
+
     const container = document.getElementById("print-preview-content");
     if (container) {
       container.innerHTML = `
@@ -3468,47 +3511,7 @@ const App = {
           </tbody>
         </table>
 
-        <!-- EXPENSES & GROUPED EXPENSES SECTION -->
-        ${expenses.length > 0 ? `
-          <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 22px 0 10px 0; border-left: 4px solid #ef4444; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">3. Tədrisin Xərcləri (Təfərrüatlı Siyahı)</div>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px;">
-            <thead>
-              <tr style="background: #334155; color: white;">
-                <th style="border: 1px solid #334155; padding: 7px 10px; text-align: left; width: 110px;">Tarix</th>
-                <th style="border: 1px solid #334155; padding: 7px 10px; text-align: left;">Xərcin Təsviri / Adı</th>
-                <th style="border: 1px solid #334155; padding: 7px 10px; text-align: right; width: 140px;">Məbləğ</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${expenseRowsHtml}
-              <tr style="background: #f1f5f9; font-weight: 800; border-top: 2px solid #0f172a;">
-                <td colspan="2" style="border: 1px solid #cbd5e1; padding: 8px 10px;">CƏMİ XƏRCLƏR</td>
-                <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right; color: #ef4444;">${formatAmount(totalExpenses)} AZN</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <!-- GROUPED EXPENSES SUMMARY TABLE -->
-          <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 22px 0 8px 0; border-left: 4px solid #10b981; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">4. Eyni Adlı Xərclərin Ümumiləşdirilmiş Xülasəsi</div>
-          <div style="font-size: 10px; color: #64748b; margin-bottom: 8px; font-style: italic;">* Eyni adda olan bütün xərclər avtomatik qruplaşdırılaraq ümumiləşdirilmişdir:</div>
-          <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
-            <thead>
-              <tr style="background: #065f46; color: white;">
-                <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: left;">Xərc Adı / Kateqoriya</th>
-                <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: center; width: 150px;">Əməliyyat Sayı</th>
-                <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: right; width: 160px;">Cəmi Məbləğ</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${groupedExpensesRowsHtml}
-              <tr style="background: #ecfdf5; font-weight: 800; border-top: 2px solid #047857;">
-                <td style="border: 1px solid #a7f3d0; padding: 8px 10px; color: #047857;">CƏMİ QRUPLAŞDIRILMIŞ XƏRC</td>
-                <td style="border: 1px solid #a7f3d0; padding: 8px 10px; text-align: center; color: #047857;">${expenses.length} əməliyyat</td>
-                <td style="border: 1px solid #a7f3d0; padding: 8px 10px; text-align: right; color: #047857;">${formatAmount(totalExpenses)} AZN</td>
-              </tr>
-            </tbody>
-          </table>
-        ` : ''}
+        ${expensesHtml}
 
         <!-- FOOTER & SIGNATURE SECTION -->
         <div style="margin-top: 35px; border-top: 1px dashed #cbd5e1; padding-top: 18px; display: flex; justify-content: space-between; align-items: flex-end;">

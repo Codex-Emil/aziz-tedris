@@ -3522,7 +3522,8 @@ const App = {
           </div>
         </div>
       `;
-    }
+    },
+
   exportTeacherExcel(teacherId) {
     const curMonth = window.DB.getCurrentMonth();
     const formattedMonth = formatMonth(curMonth);

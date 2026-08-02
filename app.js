@@ -2954,56 +2954,197 @@ const App = {
       total: groupedExpensesMap[title].total
     })).sort((a, b) => b.total - a.total);
 
-    let csv = "";
-    // HEADER BANNER
-    csv += `ƏZİZ TƏDRİS MƏRKƏZİ - RƏSMİ MALİYYƏ VƏ İCRA HESABATI (DİREKTOR BLANKI)\n`;
-    csv += `Hesabat Dövrü;${formattedMonth}\n`;
-    csv += `İxrac Tarixi;${new Date().toLocaleDateString('az-AZ')}\n`;
-    csv += `Status;TƏSDİQLƏNMİŞ\n\n`;
-    
-    // SECTION 1: FINANCIAL KPI SUMMARY
-    csv += `1. İCRAÇI MALİYYƏ GÖSTƏRİCİLƏRİ (KPI)\n`;
-    csv += `Göstərici Adı;Məbləğ (AZN);Qeyd\n`;
-    csv += `Ümumi Cəlb Olunan Gəlir;${formatAmount(totalRevenueSum)} AZN;Tələbələrdən toplanan ümumi məbləğ\n`;
-    csv += `Müəllimə Ödənişləri (Payı);${formatAmount(totalTeacherShareSum)} AZN;Müəllimələrin ümumi hesablanmış qazancı\n`;
-    csv += `Mərkəzin Payı (Brutto);${formatAmount(centerShare)} AZN;Toplanan gəlirdən müəllimə payı çıxıldıqdan sonra\n`;
-    csv += `Tədrisin Digər Xərcləri;${formatAmount(totalExpenses)} AZN;Mərkəzin bütün əməliyyat xərcləri\n`;
-    csv += `MƏRKƏZİN XALİS MƏNFƏƏTİ (NET QALIQ);${formatAmount(netProfit)} AZN;Mərkəzin payından bütün xərclər çıxıldıqdan sonra net qalıq\n\n`;
+    const teacherTableRows = teacherRows.map(tr => `
+      <tr>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold;">${tr.name}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: center;">${tr.stdCount} tələbə</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right;">${formatAmount(tr.revenue)} AZN</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: center;">${tr.sharePercent}%</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; color: #4f46e5; font-weight: bold;">${formatAmount(tr.teacherShare)} AZN</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; color: #059669; font-weight: bold;">${formatAmount(tr.paid)} AZN</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; color: #b45309; font-weight: bold;">${formatAmount(tr.due)} AZN</td>
+      </tr>
+    `).join("");
 
-    // SECTION 2: TEACHERS BREAKDOWN
-    csv += `2. MÜƏLLİMƏLƏR ÜZRƏ PAY BÖLGÜSÜ\n`;
-    csv += `Müəllimə;Aktiv Tələbə Sayı;Cəlb Olunan Məbləğ (AZN);Pay Faizi (%);Müəllimə Payı (AZN);Ödənilən Məbləğ (AZN);Qalıq Borc (AZN)\n`;
-    teacherRows.forEach(tr => {
-      csv += `${tr.name};${tr.stdCount};${formatAmount(tr.revenue)} AZN;${tr.sharePercent}%;${formatAmount(tr.teacherShare)} AZN;${formatAmount(tr.paid)} AZN;${formatAmount(tr.due)} AZN\n`;
-    });
-    csv += `CƏMİ YEKUN;${totalStudentsSum} tələbə;${formatAmount(totalRevenueSum)} AZN;-;${formatAmount(totalTeacherShareSum)} AZN;${formatAmount(totalPaidSum)} AZN;${formatAmount(totalDueSum)} AZN\n\n`;
+    const expenseTableRows = expenses.map(exp => `
+      <tr>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">${exp.date || "-"}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold;">${exp.title || ""}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; font-weight: bold;">${formatAmount(exp.amount)} AZN</td>
+      </tr>
+    `).join("");
 
-    // SECTION 3: EXPENSES LIST
-    if (expenses.length > 0) {
-      csv += `3. TƏDRİSİN XƏRCLƏRİ (TƏFƏRRÜATLI SİYAHI)\n`;
-      csv += `Tarix;Xərcin Təsviri / Adı;Məbləğ (AZN)\n`;
-      expenses.forEach(exp => {
-        csv += `${exp.date || "-"};${(exp.title || "").replace(/;/g, ",")};${formatAmount(exp.amount)} AZN\n`;
-      });
-      csv += `CƏMİ XƏRCLƏR;;${formatAmount(totalExpenses)} AZN\n\n`;
+    const groupedExpenseTableRows = groupedExpensesList.map(g => `
+      <tr>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold; color: #0f172a;">${g.title}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: center;">${g.count} əməliyyat</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; font-weight: bold; color: #047857;">${formatAmount(g.total)} AZN</td>
+      </tr>
+    `).join("");
 
-      // SECTION 4: GROUPED EXPENSES SUMMARY
-      csv += `4. EYNİ ADLI XƏRCLƏRİN ÜMUMİLƏŞDİRİLMİŞ XÜLASƏSİ (QRUPLAŞDIRILMIŞ)\n`;
-      csv += `Xərc Adı / Kateqoriya;Əməliyyat Sayı;Cəmi Məbləğ (AZN)\n`;
-      groupedExpensesList.forEach(g => {
-        csv += `${g.title.replace(/;/g, ",")};${g.count} əməliyyat;${formatAmount(g.total)} AZN\n`;
-      });
-      csv += `CƏMİ QRUPLAŞDIRILMIŞ XƏRC;${expenses.length} əməliyyat;${formatAmount(totalExpenses)} AZN\n\n`;
-    }
+    const excelHtml = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:x="urn:schemas-microsoft-com:office:excel"
+            xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--[if gte mso 9]>
+      <xml>
+       <x:ExcelWorkbook>
+        <x:ExcelWorksheets>
+         <x:ExcelWorksheet>
+          <x:Name>Maliyyə Hesabatı</x:Name>
+          <x:WorksheetOptions>
+           <x:Print>
+            <x:ValidPrinterInfo/>
+            <x:PaperSizeIndex>9</x:PaperSizeIndex>
+            <x:Orientation>Landscape</x:Orientation>
+           </x:Print>
+           <x:FitToPage/>
+          </x:WorksheetOptions>
+         </x:ExcelWorksheet>
+        </x:ExcelWorksheets>
+       </x:ExcelWorkbook>
+      </xml>
+      <![endif]-->
+      <style>
+        body, table, td, th { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #0f172a; }
+        .header-title { font-size: 16pt; font-weight: bold; color: #1e1b4b; text-transform: uppercase; }
+        .subtitle { font-size: 11pt; font-weight: bold; color: #4f46e5; text-transform: uppercase; }
+        .section-header { font-size: 12pt; font-weight: bold; color: #1e1b4b; background-color: #e0e7ff; padding: 6px 10px; margin-top: 15px; border-left: 4px solid #4f46e5; }
+        table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+        th { background-color: #1e1b4b; color: #ffffff; font-weight: bold; padding: 8px; border: 1px solid #0f172a; text-align: left; }
+        td { border: 1px solid #cbd5e1; padding: 6px 8px; }
+        .total-row { background-color: #f1f5f9; font-weight: bold; }
+        .net-profit { background-color: #ecfdf5; color: #047857; font-weight: bold; font-size: 13pt; border: 2px solid #10b981; }
+      </style>
+      </head>
+      <body>
+        <div class="header-title">ƏZİZ TƏDRİS MƏRKƏZİ</div>
+        <div class="subtitle">RƏSMİ MALİYYƏ VƏ İCRA HESABATI (DİREKTOR BLANKI)</div>
+        <div style="margin-top: 4px; font-size: 10pt; color: #475569;">
+          Dövr: <b>${formattedMonth}</b> | İxrac Tarixi: <b>${new Date().toLocaleDateString('az-AZ')}</b> | Status: <b>TƏSDİQLƏNMİŞ</b>
+        </div>
+        <br>
 
-    // SECTION 5: FOOTER & SIGNATURE
-    csv += `RƏSMİ TƏSDİQ\n`;
-    csv += `Hesabatı Tərtib Etdi (Direktor);İmza / Tarix\n`;
+        <div class="section-header">1. İCRAÇI MALİYYƏ GÖSTƏRİCİLƏRİ (KPI)</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Göstərici Adı</th>
+              <th style="text-align: right;">Məbləğ (AZN)</th>
+              <th>Açıqlama / Qeyd</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ümumi Cəlb Olunan Gəlir</td>
+              <td style="text-align: right; font-weight: bold;">${formatAmount(totalRevenueSum)} AZN</td>
+              <td>Tələbələrdən toplanan ümumi məbləğ</td>
+            </tr>
+            <tr>
+              <td>Müəllimə Ödənişləri (Payı)</td>
+              <td style="text-align: right; font-weight: bold;">${formatAmount(totalTeacherShareSum)} AZN</td>
+              <td>Müəllimələrin ümumi hesablanmış qazancı</td>
+            </tr>
+            <tr>
+              <td>Mərkəzin Payı (Brutto)</td>
+              <td style="text-align: right; font-weight: bold;">${formatAmount(centerShare)} AZN</td>
+              <td>Toplanan gəlirdən müəllimə payı çıxıldıqdan sonra</td>
+            </tr>
+            <tr>
+              <td>Tədrisin Digər Xərcləri</td>
+              <td style="text-align: right; font-weight: bold;">${formatAmount(totalExpenses)} AZN</td>
+              <td>Mərkəzin bütün əməliyyat xərcləri</td>
+            </tr>
+            <tr class="net-profit">
+              <td>MƏRKƏZİN XALİS MƏNFƏƏTİ (NET QALIQ)</td>
+              <td style="text-align: right; font-size: 14pt; font-weight: bold; color: #047857;">${formatAmount(netProfit)} AZN</td>
+              <td>Mərkəzin payından bütün xərclər çıxıldıqdan sonra net qalıq mənfəət</td>
+            </tr>
+          </tbody>
+        </table>
+        <br>
 
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+        <div class="section-header">2. MÜƏLLİMƏLƏR ÜZRƏ PAY BÖLGÜSÜ</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Müəllimə</th>
+              <th style="text-align: center;">Tələbə Sayı</th>
+              <th style="text-align: right;">Cəlb Olunan Məbləğ</th>
+              <th style="text-align: center;">Pay Faizi (%)</th>
+              <th style="text-align: right;">Müəllimə Payı</th>
+              <th style="text-align: right;">Ödənilən Məbləğ</th>
+              <th style="text-align: right;">Qalıq Borc</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${teacherTableRows}
+            <tr class="total-row">
+              <td>CƏMİ YEKUN</td>
+              <td style="text-align: center;">${totalStudentsSum} tələbə</td>
+              <td style="text-align: right;">${formatAmount(totalRevenueSum)} AZN</td>
+              <td style="text-align: center;">-</td>
+              <td style="text-align: right; color: #4f46e5;">${formatAmount(totalTeacherShareSum)} AZN</td>
+              <td style="text-align: right; color: #059669;">${formatAmount(totalPaidSum)} AZN</td>
+              <td style="text-align: right; color: #b45309;">${formatAmount(totalDueSum)} AZN</td>
+            </tr>
+          </tbody>
+        </table>
+        <br>
+
+        ${expenses.length > 0 ? `
+          <div class="section-header">3. TƏDRİSİN XƏRCLƏRİ (TƏFƏRRÜATLI SİYAHI)</div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 120px;">Tarix</th>
+                <th>Xərcin Təsviri / Adı</th>
+                <th style="text-align: right; width: 160px;">Məbləğ (AZN)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${expenseTableRows}
+              <tr class="total-row">
+                <td colspan="2">CƏMİ XƏRCLƏR</td>
+                <td style="text-align: right; color: #ef4444;">${formatAmount(totalExpenses)} AZN</td>
+              </tr>
+            </tbody>
+          </table>
+          <br>
+
+          <div class="section-header">4. EYNİ ADLI XƏRCLƏRİN ÜMUMİLƏŞDİRİLMİŞ XÜLASƏSİ (QRUPLAŞDIRILMIŞ)</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Xərc Adı / Kateqoriya</th>
+                <th style="text-align: center; width: 160px;">Əməliyyat Sayı</th>
+                <th style="text-align: right; width: 180px;">Cəmi Məbləğ (AZN)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${groupedExpenseTableRows}
+              <tr class="total-row" style="background-color: #ecfdf5; color: #047857;">
+                <td style="color: #047857;">CƏMİ QRUPLAŞDIRILMIŞ XƏRC</td>
+                <td style="text-align: center; color: #047857;">${expenses.length} əməliyyat</td>
+                <td style="text-align: right; color: #047857; font-size: 12pt;">${formatAmount(totalExpenses)} AZN</td>
+              </tr>
+            </tbody>
+          </table>
+          <br>
+        ` : ''}
+
+        <br>
+        <div style="font-size: 11pt; font-weight: bold;">Hesabatı Tərtib Etdi (Direktor): _______________________</div>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob(["\uFEFF" + excelHtml], { type: "application/vnd.ms-excel;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `Umumi_Maliyyə_Hesabatı_${curMonth}.csv`);
+    link.setAttribute("download", `Umumi_Maliyyə_Hesabatı_${curMonth}.xls`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -3259,55 +3400,175 @@ const App = {
     const paid = teacherPayoutList.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
     const due = teacherShare - paid;
 
-    let csv = "";
-    // HEADER BANNER
-    csv += `ƏZİZ TƏDRİS MƏRKƏZİ - MÜƏLLİMƏ AYLIQ PAY HESABATI VƏRƏQİ\n`;
-    csv += `Müəllimə Adı;${t.name}\n`;
-    csv += `Hesabat Dövrü;${formattedMonth}\n`;
-    csv += `İxrac Tarixi;${new Date().toLocaleDateString('az-AZ')}\n\n`;
-
-    // SECTION 1: FINANCIAL KPI SUMMARY
-    csv += `1. MALİYYƏ XÜLASƏSİ\n`;
-    csv += `Göstərici Adı;Dəyər (AZN / Say);Qeyd\n`;
-    csv += `Aktiv Tələbə Sayı;${stdCount} tələbə;Davam edən tələbələrin sayı\n`;
-    csv += `Cəlb Olunan Ümumi Məbləğ;${formatAmount(revenue)} AZN;Tələbələr tərəfindən ödənilən ümumi məbləğ\n`;
-    csv += `Müəllimənin Pay Faizi;${sharePercent}%;Müəllimənin mərkəz ilə razılaşdırılmış payı\n`;
-    csv += `Hesablanmış Müəllimə Qazancı;${formatAmount(teacherShare)} AZN;Cəlb olunan məbləğdən müəlliməyə çatacaq pay\n`;
-    csv += `Müəlliməyə Ödənilən Məbləğ (Cəmi);${formatAmount(paid)} AZN;Təhvil verilmiş nağd və ya köçürmə ödənişlər\n`;
-    csv += `Qalıq Borc (Ödəniləcək Məbləğ);${formatAmount(due)} AZN;Mərkəzin müəlliməyə qalan borcu\n\n`;
-
-    // SECTION 2: STUDENTS & COURSES LIST
-    csv += `2. ÖDƏNİŞ EDİLƏN DƏRSLƏR VƏ TƏLƏBƏLƏRİN SİYAHISI\n`;
-    csv += `Tələbə Adı Soyadı;Fənn;Paket Növü;Dərs Tezliyi;Ödəniş Tarixi;Ödənilən Məbləğ (AZN)\n`;
-    teacherPayments.forEach(p => {
+    const studentTableRows = teacherPayments.map(p => {
       const paidVal = getPaymentRevenue(p);
       const student = students.find(s => s.id === p.studentId);
       const displayName = student ? `${student.name} ${student.surname || ""}`.trim() : p.studentName;
       const renewedTag = p.isRenewed ? " (Yenilənmiş paket)" : "";
       const pkgStr = (p.packageType === "Seans" ? `Seans (${p.sessionsCount || 8} seans) (${p.groupType})` : `Aylıq (${p.groupType})`) + renewedTag;
-      csv += `${displayName};${p.courseName};${pkgStr};Həftədə ${p.weeklyFrequency} dəfə;${p.paymentDate};${formatAmount(paidVal)} AZN\n`;
-    });
-    csv += `CƏMİ CƏLB OLUNAN;;;;;${formatAmount(revenue)} AZN\n\n`;
+      return `
+        <tr>
+          <td style="border: 1px solid #cbd5e1; padding: 6px 8px; font-weight: bold;">${displayName}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">${p.courseName}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">${pkgStr}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">Həftədə ${p.weeklyFrequency} dəfə</td>
+          <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">${p.paymentDate}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; font-weight: bold;">${formatAmount(paidVal)} AZN</td>
+        </tr>
+      `;
+    }).join("");
 
-    // SECTION 3: MANUAL PAYOUTS HISTORY
-    if (teacherPayoutList.length > 0) {
-      csv += `3. MÜƏLLİMƏYƏ EDİLƏN ÖDƏNİŞLƏRİN TARİXÇƏSİ\n`;
-      csv += `Tarix;Ödəniş Açıqlaması / Növü;Ödənilən Məbləğ (AZN)\n`;
-      teacherPayoutList.forEach(log => {
-        csv += `${log.date};Nağd/Köçürmə (Müəllimə ödənişi);${formatAmount(log.amount)} AZN\n`;
-      });
-      csv += `CƏMİ ÖDƏNİLƏN MƏBLƏĞ;;${formatAmount(paid)} AZN\n\n`;
-    }
+    const payoutTableRows = teacherPayoutList.map(log => `
+      <tr>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">${log.date}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px;">Nağd/Köçürmə (Müəllimə ödənişi)</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; font-weight: bold; color: #059669;">${formatAmount(log.amount)} AZN</td>
+      </tr>
+    `).join("");
 
-    // SECTION 4: FOOTER & SIGNATURE
-    csv += `RƏSMİ TƏSDİQ VƏ İMZA\n`;
-    csv += `Təhvil Verən (Direktor);İmza / Tarix\n`;
-    csv += `Təhvil Alan (Müəllimə);${t.name}\n`;
+    const excelHtml = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:x="urn:schemas-microsoft-com:office:excel"
+            xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--[if gte mso 9]>
+      <xml>
+       <x:ExcelWorkbook>
+        <x:ExcelWorksheets>
+         <x:ExcelWorksheet>
+          <x:Name>${t.name} Hesabatı</x:Name>
+          <x:WorksheetOptions>
+           <x:Print>
+            <x:ValidPrinterInfo/>
+            <x:PaperSizeIndex>9</x:PaperSizeIndex>
+            <x:Orientation>Landscape</x:Orientation>
+           </x:Print>
+           <x:FitToPage/>
+          </x:WorksheetOptions>
+         </x:ExcelWorksheet>
+        </x:ExcelWorksheets>
+       </x:ExcelWorkbook>
+      </xml>
+      <![endif]-->
+      <style>
+        body, table, td, th { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #0f172a; }
+        .header-title { font-size: 16pt; font-weight: bold; color: #1e1b4b; text-transform: uppercase; }
+        .subtitle { font-size: 11pt; font-weight: bold; color: #4f46e5; text-transform: uppercase; }
+        .section-header { font-size: 12pt; font-weight: bold; color: #1e1b4b; background-color: #e0e7ff; padding: 6px 10px; margin-top: 15px; border-left: 4px solid #4f46e5; }
+        table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+        th { background-color: #1e1b4b; color: #ffffff; font-weight: bold; padding: 8px; border: 1px solid #0f172a; text-align: left; }
+        td { border: 1px solid #cbd5e1; padding: 6px 8px; }
+        .total-row { background-color: #f1f5f9; font-weight: bold; }
+      </style>
+      </head>
+      <body>
+        <div class="header-title">ƏZİZ TƏDRİS MƏRKƏZİ</div>
+        <div class="subtitle">MÜƏLLİMƏ AYLIQ PAY HESABATI VƏRƏQİ</div>
+        <div style="margin-top: 4px; font-size: 10pt; color: #475569;">
+          Müəllimə: <b>${t.name}</b> | Hesabat Dövrü: <b>${formattedMonth}</b> | İxrac Tarixi: <b>${new Date().toLocaleDateString('az-AZ')}</b>
+        </div>
+        <br>
 
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+        <div class="section-header">1. MALİYYƏ XÜLASƏSİ</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Göstərici Adı</th>
+              <th style="text-align: right;">Dəyər (AZN / Say)</th>
+              <th>Qeyd</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Aktiv Tələbə Sayı</td>
+              <td style="text-align: right; font-weight: bold;">${stdCount} tələbə</td>
+              <td>Davam edən tələbələrin sayı</td>
+            </tr>
+            <tr>
+              <td>Cəlb Olunan Ümumi Məbləğ</td>
+              <td style="text-align: right; font-weight: bold;">${formatAmount(revenue)} AZN</td>
+              <td>Tələbələr tərəfindən ödənilən ümumi məbləğ</td>
+            </tr>
+            <tr>
+              <td>Müəllimənin Pay Faizi</td>
+              <td style="text-align: right; font-weight: bold;">${sharePercent}%</td>
+              <td>Müəllimənin mərkəz ilə razılaşdırılmış payı</td>
+            </tr>
+            <tr style="background-color: #e0e7ff; font-weight: bold;">
+              <td style="color: #3730a3;">Hesablanmış Müəllimə Qazancı</td>
+              <td style="text-align: right; font-size: 12pt; color: #3730a3;">${formatAmount(teacherShare)} AZN</td>
+              <td>Cəlb olunan məbləğdən müəlliməyə çatacaq pay</td>
+            </tr>
+            <tr style="background-color: #ecfdf5; font-weight: bold;">
+              <td style="color: #047857;">Müəlliməyə Ödənilən Məbləğ (Cəmi)</td>
+              <td style="text-align: right; font-size: 12pt; color: #047857;">${formatAmount(paid)} AZN</td>
+              <td>Təhvil verilmiş nağd və ya köçürmə ödənişlər</td>
+            </tr>
+            <tr style="background-color: ${due > 0 ? '#fffbeb' : (due < 0 ? '#fef2f2' : '#f0fdf4')}; font-weight: bold;">
+              <td style="color: ${due > 0 ? '#b45309' : (due < 0 ? '#991b1b' : '#166534')};">Qalıq Borc (Ödəniləcək Məbləğ)</td>
+              <td style="text-align: right; font-size: 12pt; color: ${due > 0 ? '#b45309' : (due < 0 ? '#991b1b' : '#166534')};">${formatAmount(due)} AZN</td>
+              <td>Mərkəzin müəlliməyə qalan borcu</td>
+            </tr>
+          </tbody>
+        </table>
+        <br>
+
+        ${teacherPayments.length > 0 ? `
+          <div class="section-header">2. ÖDƏNİŞ EDİLƏN DƏRSLƏR VƏ TƏLƏBƏLƏRİN SİYAHISI</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Tələbə Adı Soyadı</th>
+                <th>Fənn</th>
+                <th>Paket Növü</th>
+                <th>Dərs Tezliyi</th>
+                <th>Ödəniş Tarixi</th>
+                <th style="text-align: right;">Ödənilən Məbləğ (AZN)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${studentTableRows}
+              <tr class="total-row">
+                <td colspan="5">CƏMİ CƏLB OLUNAN</td>
+                <td style="text-align: right; color: #4f46e5; font-size: 12pt;">${formatAmount(revenue)} AZN</td>
+              </tr>
+            </tbody>
+          </table>
+          <br>
+        ` : ''}
+
+        ${teacherPayoutList.length > 0 ? `
+          <div class="section-header">3. MÜƏLLİMƏYƏ EDİLƏN ÖDƏNİŞLƏRİN TARİXÇƏSİ</div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 120px;">Tarix</th>
+                <th>Ödəniş Açıqlaması / Növü</th>
+                <th style="text-align: right; width: 160px;">Ödənilən Məbləğ (AZN)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${payoutTableRows}
+              <tr class="total-row" style="background-color: #ecfdf5;">
+                <td colspan="2" style="color: #047857;">CƏMİ ÖDƏNİLƏN MƏBLƏĞ</td>
+                <td style="text-align: right; color: #047857; font-size: 12pt;">${formatAmount(paid)} AZN</td>
+              </tr>
+            </tbody>
+          </table>
+          <br>
+        ` : ''}
+
+        <br>
+        <div style="font-size: 11pt; font-weight: bold;">Təhvil Verən (Direktor): _______________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Təhvil Alan (Müəllimə - ${t.name}): _______________________</div>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob(["\uFEFF" + excelHtml], { type: "application/vnd.ms-excel;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `${t.name.replace(/\s+/g, "_")}_Aylıq_Hesabatı_${curMonth}.csv`);
+    link.setAttribute("download", `${t.name.replace(/\s+/g, "_")}_Aylıq_Hesabatı_${curMonth}.xls`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -4024,7 +4024,7 @@ const DB = {
   "admin_password": "Adela121421",
   "theme": "light"
 };
-    if (!localStorage.getItem(DB_PREFIX + "initialized")) {
+    if (!localStorage.getItem(DB_PREFIX + "initialized") || this.getStudents().length === 0) {
       Object.keys(backupData).forEach(k => {
         this._set(k, backupData[k]);
       });

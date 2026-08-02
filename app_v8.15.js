@@ -1,3 +1,19 @@
+function getMonthlyPaymentDueDate(payment, student, curMonth) {
+  if (payment.dueDate) return payment.dueDate;
+  let enrollStr = student ? (student.enrollDate || student.joinDate || student.createdDate || student.daxilOlduguTarix) : null;
+  if (!enrollStr && payment.paymentDate) {
+    enrollStr = payment.paymentDate;
+  }
+  if (enrollStr) {
+    const eDate = parseSafeDate(enrollStr);
+    if (!isNaN(eDate.getTime())) {
+      const day = Math.min(eDate.getDate(), 28);
+      return `${curMonth}-${String(day).padStart(2, '0')}`;
+    }
+  }
+  return `${curMonth}-15`;
+}
+
 function xmlEscape(str) {
   if (str === null || str === undefined) return "";
   return String(str)
@@ -1706,10 +1722,11 @@ const App = {
         actionButtons = `<span style="font-size: 0.8rem; color: var(--text-muted); margin-right: 8px;">Əməliyyat dayandırılıb</span>`;
       } else {
         if (p.packageType === "Aylıq") {
+          const nextDueDate = getMonthlyPaymentDueDate(p, student, curMonth);
+          const diff = getDaysDiff(nextDueDate, today);
           if (p.paymentStatus === "Ödənildi") {
             statusHtml = `<span class="badge badge-paid">Ödənildi (${p.paymentDate || ""})</span>`;
           } else if (p.paymentStatus === "Qismən ödənilib") {
-            const diff = getDaysDiff(p.dueDate, today);
             let debtText = "";
             let badgeClass = "badge-partial";
             if (diff < 0) {
@@ -1724,20 +1741,6 @@ const App = {
             statusHtml = `<span class="badge ${badgeClass}">Qismən (${p.paidAmount}/${p.fee} AZN)${debtText}</span>`;
             actionButtons += `<button class="btn btn-success btn-sm" onclick="App.markPaymentPaid('${p.id}')">Ödənişi tamamla</button>`;
           } else {
-            let effDueDate = p.dueDate;
-            if (!effDueDate && p.paymentDate) {
-              const pDate = parseSafeDate(p.paymentDate);
-              if (!isNaN(pDate.getTime())) {
-                const m = pDate.getMonth() % 12 + 1;
-                const y = pDate.getFullYear() + (pDate.getMonth() === 11 ? 1 : 0);
-                const d = Math.min(pDate.getDate(), 28);
-                effDueDate = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-              }
-            }
-            if (!effDueDate) {
-              effDueDate = `${curMonth}-15`;
-            }
-            const diff = getDaysDiff(effDueDate, today);
             if (diff < 0) {
               statusHtml = `<span class="badge badge-late-dark">${Math.abs(diff)} gün gecikir</span>`;
             } else if (diff === 0) {
@@ -1801,8 +1804,7 @@ const App = {
         dueDateDisplay = "-";
       } else {
         if (p.packageType === "Aylıq") {
-          const monthlySessionDueDate = calculateSessionDueDate(p);
-          dueDateDisplay = monthlySessionDueDate || p.sessionStartDate || "-";
+          dueDateDisplay = getMonthlyPaymentDueDate(p, student, curMonth);
         } else {
           dueDateDisplay = sDueDate || p.sessionStartDate || p.paymentDate || "-";
         }

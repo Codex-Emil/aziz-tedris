@@ -3178,7 +3178,7 @@ const DB = {
         "sessionsLogged": 0,
         "isManualSessions": false,
         "sessionDays": null,
-        "dueDate": "2026-08-15"
+        "dueDate": "2026-08-12"
       },
       {
         "id": "pay_202608_pay_1783370008659_9jk63",
@@ -3222,7 +3222,7 @@ const DB = {
         "sessionsLogged": 0,
         "isManualSessions": false,
         "sessionDays": null,
-        "dueDate": "2026-08-28"
+        "dueDate": "2026-08-15"
       },
       {
         "id": "pay_202608_pay_1783370008659_krdhg",
@@ -3266,7 +3266,7 @@ const DB = {
         "sessionsLogged": 0,
         "isManualSessions": false,
         "sessionDays": null,
-        "dueDate": "2026-08-15"
+        "dueDate": "2026-08-09"
       },
       {
         "id": "pay_202608_pay_1783370008659_ui43f",
@@ -3288,7 +3288,7 @@ const DB = {
         "sessionsLogged": 0,
         "isManualSessions": false,
         "sessionDays": null,
-        "dueDate": "2026-08-15"
+        "dueDate": "2026-08-22"
       },
       {
         "id": "pay_202608_pay_1783370008659_3mbpe",
@@ -3332,7 +3332,7 @@ const DB = {
         "sessionsLogged": 0,
         "isManualSessions": false,
         "sessionDays": null,
-        "dueDate": "2026-08-14"
+        "dueDate": "2026-08-11"
       },
       {
         "id": "pay_202608_pay_1783370008659_xgjx7",
@@ -3354,7 +3354,7 @@ const DB = {
         "sessionsLogged": 0,
         "isManualSessions": false,
         "sessionDays": null,
-        "dueDate": "2026-08-28"
+        "dueDate": "2026-08-22"
       },
       {
         "id": "pay_202608_pay_1783370008659_6xrvo",
@@ -3521,7 +3521,7 @@ const DB = {
         "sessionsLogged": 0,
         "isManualSessions": false,
         "sessionDays": null,
-        "dueDate": "2026-08-15"
+        "dueDate": "2026-08-02"
       },
       {
         "id": "pay_202608_pay_1783370008660_7fal2",

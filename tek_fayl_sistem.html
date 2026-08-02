@@ -15,7 +15,12 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <script>
     window.onerror = function(msg, url, line) {
-      alert("Sistem Xətası:\n" + msg + "\n\nFayl: " + url.split('/').pop() + "\nSətir: " + line);
+      if (!msg || msg.indexOf("Script error") !== -1 || line === 0) {
+        console.warn("Cross-origin or non-critical script warning ignored:", msg);
+        return true;
+      }
+      const fname = url ? url.split('/').pop() : 'naməlum';
+      alert("Sistem Xətası:\n" + msg + "\n\nFayl: " + fname + "\nSətir: " + line);
       return false;
     };
   </script>

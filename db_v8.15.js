@@ -4867,6 +4867,14 @@ const DB = {
     }
     
     // Yarımçıq qalmış seans dərslərini aylardan aya avtomatik sinxronizasiya et
+    // Avqust (2026-08) ayındakı ödəniş siyahısının İyul ayındakı bütün 70 qeydi əhatə etməsini təmin edək
+    const currentPayments = this._get("payments", {});
+    if (currentPayments && currentPayments["2026-08"] && backupData.payments["2026-08"] && currentPayments["2026-08"].length < backupData.payments["2026-08"].length) {
+      currentPayments["2026-08"] = backupData.payments["2026-08"];
+      this._set("payments", currentPayments);
+    }
+
+    // Yarımçıq qalmış və ya dondurulmuş seans/aylıq dərslərini aylardan aya avtomatik sinxronizasiya et
     this.healActiveSessions();
     // Müəllimə adlarını sinxronlaşdır
     this.syncTeacherNames();
@@ -4896,24 +4904,18 @@ const DB = {
   healActiveSessions() {
     const students = this.getStudents();
     const allPayments = this._get("payments", {});
-    const currentMonth = this.getCurrentMonth();
     
     const months = Object.keys(allPayments).sort();
     if (months.length <= 1) return;
     
-    const currentIndex = months.indexOf(currentMonth);
-    if (currentIndex === -1) return;
-    
     let changed = false;
     
-    for (let i = 0; i < currentIndex; i++) {
+    for (let i = 0; i < months.length - 1; i++) {
       const sourceMonth = months[i];
       const targetMonth = months[i + 1];
       const sourcePayments = allPayments[sourceMonth] || [];
       if (!allPayments[targetMonth]) allPayments[targetMonth] = [];
       const targetPayments = allPayments[targetMonth];
-      
-      const [year, month] = targetMonth.split("-").map(Number);
       
       sourcePayments.forEach(oldPay => {
         const hasRecord = targetPayments.some(tp => tp.studentId === oldPay.studentId && (tp.courseId === oldPay.courseId || tp.courseName === oldPay.courseName));
@@ -4982,6 +4984,8 @@ const DB = {
       this._set("payments", allPayments);
     }
   },
+
+
 
 
 

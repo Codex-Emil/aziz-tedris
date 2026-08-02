@@ -93,22 +93,18 @@ const DEFAULT_COURSES = [];
 const DB = {
   // Yaddaşdan məlumat oxumaq üçün köməkçi
   _get(key, defaultValue = []) {
+    const data = localStorage.getItem(DB_PREFIX + key);
+    if (!data) return defaultValue;
     try {
-      const data = localStorage.getItem(DB_PREFIX + key);
-      if (!data) return defaultValue;
       return JSON.parse(data);
     } catch (e) {
-      return defaultValue;
+      return data;
     }
   },
 
   // Yaddaşa yazmaq üçün köməkçi
   _set(key, data) {
-    try {
-      localStorage.setItem(DB_PREFIX + key, JSON.stringify(data));
-    } catch (e) {
-      console.error("LocalStorage write error:", e);
-    }
+    localStorage.setItem(DB_PREFIX + key, JSON.stringify(data));
   },
 
   // Bazanı sıfırlamaq və ya ilkin sazlamaq
@@ -4637,8 +4633,8 @@ const DB = {
   },
 
   getAdminPassword() {
-    const p = this._get("admin_password", "12345");
-    return String(p || "12345").trim();
+    const pwd = this._get("admin_password", "12345");
+    return String(pwd || "12345").trim();
   },
 
   setAdminPassword(password) {

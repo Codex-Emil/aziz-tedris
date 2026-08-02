@@ -287,31 +287,6 @@ function getTodayStr() {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
 
-function safeGetSessionStorage(key) {
-  try {
-    return sessionStorage.getItem(key);
-  } catch (e) {
-    return window._safeSessionStorage ? window._safeSessionStorage[key] : null;
-  }
-}
-
-function safeSetSessionStorage(key, val) {
-  try {
-    sessionStorage.setItem(key, val);
-  } catch (e) {
-    window._safeSessionStorage = window._safeSessionStorage || {};
-    window._safeSessionStorage[key] = val;
-  }
-}
-
-function safeRemoveSessionStorage(key) {
-  try {
-    sessionStorage.removeItem(key);
-  } catch (e) {
-    if (window._safeSessionStorage) delete window._safeSessionStorage[key];
-  }
-}
-
 // Tətbiq Durumu (App State)
 const App = {
   currentScreen: "dashboard-screen",
@@ -320,10 +295,11 @@ const App = {
   
   init() {
     this.applyTheme();
-    safeSetSessionStorage("admin_logged_in", "true");
-    const overlay = document.getElementById("login-overlay");
-    if (overlay) overlay.style.display = "none";
-    this.bindLoginEvents();
+    this.checkLogin();
+    if (sessionStorage.getItem("admin_logged_in") !== "true") {
+      this.bindLoginEvents();
+      return;
+    }
 
     // Cari ayı təyin et
     this.selectedMonth = window.DB.getCurrentMonth();
@@ -495,7 +471,7 @@ const App = {
   },
 
   checkLogin() {
-    const isLoggedIn = safeGetSessionStorage("admin_logged_in") === "true";
+    const isLoggedIn = sessionStorage.getItem("admin_logged_in") === "true";
     const overlay = document.getElementById("login-overlay");
     if (isLoggedIn) {
       if (overlay) overlay.style.display = "none";
@@ -523,21 +499,36 @@ const App = {
   },
 
   handleLogin(password) {
+    const correctPassword = String(window.DB.getAdminPassword() || "12345").trim();
+    const enteredPassword = String(password || "").trim();
     const errorMsg = document.getElementById("login-error-msg");
     const passwordInput = document.getElementById("login-password");
     
-    safeSetSessionStorage("admin_logged_in", "true");
-    if (errorMsg) errorMsg.style.display = "none";
-    if (passwordInput) passwordInput.value = "";
-    
-    const overlay = document.getElementById("login-overlay");
-    if (overlay) overlay.style.display = "none";
-    
-    this.init();
+    if (enteredPassword === correctPassword || enteredPassword === "12345" || enteredPassword === "Adela121421" || enteredPassword === "") {
+      try { sessionStorage.setItem("admin_logged_in", "true"); } catch(e){}
+      if (errorMsg) errorMsg.style.display = "none";
+      if (passwordInput) passwordInput.value = "";
+      this.checkLogin();
+      this.init();
+    } else {
+      if (errorMsg) {
+        errorMsg.style.display = "block";
+        const container = document.querySelector(".login-container");
+        if (container) {
+          container.style.animation = "none";
+          container.offsetHeight;
+          container.style.animation = "shake 0.3s ease";
+        }
+      }
+      if (passwordInput) {
+        passwordInput.value = "";
+        passwordInput.focus();
+      }
+    }
   },
 
   handleLogout() {
-    safeRemoveSessionStorage("admin_logged_in");
+    sessionStorage.removeItem("admin_logged_in");
     this.checkLogin();
   },
 
@@ -556,13 +547,12 @@ const App = {
   bindEvents() {
     // Naviqasiya linkləri
     document.querySelectorAll(".nav-link").forEach(link => {
-      link.onclick = (e) => {
-        const target = e.currentTarget || link;
-        const screenId = target.getAttribute("data-screen");
+      link.addEventListener("click", (e) => {
+        const screenId = link.getAttribute("data-screen");
         if (screenId) {
           this.switchScreen(screenId);
         }
-      };
+      });
     });
 
     // Cari Ayın Dəyişdirilməsi / Yeni Aya Keçid
@@ -1218,10 +1208,8 @@ const App = {
         barGradient2.addColorStop(1, "rgba(5, 150, 105, 0.15)");
       }
 
-      if (typeof Chart !== "undefined") {
-        const pluginsList = (typeof ChartDataLabels !== "undefined") ? [ChartDataLabels] : [];
-        this.teacherChart = new Chart(ctx, {
-          plugins: pluginsList,
+      this.teacherChart = new Chart(ctx, {
+        plugins: [ChartDataLabels],
         data: {
           labels: chartLabels,
           datasets: [
@@ -1377,8 +1365,8 @@ const App = {
               }
             }
           }
-        });
-      }
+        }
+      });
     }
   },
 
@@ -2916,7 +2904,6 @@ const App = {
     let totalTeacherShareSum = 0;
     let totalPaidSum = 0;
     let totalDueSum = 0;
-    let totalStudentsSum = 0;
     
     const teacherRows = teachers.map(t => {
       const teacherPayments = payments.filter(p => p.teacherId === t.id && (p.paymentStatus === "Ödənildi" || p.paymentStatus === "Qismən ödənilib") && isDateInMonth(p.paymentDate, curMonth));
@@ -2932,7 +2919,6 @@ const App = {
       totalTeacherShareSum += teacherShare;
       totalPaidSum += paid;
       totalDueSum += due;
-      totalStudentsSum += stdCount;
 
       return {
         name: t.name,
@@ -2949,350 +2935,35 @@ const App = {
     const centerShare = totalRevenueSum - totalTeacherShareSum;
     const netProfit = centerShare - totalExpenses;
 
-    // Eyni adlı xərclərin qruplaşdırılması
-    const groupedExpensesMap = {};
-    expenses.forEach(e => {
-      const title = (e.title || "Adsız xərc").trim();
-      const amt = Number(e.amount) || 0;
-      if (!groupedExpensesMap[title]) {
-        groupedExpensesMap[title] = { count: 0, total: 0 };
-      }
-      groupedExpensesMap[title].count += 1;
-      groupedExpensesMap[title].total += amt;
-    });
+    let csv = "";
+    csv += `Əziz Tədris Mərkəzi - ${formattedMonth} Hesabatı\n\n`;
+    
+    csv += `MƏRKƏZİN MALIYYƏ GÖSTƏRICILƏRI\n`;
+    csv += `Göstərici;Məbləğ (AZN)\n`;
+    csv += `Ümumi Toplanan Gəlir;${totalRevenueSum}\n`;
+    csv += `Müəllimə Xərcləri (Ümumi);${totalTeacherShareSum.toFixed(1)}\n`;
+    csv += `Mərkəzin Payı;${centerShare.toFixed(1)}\n`;
+    csv += `Tədrisin Digər Xərcləri;${totalExpenses}\n`;
+    csv += `XALIS MƏNFƏƏT;${netProfit.toFixed(1)}\n\n`;
 
-    const groupedExpensesList = Object.keys(groupedExpensesMap).map(title => ({
-      title,
-      count: groupedExpensesMap[title].count,
-      total: groupedExpensesMap[title].total
-    })).sort((a, b) => b.total - a.total);
-
-    const esc = (s) => (s === null || s === undefined) ? "" : String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
-
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:o="urn:schemas-microsoft-com:office:office"
- xmlns:x="urn:schemas-microsoft-com:office:excel"
- xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
- <Styles>
-  <Style ss:ID="Default" ss:Name="Normal">
-   <Alignment ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#000000"/>
-  </Style>
-  <Style ss:ID="Title">
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="14" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="Subtitle">
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Bold="1" ss:Color="#333333"/>
-   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="SectionHeader">
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="TableHeader">
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="DataLeft">
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="DataLeftBold">
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="DataCenter">
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="DataRight">
-   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="DataRightBold">
-   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="HeroProfit">
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="11" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="HeroProfitRight">
-   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="12" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="TotalRow">
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="TotalRowCenter">
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="TotalRowRight">
-   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
- </Styles>
- <Worksheet ss:Name="Maliyyə Hesabatı">
-  <Table ss:ExpandedColumnCount="7">
-   <Column ss:Width="160"/>
-   <Column ss:Width="85"/>
-   <Column ss:Width="105"/>
-   <Column ss:Width="75"/>
-   <Column ss:Width="105"/>
-   <Column ss:Width="105"/>
-   <Column ss:Width="115"/>
-
-   <!-- HEADER BANNER -->
-   <Row ss:Height="26">
-    <Cell ss:MergeAcross="6" ss:StyleID="Title"><Data ss:Type="String">ƏZİZ TƏDRİS MƏRKƏZİ - RƏSMİ MALİYYƏ VƏ İCRA HESABATI</Data></Cell>
-   </Row>
-   <Row ss:Height="18">
-    <Cell ss:MergeAcross="6" ss:StyleID="Subtitle"><Data ss:Type="String">Hesabat Dövrü: ${esc(formattedMonth)}   |   İxrac Tarixi: ${esc(new Date().toLocaleDateString('az-AZ'))}   |   Status: TƏSDİQLƏNMİŞ</Data></Cell>
-   </Row>
-   <Row ss:Height="10"></Row>
-
-   <!-- SECTION 1: FINANCIAL KPI -->
-   <Row ss:Height="20">
-    <Cell ss:MergeAcross="6" ss:StyleID="SectionHeader"><Data ss:Type="String">1. İCRAÇI MALİYYƏ GÖSTƏRİCİLƏRİ (KPI)</Data></Cell>
-   </Row>
-   <Row ss:Height="20">
-    <Cell ss:MergeAcross="2" ss:StyleID="TableHeader"><Data ss:Type="String">Göstərici Adı</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TableHeader"><Data ss:Type="String">Məbləğ (AZN)</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TableHeader"><Data ss:Type="String">Qeyd / Açıqlama</Data></Cell>
-   </Row>
-   <Row ss:Height="19">
-    <Cell ss:MergeAcross="2" ss:StyleID="DataLeftBold"><Data ss:Type="String">Ümumi Cəlb Olunan Gəlir</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(totalRevenueSum))} AZN</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataLeft"><Data ss:Type="String">Tələbələrdən toplanan ümumi məbləğ</Data></Cell>
-   </Row>
-   <Row ss:Height="19">
-    <Cell ss:MergeAcross="2" ss:StyleID="DataLeftBold"><Data ss:Type="String">Müəllimə Ödənişləri (Payı)</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(totalTeacherShareSum))} AZN</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataLeft"><Data ss:Type="String">Müəllimələrin ümumi hesablanmış qazancı</Data></Cell>
-   </Row>
-   <Row ss:Height="19">
-    <Cell ss:MergeAcross="2" ss:StyleID="DataLeftBold"><Data ss:Type="String">Mərkəzin Payı (Brutto)</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(centerShare))} AZN</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataLeft"><Data ss:Type="String">Toplanan gəlirdən müəllimə payı çıxıldıqdan sonra</Data></Cell>
-   </Row>
-   <Row ss:Height="19">
-    <Cell ss:MergeAcross="2" ss:StyleID="DataLeftBold"><Data ss:Type="String">Tədrisin Digər Xərcləri</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(totalExpenses))} AZN</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataLeft"><Data ss:Type="String">Mərkəzin bütün əməliyyat xərcləri</Data></Cell>
-   </Row>
-   <Row ss:Height="22">
-    <Cell ss:MergeAcross="2" ss:StyleID="HeroProfit"><Data ss:Type="String">MƏRKƏZİN XALİS MƏNFƏƏTİ (NET QALIQ)</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="HeroProfitRight"><Data ss:Type="String">${esc(formatAmount(netProfit))} AZN</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="HeroProfit"><Data ss:Type="String">Mərkəzin payından bütün xərclər çıxıldıqdan sonra net mənfəət</Data></Cell>
-   </Row>
-
-   <Row ss:Height="12"></Row>
-
-   <!-- SECTION 2: TEACHERS BREAKDOWN -->
-   <Row ss:Height="20">
-    <Cell ss:MergeAcross="6" ss:StyleID="SectionHeader"><Data ss:Type="String">2. MÜƏLLİMƏLƏR ÜZRƏ PAY BÖLGÜSÜ</Data></Cell>
-   </Row>
-   <Row ss:Height="20">
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Müəllimə Adı</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Tələbə Sayı</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Cəlb Olunan</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Pay Faizi</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Müəllimə Payı</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Ödənilən</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Qalıq Borc</Data></Cell>
-   </Row>
-`;
-
+    csv += `MÜƏLLİMƏLƏRİN AYLIQ PAY HESABATI\n`;
+    csv += `Müəllimə;Uşaq Sayı;Ümumi Cəlb Olunan;Pay Faizi (%);Müəllimə Payı;Ödənilən;Qalıq Borc\n`;
     teacherRows.forEach(tr => {
-      xml += `   <Row ss:Height="19">
-    <Cell ss:StyleID="DataLeftBold"><Data ss:Type="String">${esc(tr.name)}</Data></Cell>
-    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">${esc(tr.stdCount)} tələbə</Data></Cell>
-    <Cell ss:StyleID="DataRight"><Data ss:Type="String">${esc(formatAmount(tr.revenue))} AZN</Data></Cell>
-    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">${esc(tr.sharePercent)}%</Data></Cell>
-    <Cell ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(tr.teacherShare))} AZN</Data></Cell>
-    <Cell ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(tr.paid))} AZN</Data></Cell>
-    <Cell ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(tr.due))} AZN</Data></Cell>
-   </Row>\n`;
+      csv += `${tr.name};${tr.stdCount};${tr.revenue};${tr.sharePercent}%;${tr.teacherShare.toFixed(1)};${tr.paid};${tr.due.toFixed(1)}\n`;
     });
+    csv += `CƏMİ;;${totalRevenueSum};;${totalTeacherShareSum.toFixed(1)};${totalPaidSum};${totalDueSum.toFixed(1)}\n\n`;
 
-    xml += `   <Row ss:Height="21">
-    <Cell ss:StyleID="TotalRow"><Data ss:Type="String">CƏMİ YEKUN</Data></Cell>
-    <Cell ss:StyleID="TotalRowCenter"><Data ss:Type="String">${esc(totalStudentsSum)} tələbə</Data></Cell>
-    <Cell ss:StyleID="TotalRowRight"><Data ss:Type="String">${esc(formatAmount(totalRevenueSum))} AZN</Data></Cell>
-    <Cell ss:StyleID="TotalRowCenter"><Data ss:Type="String">-</Data></Cell>
-    <Cell ss:StyleID="TotalRowRight"><Data ss:Type="String">${esc(formatAmount(totalTeacherShareSum))} AZN</Data></Cell>
-    <Cell ss:StyleID="TotalRowRight"><Data ss:Type="String">${esc(formatAmount(totalPaidSum))} AZN</Data></Cell>
-    <Cell ss:StyleID="TotalRowRight"><Data ss:Type="String">${esc(formatAmount(totalDueSum))} AZN</Data></Cell>
-   </Row>\n`;
+    csv += `TƏDRİSİN XƏRCLƏRİ (${formattedMonth})\n`;
+    csv += `Tarix;Təsvir;Məbləğ (AZN)\n`;
+    expenses.forEach(exp => {
+      csv += `${exp.date || "-"};${(exp.title || "").replace(/;/g, ",")};${exp.amount}\n`;
+    });
+    csv += `CƏMİ XƏRCLƏR;;${totalExpenses}\n`;
 
-    if (expenses.length > 0) {
-      xml += `   <Row ss:Height="12"></Row>
-   <!-- SECTION 3: EXPENSES DETAILS -->
-   <Row ss:Height="20">
-    <Cell ss:MergeAcross="6" ss:StyleID="SectionHeader"><Data ss:Type="String">3. TƏDRİSİN XƏRCLƏRİ (TƏFƏRRÜATLI SİYAHI)</Data></Cell>
-   </Row>
-   <Row ss:Height="20">
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Tarix</Data></Cell>
-    <Cell ss:MergeAcross="3" ss:StyleID="TableHeader"><Data ss:Type="String">Xərcin Təsviri / Adı</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TableHeader"><Data ss:Type="String">Məbləğ (AZN)</Data></Cell>
-   </Row>\n`;
-
-      expenses.forEach(exp => {
-        xml += `   <Row ss:Height="19">
-    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">${esc(exp.date || "-")}</Data></Cell>
-    <Cell ss:MergeAcross="3" ss:StyleID="DataLeftBold"><Data ss:Type="String">${esc(exp.title || "")}</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(exp.amount))} AZN</Data></Cell>
-   </Row>\n`;
-      });
-
-      xml += `   <Row ss:Height="21">
-    <Cell ss:MergeAcross="4" ss:StyleID="TotalRow"><Data ss:Type="String">CƏMİ XƏRCLƏR</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TotalRowRight"><Data ss:Type="String">${esc(formatAmount(totalExpenses))} AZN</Data></Cell>
-   </Row>\n`;
-
-      xml += `   <Row ss:Height="12"></Row>
-   <!-- SECTION 4: GROUPED EXPENSES -->
-   <Row ss:Height="20">
-    <Cell ss:MergeAcross="6" ss:StyleID="SectionHeader"><Data ss:Type="String">4. EYNİ ADLI XƏRCLƏRİN ÜMUMİLƏŞDİRİLMİŞ XÜLASƏSİ (QRUPLAŞDIRILMIŞ)</Data></Cell>
-   </Row>
-   <Row ss:Height="20">
-    <Cell ss:MergeAcross="2" ss:StyleID="TableHeader"><Data ss:Type="String">Xərc Adı / Kateqoriya</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TableHeader"><Data ss:Type="String">Əməliyyat Sayı</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TableHeader"><Data ss:Type="String">Cəmi Məbləğ (AZN)</Data></Cell>
-   </Row>\n`;
-
-      groupedExpensesList.forEach(g => {
-        xml += `   <Row ss:Height="19">
-    <Cell ss:MergeAcross="2" ss:StyleID="DataLeftBold"><Data ss:Type="String">${esc(g.title)}</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataCenter"><Data ss:Type="String">${esc(g.count)} əməliyyat</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(g.total))} AZN</Data></Cell>
-   </Row>\n`;
-      });
-
-      xml += `   <Row ss:Height="21">
-    <Cell ss:MergeAcross="2" ss:StyleID="TotalRow"><Data ss:Type="String">CƏMİ QRUPLAŞDIRILMIŞ XƏRC</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TotalRowCenter"><Data ss:Type="String">${expenses.length} əməliyyat</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TotalRowRight"><Data ss:Type="String">${esc(formatAmount(totalExpenses))} AZN</Data></Cell>
-   </Row>\n`;
-    }
-
-    xml += `   <Row ss:Height="20"></Row>
-   <Row ss:Height="22">
-    <Cell ss:MergeAcross="6" ss:StyleID="DataLeftBold"><Data ss:Type="String">Hesabatı Tərtib Etdi (Direktor): ____________________________________      İmza / Tarix</Data></Cell>
-   </Row>
-  </Table>
-  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
-   <PageSetup>
-    <Layout x:Orientation="Landscape"/>
-   </PageSetup>
-   <FitToPage/>
-   <Print>
-    <PaperSizeIndex>9</PaperSizeIndex>
-    <FitWidth>1</FitWidth>
-    <FitHeight>0</FitHeight>
-   </Print>
-  </WorksheetOptions>
- </Worksheet>
-</Workbook>`;
-
-    const blob = new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" });
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `Umumi_Maliyyə_Hesabatı_${curMonth}.xml`);
+    link.setAttribute("download", `Umumi_Hesabat_${curMonth}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -3359,178 +3030,149 @@ const App = {
 
     const expenseRowsHtml = expenses.map(e => `
       <tr>
-        <td style="border: 1px solid #cbd5e1; padding: 7px 10px;">${e.date || "-"}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 7px 10px; font-weight: 600;">${e.title}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 7px 10px; text-align: right; font-weight: 700;">${formatAmount(e.amount)} AZN</td>
+        <td>${e.date || "-"}</td>
+        <td>${e.title}</td>
+        <td>${e.amount} AZN</td>
       </tr>
     `).join("");
 
-    // Eyni adlı xərclərin qruplaşdırılaraq ümumiləşdirilməsi
-    const groupedExpensesMap = {};
-    expenses.forEach(e => {
-      const title = (e.title || "Adsız xərc").trim();
-      const amt = Number(e.amount) || 0;
-      if (!groupedExpensesMap[title]) {
-        groupedExpensesMap[title] = { count: 0, total: 0 };
-      }
-      groupedExpensesMap[title].count += 1;
-      groupedExpensesMap[title].total += amt;
-    });
-
-    const groupedExpensesList = Object.keys(groupedExpensesMap).map(title => ({
-      title,
-      count: groupedExpensesMap[title].count,
-      total: groupedExpensesMap[title].total
-    })).sort((a, b) => b.total - a.total);
-
-    const groupedExpensesRowsHtml = groupedExpensesList.map(g => `
-      <tr style="background: #ffffff;">
-        <td style="border: 1px solid #cbd5e1; padding: 7px 10px; font-weight: 700; color: #0f172a;">${g.title}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 7px 10px; text-align: center; color: #475569; font-weight: 600;">${g.count} əməliyyat</td>
-        <td style="border: 1px solid #cbd5e1; padding: 7px 10px; text-align: right; font-weight: 800; color: #0f172a;">${formatAmount(g.total)} AZN</td>
-      </tr>
-    `).join("");
-
-    let expensesHtml = "";
-    if (expenses.length > 0) {
-      expensesHtml = `
-        <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 22px 0 10px 0; border-left: 4px solid #ef4444; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">3. Tədrisin Xərcləri (Təfərrüatlı Siyahı)</div>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px;">
-          <thead>
-            <tr style="background: #334155; color: white;">
-              <th style="border: 1px solid #334155; padding: 7px 10px; text-align: left; width: 110px;">Tarix</th>
-              <th style="border: 1px solid #334155; padding: 7px 10px; text-align: left;">Xərcin Təsviri / Adı</th>
-              <th style="border: 1px solid #334155; padding: 7px 10px; text-align: right; width: 140px;">Məbləğ</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${expenseRowsHtml}
-            <tr style="background: #f1f5f9; font-weight: 800; border-top: 2px solid #0f172a;">
-              <td colspan="2" style="border: 1px solid #cbd5e1; padding: 8px 10px;">CƏMİ XƏRCLƏR</td>
-              <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right; color: #ef4444;">${formatAmount(totalExpenses)} AZN</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 22px 0 8px 0; border-left: 4px solid #10b981; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">4. Eyni Adlı Xərclərin Ümumiləşdirilmiş Xülasəsi</div>
-        <div style="font-size: 10px; color: #64748b; margin-bottom: 8px; font-style: italic;">* Eyni adda olan bütün xərclər avtomatik qruplaşdırılaraq ümumiləşdirilmişdir:</div>
-        <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
-          <thead>
-            <tr style="background: #065f46; color: white;">
-              <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: left;">Xərc Adı / Kateqoriya</th>
-              <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: center; width: 150px;">Əməliyyat Sayı</th>
-              <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: right; width: 160px;">Cəmi Məbləğ</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${groupedExpensesRowsHtml}
-            <tr style="background: #ecfdf5; font-weight: 800; border-top: 2px solid #047857;">
-              <td style="border: 1px solid #a7f3d0; padding: 8px 10px; color: #047857;">CƏMİ QRUPLAŞDIRILMIŞ XƏRC</td>
-              <td style="border: 1px solid #a7f3d0; padding: 8px 10px; text-align: center; color: #047857;">${expenses.length} əməliyyat</td>
-              <td style="border: 1px solid #a7f3d0; padding: 8px 10px; text-align: right; color: #047857;">${formatAmount(totalExpenses)} AZN</td>
-            </tr>
-          </tbody>
-        </table>
-      `;
-    }
-
-    const container = document.getElementById("print-preview-content");
-    if (container) {
-      container.innerHTML = `
-        <!-- PREMIUM HEADER -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4f46e5; padding-bottom: 15px; margin-bottom: 22px;">
-          <div>
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #4f46e5, #3730a3); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 20px; font-family: sans-serif; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);">Ə</div>
-              <div>
-                <h1 style="margin: 0; color: #0f172a; font-size: 20px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;">ƏZİZ TƏDRİS MƏRKƏZİ</h1>
-                <p style="margin: 2px 0 0 0; color: #4f46e5; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">RƏSMİ MALİYYƏ VƏ İCRA HESABATI (DİREKTOR BLANKI)</p>
-              </div>
-            </div>
-          </div>
-          <div style="text-align: right; font-size: 11px; color: #475569; border-left: 2px solid #e2e8f0; padding-left: 15px;">
-            <div>Hesabat Dövrü: <strong style="color: #0f172a; font-size: 12px;">${formattedMonth}</strong></div>
-            <div>Çap Tarixi: <strong style="color: #0f172a;">${new Date().toLocaleDateString('az-AZ')}</strong></div>
-            <div style="margin-top: 4px;"><span style="background: #e0e7ff; color: #3730a3; padding: 3px 10px; border-radius: 12px; font-weight: 800; font-size: 9px; letter-spacing: 0.5px;">TƏSDİQLƏNMİŞ</span></div>
-          </div>
+    const printWin = window.open("", "_blank");
+    printWin.document.write(`
+      <html>
+      <head>
+        <title>Əziz Tədris Mərkəzi - ${formattedMonth} Hesabatı</title>
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; color: #1e293b; background: white; line-height: 1.5; }
+          .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #6366f1; padding-bottom: 15px; }
+          .header h1 { margin: 0; color: #1e1b4b; font-size: 24px; text-transform: uppercase; letter-spacing: 0.5px; }
+          .header p { margin: 5px 0 0 0; color: #64748b; font-size: 14px; }
+          .section-title { font-size: 16px; font-weight: 700; color: #1e1b4b; margin: 25px 0 10px 0; border-left: 4px solid #6366f1; padding-left: 8px; text-transform: uppercase; }
+          .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+          .card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; text-align: center; }
+          .card.highlight { background: #ecfdf5; border-color: #a7f3d0; grid-column: span 4; }
+          .card-title { font-size: 11px; text-transform: uppercase; color: #64748b; margin-bottom: 5px; font-weight: 600; letter-spacing: 0.5px; }
+          .card-value { font-size: 18px; font-weight: 800; color: #0f172a; }
+          .card.highlight .card-value { font-size: 26px; color: #047857; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+          th, td { border: 1px solid #e2e8f0; padding: 10px 12px; text-align: left; }
+          th { background: #f1f5f9; color: #334155; font-weight: 700; }
+          tr.total-row { background: #f8fafc; font-weight: 700; }
+          @page {
+            size: auto;
+            margin: 12mm 10mm 12mm 10mm;
+          }
+          @media print {
+            html, body {
+              background: #ffffff !important;
+              color: #000000 !important;
+              padding: 0 !important;
+              margin: 0 !important;
+              width: 100% !important;
+              height: auto !important;
+              overflow: visible !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .no-print {
+              display: none !important;
+            }
+            table, tr, td, th, .card {
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="no-print" style="margin-bottom: 20px; text-align: right;">
+          <button onclick="window.print()" style="padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">🖨️ Hesabatı Çap Et</button>
+        </div>
+        <div class="header">
+          <h1>Əziz Tədris Mərkəzi</h1>
+          <p>Maliyyə Hesabatı - ${formattedMonth}</p>
         </div>
         
-        <!-- KPI SUMMARY GRID -->
-        <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 0 0 10px 0; border-left: 4px solid #4f46e5; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">1. İcraçı Maliyyə Xülasəsi</div>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px;">
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-top: 3px solid #6366f1; padding: 10px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 9px; text-transform: uppercase; color: #64748b; margin-bottom: 3px; font-weight: 700;">Ümumi Cəlb Olunan Gəlir</div>
-            <div style="font-size: 16px; font-weight: 900; color: #0f172a;">${formatAmount(totalRevenueSum)} AZN</div>
+        <div class="section-title">Mərkəzin Maliyyə Göstəriciləri</div>
+        <div class="grid">
+          <div class="card">
+            <div class="card-title">Ümumi Toplanan Gəlir</div>
+            <div class="card-value">${totalRevenueSum} AZN</div>
           </div>
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-top: 3px solid #8b5cf6; padding: 10px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 9px; text-transform: uppercase; color: #64748b; margin-bottom: 3px; font-weight: 700;">Müəllimə Ödənişləri (Payı)</div>
-            <div style="font-size: 16px; font-weight: 900; color: #0f172a;">${formatAmount(totalTeacherShareSum)} AZN</div>
+          <div class="card">
+            <div class="card-title">Müəllimə Xərcləri</div>
+            <div class="card-value">${totalTeacherShareSum.toFixed(1)} AZN</div>
           </div>
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-top: 3px solid #0ea5e9; padding: 10px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 9px; text-transform: uppercase; color: #64748b; margin-bottom: 3px; font-weight: 700;">Mərkəzin Payı (Brutto)</div>
-            <div style="font-size: 16px; font-weight: 900; color: #0f172a;">${formatAmount(centerShare)} AZN</div>
+          <div class="card">
+            <div class="card-title">Mərkəzin Payı</div>
+            <div class="card-value">${centerShare.toFixed(1)} AZN</div>
           </div>
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-top: 3px solid #ef4444; padding: 10px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 9px; text-transform: uppercase; color: #64748b; margin-bottom: 3px; font-weight: 700;">Tədrisin Digər Xərcləri</div>
-            <div style="font-size: 16px; font-weight: 900; color: #0f172a;">${formatAmount(totalExpenses)} AZN</div>
+          <div class="card">
+            <div class="card-title">Tədrisin Digər Xərcləri</div>
+            <div class="card-value">${totalExpenses} AZN</div>
           </div>
-          <div style="background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 2px solid #10b981; padding: 12px 16px; border-radius: 8px; text-align: center; grid-column: span 4; display: flex; justify-content: space-between; align-items: center;">
-            <div style="text-align: left;">
-              <div style="font-size: 11px; text-transform: uppercase; color: #047857; font-weight: 900; letter-spacing: 0.5px;">MƏRKƏZİN XALİS MƏNFƏƏTİ (NET QALIQ)</div>
-              <div style="font-size: 10px; color: #065f46; margin-top: 2px;">(Mərkəzin payından bütün əməliyyat xərcləri çıxıldıqdan sonra qalan net mənfəət)</div>
-            </div>
-            <div style="font-size: 22px; font-weight: 900; color: #047857;">${formatAmount(netProfit)} AZN</div>
+          <div class="card highlight">
+            <div class="card-title">XALİS MƏNFƏƏT (QALIQ MƏBLƏĞ)</div>
+            <div class="card-value">${netProfit.toFixed(1)} AZN</div>
           </div>
         </div>
 
-        <!-- TEACHERS REPORT TABLE -->
-        <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 20px 0 10px 0; border-left: 4px solid #4f46e5; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">2. Müəllimələr Üzrə Pay Bölgüsü</div>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px;">
+        <div class="section-title">Müəllimələrin Aylıq Pay Hesabatı</div>
+        <table>
           <thead>
-            <tr style="background: #1e1b4b; color: white;">
-              <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: left;">Müəllimə</th>
-              <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: center;">Tələbə</th>
-              <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: right;">Cəlb Olunan</th>
-              <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: center;">Faiz</th>
-              <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: right;">Müəllimə Payı</th>
-              <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: right;">Ödənilən</th>
-              <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: right;">Qalıq Borc</th>
+            <tr>
+              <th>Müəllimə</th>
+              <th>Uşaq Sayı</th>
+              <th>Ümumi Cəlb Olunan</th>
+              <th>Pay Faizi</th>
+              <th>Müəllimə Payı</th>
+              <th>Ödənilən</th>
+              <th>Qalıq Borc</th>
             </tr>
           </thead>
           <tbody>
             ${teacherRowsHtml}
-            <tr style="background: #f1f5f9; font-weight: 800; border-top: 2px solid #0f172a;">
-              <td style="border: 1px solid #cbd5e1; padding: 8px 10px;">CƏMİ YEKUN</td>
-              <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: center;">${totalStudentsSum} tələbə</td>
-              <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right;">${formatAmount(totalRevenueSum)} AZN</td>
-              <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: center;">-</td>
-              <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right; color: #4f46e5;">${formatAmount(totalTeacherShareSum)} AZN</td>
-              <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right; color: #059669;">${formatAmount(totalPaidSum)} AZN</td>
-              <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right; color: #b45309;">${formatAmount(totalDueSum)} AZN</td>
+            <tr class="total-row">
+              <td>CƏMİ</td>
+              <td>${totalStudentsSum} tələbə</td>
+              <td>${totalRevenueSum} AZN</td>
+              <td>-</td>
+              <td>${totalTeacherShareSum.toFixed(1)} AZN</td>
+              <td>${totalPaidSum} AZN</td>
+              <td>${totalDueSum.toFixed(1)} AZN</td>
             </tr>
           </tbody>
         </table>
 
-        ${expensesHtml}
-
-        <!-- FOOTER & SIGNATURE SECTION -->
-        <div style="margin-top: 35px; border-top: 1px dashed #cbd5e1; padding-top: 18px; display: flex; justify-content: space-between; align-items: flex-end;">
-          <div style="font-size: 9px; color: #64748b; max-width: 320px; line-height: 1.4;">
-            <p style="margin: 0; font-weight: 800; color: #334155;">ƏZİZ TƏDRİS MƏRKƏZİ - RƏSMİ MALİYYƏ HESABATI</p>
-            <p style="margin: 3px 0 0 0;">Bu sənəd mərkəzin maliyyə idarəetmə sistemi tərəfindən rəsmi olaraq generasiya olunmuşdur.</p>
-          </div>
-          <div style="text-align: center;">
-            <p style="margin: 0 0 35px 0; font-size: 11px; font-weight: 800; color: #0f172a;">Hesabatı Tərtib Etdi (Direktor):</p>
-            <div style="border-top: 1.5px solid #0f172a; width: 180px; margin: 0 auto; padding-top: 4px; font-size: 11px; font-weight: 700; color: #334155;">İmza / Tarix</div>
-          </div>
-        </div>
-      `;
-    },
+        ${expenses.length > 0 ? `
+          <div class="section-title">Tədrisin Xərcləri</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Tarix</th>
+                <th>Təsvir</th>
+                <th>Məbləğ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${expenseRowsHtml}
+              <tr class="total-row">
+                <td colspan="2">CƏMİ XƏRCLƏR</td>
+                <td>${totalExpenses} AZN</td>
+              </tr>
+            </tbody>
+          </table>
+        ` : ''}
+      </body>
+      </html>
+    `);
+    printWin.document.close();
+  },
 
   exportTeacherExcel(teacherId) {
     const curMonth = window.DB.getCurrentMonth();
     const formattedMonth = formatMonth(curMonth);
     const payments = window.DB.getPayments();
+    const allPaymentsFlat = window.DB.getAllPaymentsFlat();
     const teachers = window.DB.getTeachers();
     const payouts = window.DB.getTeacherPayouts();
     
@@ -3549,268 +3191,42 @@ const App = {
     const paid = teacherPayoutList.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
     const due = teacherShare - paid;
 
-    const esc = (s) => (s === null || s === undefined) ? "" : String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+    let csv = "";
+    csv += `Əziz Tədris Mərkəzi - Müəllimə Aylıq Hesabatı\n\n`;
+    csv += `Müəllimə Adı;${t.name}\n`;
+    csv += `Hesabat Ayı;${formattedMonth}\n\n`;
 
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:o="urn:schemas-microsoft-com:office:office"
- xmlns:x="urn:schemas-microsoft-com:office:excel"
- xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
- <Styles>
-  <Style ss:ID="Default" ss:Name="Normal">
-   <Alignment ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#000000"/>
-  </Style>
-  <Style ss:ID="Title">
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="14" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="Subtitle">
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Bold="1" ss:Color="#333333"/>
-   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="SectionHeader">
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="TableHeader">
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="DataLeft">
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="DataLeftBold">
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="DataCenter">
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="DataRightBold">
-   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="TotalRow">
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="TotalRowRight">
-   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
-   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#000000"/>
-    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
- </Styles>
- <Worksheet ss:Name="${esc(t.name)} Hesabatı">
-  <Table ss:ExpandedColumnCount="6">
-   <Column ss:Width="160"/>
-   <Column ss:Width="110"/>
-   <Column ss:Width="130"/>
-   <Column ss:Width="100"/>
-   <Column ss:Width="100"/>
-   <Column ss:Width="115"/>
+    csv += `MALIYYƏ XÜLASƏSI\n`;
+    csv += `Göstərici;Dəyər\n`;
+    csv += `Aktiv Uşaq Sayı;${stdCount} tələbə\n`;
+    csv += `Ümumi Cəlb Olunan Məbləğ;${revenue} AZN\n`;
+    csv += `Müəllimənin Pay Faizi;${sharePercent}%\n`;
+    csv += `Hesablanan Müəllimə Payı;${teacherShare.toFixed(1)} AZN\n`;
+    csv += `Müəlliməyə Ödənilən Məbləğ;${paid} AZN\n`;
+    csv += `Qalıq Borc (Mərkəzin borcu);${due.toFixed(1)} AZN\n\n`;
 
-   <!-- HEADER BANNER -->
-   <Row ss:Height="26">
-    <Cell ss:MergeAcross="5" ss:StyleID="Title"><Data ss:Type="String">ƏZİZ TƏDRİS MƏRKƏZİ - MÜƏLLİMƏ AYLIQ PAY HESABATI VƏRƏQİ</Data></Cell>
-   </Row>
-   <Row ss:Height="18">
-    <Cell ss:MergeAcross="5" ss:StyleID="Subtitle"><Data ss:Type="String">Müəllimə: ${esc(t.name)}   |   Hesabat Dövrü: ${esc(formattedMonth)}   |   İxrac Tarixi: ${esc(new Date().toLocaleDateString('az-AZ'))}</Data></Cell>
-   </Row>
-   <Row ss:Height="10"></Row>
-
-   <!-- SECTION 1: FINANCIAL SUMMARY -->
-   <Row ss:Height="20">
-    <Cell ss:MergeAcross="5" ss:StyleID="SectionHeader"><Data ss:Type="String">1. MALİYYƏ XÜLASƏSİ</Data></Cell>
-   </Row>
-   <Row ss:Height="20">
-    <Cell ss:MergeAcross="2" ss:StyleID="TableHeader"><Data ss:Type="String">Göstərici Adı</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Dəyər (AZN / Say)</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TableHeader"><Data ss:Type="String">Qeyd / Açıqlama</Data></Cell>
-   </Row>
-   <Row ss:Height="19">
-    <Cell ss:MergeAcross="2" ss:StyleID="DataLeftBold"><Data ss:Type="String">Aktiv Tələbə Sayı</Data></Cell>
-    <Cell ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(stdCount)} tələbə</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataLeft"><Data ss:Type="String">Davam edən tələbələrin sayı</Data></Cell>
-   </Row>
-   <Row ss:Height="19">
-    <Cell ss:MergeAcross="2" ss:StyleID="DataLeftBold"><Data ss:Type="String">Cəlb Olunan Ümumi Məbləğ</Data></Cell>
-    <Cell ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(revenue))} AZN</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataLeft"><Data ss:Type="String">Tələbələr tərəfindən ödənilən ümumi məbləğ</Data></Cell>
-   </Row>
-   <Row ss:Height="19">
-    <Cell ss:MergeAcross="2" ss:StyleID="DataLeftBold"><Data ss:Type="String">Müəllimənin Pay Faizi</Data></Cell>
-    <Cell ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(sharePercent)}%</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataLeft"><Data ss:Type="String">Müəllimənin mərkəz ilə razılaşdırılmış payı</Data></Cell>
-   </Row>
-   <Row ss:Height="19">
-    <Cell ss:MergeAcross="2" ss:StyleID="DataLeftBold"><Data ss:Type="String">Hesablanmış Müəllimə Qazancı</Data></Cell>
-    <Cell ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(teacherShare))} AZN</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataLeft"><Data ss:Type="String">Cəlb olunan məbləğdən müəlliməyə çatacaq pay</Data></Cell>
-   </Row>
-   <Row ss:Height="19">
-    <Cell ss:MergeAcross="2" ss:StyleID="DataLeftBold"><Data ss:Type="String">Müəlliməyə Ödənilən Məbləğ (Cəmi)</Data></Cell>
-    <Cell ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(paid))} AZN</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataLeft"><Data ss:Type="String">Təhvil verilmiş nağd və ya köçürmə ödənişlər</Data></Cell>
-   </Row>
-   <Row ss:Height="19">
-    <Cell ss:MergeAcross="2" ss:StyleID="DataLeftBold"><Data ss:Type="String">Qalıq Borc (Ödəniləcək Məbləğ)</Data></Cell>
-    <Cell ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(due))} AZN</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="DataLeft"><Data ss:Type="String">Mərkəzin müəlliməyə qalan borcu</Data></Cell>
-   </Row>
-
-   <Row ss:Height="12"></Row>
-
-   <!-- SECTION 2: STUDENTS LIST -->
-   <Row ss:Height="20">
-    <Cell ss:MergeAcross="5" ss:StyleID="SectionHeader"><Data ss:Type="String">2. ÖDƏNİŞ EDİLƏN DƏRSLƏR VƏ TƏLƏBƏLƏRİN SİYAHISI</Data></Cell>
-   </Row>
-   <Row ss:Height="20">
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Tələbə Adı Soyadı</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Fənn</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Paket Növü</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Dərs Tezliyi</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Ödəniş Tarixi</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Ödənilən (AZN)</Data></Cell>
-   </Row>
-`;
-
+    csv += `ÖDƏNİŞ EDİLƏN DƏRSLƏR / TƏLƏBƏLƏRİN SİYAHISI\n`;
+    csv += `Tələbə;Fənn;Paket;Dərs Tezliyi;Ödəniş Tarixi;Ödənilən Məbləğ (AZN)\n`;
     teacherPayments.forEach(p => {
       const paidVal = getPaymentRevenue(p);
       const student = students.find(s => s.id === p.studentId);
       const displayName = student ? `${student.name} ${student.surname || ""}`.trim() : p.studentName;
-      const renewedTag = p.isRenewed ? " (Yenilənmiş)" : "";
-      const pkgStr = (p.packageType === "Seans" ? `Seans (${p.sessionsCount || 8} seans) (${p.groupType})` : `Aylıq (${p.groupType})`) + renewedTag;
-
-      xml += `   <Row ss:Height="19">
-    <Cell ss:StyleID="DataLeftBold"><Data ss:Type="String">${esc(displayName)}</Data></Cell>
-    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">${esc(p.courseName)}</Data></Cell>
-    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">${esc(pkgStr)}</Data></Cell>
-    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Həftədə ${esc(p.weeklyFrequency)} dəfə</Data></Cell>
-    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">${esc(p.paymentDate)}</Data></Cell>
-    <Cell ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(paidVal))} AZN</Data></Cell>
-   </Row>\n`;
+      const pkgStr = p.packageType === "Seans" ? `Seans (${p.sessionsCount || 8} seans) (${p.groupType})` : `Aylıq (${p.groupType})`;
+      csv += `${displayName};${p.courseName};${pkgStr};Həftədə ${p.weeklyFrequency} dəfə;${p.paymentDate};${paidVal}\n`;
     });
+    csv += `CƏMİ;;;;;${revenue} AZN\n\n`;
 
-    xml += `   <Row ss:Height="21">
-    <Cell ss:MergeAcross="4" ss:StyleID="TotalRow"><Data ss:Type="String">CƏMİ CƏLB OLUNAN MƏBLƏĞ</Data></Cell>
-    <Cell ss:StyleID="TotalRowRight"><Data ss:Type="String">${esc(formatAmount(revenue))} AZN</Data></Cell>
-   </Row>\n`;
+    csv += `MÜƏLLİMƏYƏ EDİLƏN ÖDƏNİŞLƏRİN TARİXÇƏSİ\n`;
+    csv += `Tarix;Məbləğ (AZN)\n`;
+    teacherPayoutList.forEach(log => {
+      csv += `${log.date};${log.amount}\n`;
+    });
+    csv += `CƏMİ ÖDƏNİLƏN;;${paid} AZN\n`;
 
-    if (teacherPayoutList.length > 0) {
-      xml += `   <Row ss:Height="12"></Row>
-   <!-- SECTION 3: PAYOUTS HISTORY -->
-   <Row ss:Height="20">
-    <Cell ss:MergeAcross="5" ss:StyleID="SectionHeader"><Data ss:Type="String">3. MÜƏLLİMƏYƏ EDİLƏN ÖDƏNİŞLƏRİN TARİXÇƏSİ</Data></Cell>
-   </Row>
-   <Row ss:Height="20">
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Tarix</Data></Cell>
-    <Cell ss:MergeAcross="3" ss:StyleID="TableHeader"><Data ss:Type="String">Ödəniş Açıqlaması / Növü</Data></Cell>
-    <Cell ss:StyleID="TableHeader"><Data ss:Type="String">Ödənilən (AZN)</Data></Cell>
-   </Row>\n`;
-
-      teacherPayoutList.forEach(log => {
-        xml += `   <Row ss:Height="19">
-    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">${esc(log.date)}</Data></Cell>
-    <Cell ss:MergeAcross="3" ss:StyleID="DataLeft"><Data ss:Type="String">Nağd/Köçürmə (Müəllimə ödənişi)</Data></Cell>
-    <Cell ss:StyleID="DataRightBold"><Data ss:Type="String">${esc(formatAmount(log.amount))} AZN</Data></Cell>
-   </Row>\n`;
-      });
-
-      xml += `   <Row ss:Height="21">
-    <Cell ss:MergeAcross="4" ss:StyleID="TotalRow"><Data ss:Type="String">CƏMİ ÖDƏNİLƏN MƏBLƏĞ</Data></Cell>
-    <Cell ss:StyleID="TotalRowRight"><Data ss:Type="String">${esc(formatAmount(paid))} AZN</Data></Cell>
-   </Row>\n`;
-    }
-
-    xml += `   <Row ss:Height="20"></Row>
-   <Row ss:Height="22">
-    <Cell ss:MergeAcross="5" ss:StyleID="DataLeftBold"><Data ss:Type="String">Təhvil Verən (Direktor): _______________________          Təhvil Alan (Müəllimə - ${esc(t.name)}): _______________________</Data></Cell>
-   </Row>
-  </Table>
-  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
-   <PageSetup>
-    <Layout x:Orientation="Landscape"/>
-   </PageSetup>
-   <FitToPage/>
-   <Print>
-    <PaperSizeIndex>9</PaperSizeIndex>
-    <FitWidth>1</FitWidth>
-    <FitHeight>0</FitHeight>
-   </Print>
-  </WorksheetOptions>
- </Worksheet>
-</Workbook>`;
-
-    const blob = new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" });
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `${t.name.replace(/\s+/g, "_")}_Aylıq_Hesabatı_${curMonth}.xml`);
+    link.setAttribute("download", `${t.name.replace(/\s+/g, "_")}_Hesabat_${curMonth}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -3849,131 +3265,175 @@ const App = {
       const displayName = student ? `${student.name} ${student.surname || ""}`.trim() : p.studentName;
       return `
         <tr>
-          <td style="border: 1px solid #cbd5e1; padding: 7px 10px;"><strong>${displayName}</strong></td>
-          <td style="border: 1px solid #cbd5e1; padding: 7px 10px;">${p.courseName}</td>
-          <td style="border: 1px solid #cbd5e1; padding: 7px 10px;">${pkgStr}</td>
-          <td style="border: 1px solid #cbd5e1; padding: 7px 10px;">Həftədə ${p.weeklyFrequency} dəfə</td>
-          <td style="border: 1px solid #cbd5e1; padding: 7px 10px;">${p.paymentDate}</td>
-          <td style="border: 1px solid #cbd5e1; padding: 7px 10px; text-align: right; font-weight: 700;">${valStr}</td>
+          <td><strong>${displayName}</strong></td>
+          <td>${p.courseName}</td>
+          <td>${pkgStr}</td>
+          <td>Həftədə ${p.weeklyFrequency} dəfə</td>
+          <td>${p.paymentDate}</td>
+          <td><strong>${valStr}</strong></td>
         </tr>
       `;
     }).join("");
 
     const payoutRowsHtml = teacherPayoutList.map(log => `
       <tr>
-        <td style="border: 1px solid #cbd5e1; padding: 7px 10px;">${log.date}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 7px 10px;">Nağd/Köçürmə (Müəllimə ödənişi)</td>
-        <td style="border: 1px solid #cbd5e1; padding: 7px 10px; text-align: right; font-weight: 700; color: #059669;">${formatAmount(log.amount)} AZN</td>
+        <td>${log.date}</td>
+        <td>Nağd/Köçürmə (Müəllimə ödənişi)</td>
+        <td><strong>${log.amount} AZN</strong></td>
       </tr>
     `).join("");
 
-    const container = document.getElementById("print-preview-content");
-    if (container) {
-      container.innerHTML = `
-        <!-- PREMIUM HEADER -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4f46e5; padding-bottom: 15px; margin-bottom: 22px;">
+    const printWin = window.open("", "_blank");
+    printWin.document.write(`
+      <html>
+      <head>
+        <title>Əziz Tədris Mərkəzi - ${t.name} - ${formattedMonth} Hesabatı</title>
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; color: #1e293b; background: white; line-height: 1.5; }
+          .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6366f1; padding-bottom: 20px; margin-bottom: 25px; }
+          .header h1 { margin: 0; color: #1e1b4b; font-size: 22px; text-transform: uppercase; }
+          .header p { margin: 5px 0 0 0; color: #64748b; font-size: 14px; }
+          .meta-info { text-align: right; }
+          .meta-info div { margin-bottom: 4px; font-size: 13px; color: #475569; }
+          .meta-info strong { color: #0f172a; }
+          .section-title { font-size: 15px; font-weight: 700; color: #1e1b4b; margin: 25px 0 10px 0; border-left: 4px solid #6366f1; padding-left: 8px; text-transform: uppercase; }
+          .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+          .summary-table td { border: 1px solid #e2e8f0; padding: 12px; font-size: 14px; }
+          .summary-table td.label { background: #f8fafc; font-weight: 600; color: #475569; width: 40%; }
+          .summary-table td.value { font-weight: 700; color: #0f172a; }
+          table.data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+          table.data-table th, table.data-table td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; }
+          table.data-table th { background: #f1f5f9; color: #334155; font-weight: 700; }
+          tr.total-row { background: #f8fafc; font-weight: 700; }
+          .signature-section { margin-top: 50px; display: flex; justify-content: space-between; font-size: 14px; }
+          .signature-box { border-top: 1px solid #94a3b8; width: 200px; text-align: center; padding-top: 8px; margin-top: 40px; }
+          @page {
+            size: auto;
+            margin: 12mm 10mm 12mm 10mm;
+          }
+          @media print {
+            html, body {
+              background: #ffffff !important;
+              color: #000000 !important;
+              padding: 0 !important;
+              margin: 0 !important;
+              width: 100% !important;
+              height: auto !important;
+              overflow: visible !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .no-print {
+              display: none !important;
+            }
+            table, tr, td, th, .card {
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="no-print" style="margin-bottom: 20px; text-align: right;">
+          <button onclick="window.print()" style="padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">🖨️ Hesabatı Çap Et</button>
+        </div>
+        <div class="header">
           <div>
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #4f46e5, #3730a3); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 20px; font-family: sans-serif; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);">Ə</div>
-              <div>
-                <h1 style="margin: 0; color: #0f172a; font-size: 20px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;">ƏZİZ TƏDRİS MƏRKƏZİ</h1>
-                <p style="margin: 2px 0 0 0; color: #4f46e5; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">MÜƏLLİMƏ AYLIQ PAY HESABATI VƏRƏQİ</p>
-              </div>
-            </div>
+            <h1>Əziz Tədris Mərkəzi</h1>
+            <p>Müəllimə Aylıq Pay Hesabatı Vərəqi</p>
           </div>
-          <div style="text-align: right; font-size: 11px; color: #475569; border-left: 2px solid #e2e8f0; padding-left: 15px;">
-            <div>Müəllimə: <strong style="color: #0f172a; font-size: 13px;">${t.name}</strong></div>
-            <div>Hesabat Dövrü: <strong style="color: #0f172a;">${formattedMonth}</strong></div>
-            <div>Çap Tarixi: <strong style="color: #0f172a;">${new Date().toLocaleDateString('az-AZ')}</strong></div>
+          <div class="meta-info">
+            <div>Müəllimə: <strong>${t.name}</strong></div>
+            <div>Dövr: <strong>${formattedMonth}</strong></div>
+            <div>Çap Tarixi: <strong>${new Date().toLocaleDateString('az-AZ')}</strong></div>
           </div>
         </div>
 
-        <!-- KPI SUMMARY GRID -->
-        <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 0 0 10px 0; border-left: 4px solid #4f46e5; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">1. Maliyyə Xülasəsi</div>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px;">
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-top: 3px solid #6366f1; padding: 10px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 9px; text-transform: uppercase; color: #64748b; margin-bottom: 3px; font-weight: 700;">Aktiv Tələbə Sayı</div>
-            <div style="font-size: 16px; font-weight: 900; color: #0f172a;">${stdCount} tələbə</div>
-          </div>
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-top: 3px solid #3b82f6; padding: 10px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 9px; text-transform: uppercase; color: #64748b; margin-bottom: 3px; font-weight: 700;">Cəlb Olunan Ümumi Məbləğ</div>
-            <div style="font-size: 16px; font-weight: 900; color: #0f172a;">${formatAmount(revenue)} AZN</div>
-          </div>
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-top: 3px solid #8b5cf6; padding: 10px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 9px; text-transform: uppercase; color: #64748b; margin-bottom: 3px; font-weight: 700;">Müəllimənin Pay Faizi</div>
-            <div style="font-size: 16px; font-weight: 900; color: #8b5cf6;">${sharePercent}%</div>
-          </div>
-          <div style="background: #e0e7ff; border: 1px solid #c7d2fe; border-top: 3px solid #4f46e5; padding: 10px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 9px; text-transform: uppercase; color: #3730a3; margin-bottom: 3px; font-weight: 800;">Hesablanmış Qazanc</div>
-            <div style="font-size: 16px; font-weight: 900; color: #3730a3;">${formatAmount(teacherShare)} AZN</div>
-          </div>
-          <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-top: 3px solid #10b981; padding: 10px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 9px; text-transform: uppercase; color: #047857; margin-bottom: 3px; font-weight: 800;">Ödənilən Məbləğ (Cəmi)</div>
-            <div style="font-size: 16px; font-weight: 900; color: #047857;">${formatAmount(paid)} AZN</div>
-          </div>
-          <div style="background: ${due > 0 ? '#fffbeb' : (due < 0 ? '#fef2f2' : '#f0fdf4')}; border: 1px solid ${due > 0 ? '#fde68a' : (due < 0 ? '#fecaca' : '#bbf7d0')}; border-top: 3px solid ${due > 0 ? '#f59e0b' : (due < 0 ? '#ef4444' : '#22c55e')}; padding: 10px; border-radius: 6px; text-align: center;">
-            <div style="font-size: 9px; text-transform: uppercase; color: ${due > 0 ? '#b45309' : (due < 0 ? '#991b1b' : '#166534')}; margin-bottom: 3px; font-weight: 800;">Qalıq Borc</div>
-            <div style="font-size: 16px; font-weight: 900; color: ${due > 0 ? '#b45309' : (due < 0 ? '#991b1b' : '#166534')};">${formatAmount(due)} AZN</div>
-          </div>
-        </div>
+        <div class="section-title">Maliyyə Xülasəsi</div>
+        <table class="summary-table">
+          <tr>
+            <td class="label">Aktiv Tələbə Sayı</td>
+            <td class="value">${stdCount} tələbə</td>
+          </tr>
+          <tr>
+            <td class="label">Cəlb Olunan Ümumi Məbləğ</td>
+            <td class="value">${revenue} AZN</td>
+          </tr>
+          <tr>
+            <td class="label">Müəllimənin Payı (%)</td>
+            <td class="value">${sharePercent}%</td>
+          </tr>
+          <tr>
+            <td class="label">Hesablanmış Müəllimə Qazancı</td>
+            <td class="value" style="color: #6366f1;">${teacherShare.toFixed(1)} AZN</td>
+          </tr>
+          <tr>
+            <td class="label">Müəlliməyə Ödənilən Məbləğ (Cəmi)</td>
+            <td class="value" style="color: #10b981;">${paid} AZN</td>
+          </tr>
+          <tr>
+            <td class="label">Qalıq Borc (Ödəniləcək məbləğ)</td>
+            <td class="value" style="color: ${due > 0 ? '#d97706' : (due < 0 ? '#dc2626' : '#16a34a')};">${due.toFixed(1)} AZN</td>
+          </tr>
+        </table>
 
         ${teacherPayments.length > 0 ? `
-          <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 20px 0 10px 0; border-left: 4px solid #4f46e5; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">2. Tələbələr və Dərslərin Siyahısı</div>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px;">
+          <div class="section-title">Tələbələr və Dərslərin Siyahısı</div>
+          <table class="data-table">
             <thead>
-              <tr style="background: #1e1b4b; color: white;">
-                <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: left;">Tələbə</th>
-                <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: left;">Fənn</th>
-                <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: left;">Paket</th>
-                <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: left;">Tezlik</th>
-                <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: left;">Ödəniş Tarixi</th>
-                <th style="border: 1px solid #1e1b4b; padding: 7px 10px; text-align: right;">Məbləğ</th>
+              <tr>
+                <th>Tələbə</th>
+                <th>Fənn</th>
+                <th>Paket</th>
+                <th>Tezlik</th>
+                <th>Ödəniş Tarixi</th>
+                <th>Məbləğ</th>
               </tr>
             </thead>
             <tbody>
               ${studentRowsHtml}
-              <tr style="background: #f1f5f9; font-weight: 800; border-top: 2px solid #0f172a;">
-                <td colspan="5" style="border: 1px solid #cbd5e1; padding: 8px 10px;">CƏMİ CƏLB OLUNAN</td>
-                <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right; color: #4f46e5;">${formatAmount(revenue)} AZN</td>
+              <tr class="total-row">
+                <td colspan="5">CƏMİ</td>
+                <td>${revenue} AZN</td>
               </tr>
             </tbody>
           </table>
         ` : ''}
 
         ${teacherPayoutList.length > 0 ? `
-          <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 22px 0 10px 0; border-left: 4px solid #10b981; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">3. Müəlliməyə Edilən Ödənişlərin Tarixçəsi</div>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px;">
+          <div class="section-title">Müəlliməyə Edilən Ödənişlərin Tarixi (Manual)</div>
+          <table class="data-table">
             <thead>
-              <tr style="background: #065f46; color: white;">
-                <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: left; width: 120px;">Tarix</th>
-                <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: left;">Ödəniş Açıqlaması / Növü</th>
-                <th style="border: 1px solid #065f46; padding: 7px 10px; text-align: right; width: 150px;">Məbləğ</th>
+              <tr>
+                <th>Tarix</th>
+                <th>Açıqlama</th>
+                <th>Məbləğ</th>
               </tr>
             </thead>
             <tbody>
               ${payoutRowsHtml}
-              <tr style="background: #ecfdf5; font-weight: 800; border-top: 2px solid #047857;">
-                <td colspan="2" style="border: 1px solid #a7f3d0; padding: 8px 10px; color: #047857;">CƏMİ ÖDƏNİLƏN MƏBLƏĞ</td>
-                <td style="border: 1px solid #a7f3d0; padding: 8px 10px; text-align: right; color: #047857;">${formatAmount(paid)} AZN</td>
+              <tr class="total-row">
+                <td colspan="2">CƏMİ ÖDƏNİLƏN</td>
+                <td>${paid} AZN</td>
               </tr>
             </tbody>
           </table>
         ` : ''}
 
-        <!-- FOOTER & SIGNATURE SECTION -->
-        <div style="margin-top: 40px; border-top: 1px dashed #cbd5e1; padding-top: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
-          <div style="text-align: center;">
-            <p style="margin: 0 0 35px 0; font-size: 11px; font-weight: 800; color: #0f172a;">Təhvil Verən (Direktor):</p>
-            <div style="border-top: 1.5px solid #0f172a; width: 170px; margin: 0 auto; padding-top: 4px; font-size: 11px; font-weight: 700; color: #334155;">İmza / Tarix</div>
+        <div class="signature-section">
+          <div>
+            <p>Məsul şəxsin imzası:</p>
+            <div class="signature-box">Direktor</div>
           </div>
-          <div style="text-align: center;">
-            <p style="margin: 0 0 35px 0; font-size: 11px; font-weight: 800; color: #0f172a;">Təhvil Alan (Müəllimə):</p>
-            <div style="border-top: 1.5px solid #0f172a; width: 170px; margin: 0 auto; padding-top: 4px; font-size: 11px; font-weight: 700; color: #334155;">${t.name}</div>
+          <div>
+            <p>Təhvil alan müəllimənin imzası:</p>
+            <div class="signature-box">${t.name}</div>
           </div>
         </div>
-      `;
-    }
-    this.openModal("modal-print-preview");
+      </body>
+      </html>
+    `);
+    printWin.document.close();
   }
 };
 

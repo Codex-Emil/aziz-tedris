@@ -1789,77 +1789,41 @@ body.light-theme .badge-passive {
 }
 
 @media print {
-  body > *:not(#modal-print-preview) {
+  header.top-navbar,
+  .no-print,
+  .btn,
+  .modal-overlay,
+  #btn-change-month,
+  .header-actions {
     display: none !important;
   }
 
-  #modal-print-preview {
-    position: static !important;
+  body, .app-container, main.main-content {
     background: #ffffff !important;
-    display: block !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  #modal-print-preview .modal-container {
-    max-width: 100% !important;
-    width: 100% !important;
-    box-shadow: none !important;
-    border: none !important;
-    background: #ffffff !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    max-height: none !important;
-    transform: none !important;
-  }
-
-  #modal-print-preview .modal-header,
-  #modal-print-preview .modal-footer,
-  .no-print {
-    display: none !important;
-  }
-
-  #modal-print-preview .modal-body {
-    padding: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  #print-preview-content {
-    background: #ffffff !important;
-    color: #000000 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
-
-  #print-preview-content table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    margin-top: 10px !important;
-    font-size: 10pt !important;
-  }
-
-  #print-preview-content th, 
-  #print-preview-content td {
-    border: 1px solid #64748b !important;
-    padding: 6px 8px !important;
-    color: #000000 !important;
-    background: #ffffff !important;
-  }
-
-  #print-preview-content th {
-    background: #f1f5f9 !important;
-    font-weight: bold !important;
     color: #0f172a !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    box-shadow: none !important;
   }
 
-  tr, table, .card, .summary-table {
+  .card, .stat-card, .table-responsive {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+  }
+
+  table {
+    color: #0f172a !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
   }
 }
 

@@ -1683,7 +1683,11 @@ const DB = {
         "paymentDate": "2026-06-18",
         "sessionsLogged": 0,
         "paidAmount": 30,
-        "sessionStartDate": "2026-06-18"
+        "sessionStartDate": "2026-06-18",
+        "sessionDays": [
+          2,
+          4
+        ]
       },
       {
         "id": "pay_1783370008660_mfapj",
@@ -1705,7 +1709,11 @@ const DB = {
         "paidAmount": 30,
         "sessionStartDate": "2026-06-18",
         "isManualSessions": true,
-        "isRenewed": true
+        "isRenewed": true,
+        "sessionDays": [
+          2,
+          4
+        ]
       },
       {
         "id": "pay_1783370008660_pyhri",
@@ -1727,7 +1735,11 @@ const DB = {
         "paidAmount": 40,
         "sessionStartDate": "2026-06-22",
         "isManualSessions": true,
-        "isRenewed": true
+        "isRenewed": true,
+        "sessionDays": [
+          2,
+          4
+        ]
       },
       {
         "id": "pay_1783370008660_ao1cw",
@@ -1896,7 +1908,11 @@ const DB = {
         "sessionsLogged": 8,
         "paidAmount": 30,
         "sessionStartDate": "2026-06-12",
-        "isManualSessions": true
+        "isManualSessions": true,
+        "sessionDays": [
+          2,
+          5
+        ]
       },
       {
         "id": "pay_1783370008660_aezb1",
@@ -1916,7 +1932,11 @@ const DB = {
         "paymentDate": "2026-06-01",
         "sessionsLogged": 0,
         "paidAmount": 30,
-        "sessionStartDate": "2026-06-01"
+        "sessionStartDate": "2026-06-01",
+        "sessionDays": [
+          2,
+          5
+        ]
       },
       {
         "id": "pay_1783370008660_s4i08",
@@ -1962,7 +1982,11 @@ const DB = {
         "paidAmount": 30,
         "sessionStartDate": "2026-06-17",
         "isManualSessions": true,
-        "isRenewed": true
+        "isRenewed": true,
+        "sessionDays": [
+          2,
+          5
+        ]
       },
       {
         "id": "pay_1783370008660_kuvpv",
@@ -1984,7 +2008,11 @@ const DB = {
         "paidAmount": 30,
         "sessionStartDate": "2026-06-17",
         "isManualSessions": true,
-        "isRenewed": true
+        "isRenewed": true,
+        "sessionDays": [
+          2,
+          5
+        ]
       },
       {
         "id": "pay_1783370008660_f7twe",
@@ -2082,7 +2110,11 @@ const DB = {
         "paymentDate": "2026-07-02",
         "sessionsLogged": 8,
         "isManualSessions": true,
-        "isRenewed": true
+        "isRenewed": true,
+        "sessionDays": [
+          2,
+          4
+        ]
       },
       {
         "id": "pay_1783445955415_addbv",
@@ -2177,7 +2209,11 @@ const DB = {
         "paidAmount": 120,
         "sessionStartDate": "2026-07-14",
         "isManualSessions": true,
-        "isRenewed": true
+        "isRenewed": true,
+        "sessionDays": [
+          1,
+          4
+        ]
       },
       {
         "id": "pay_1783446585970_gunz3",
@@ -2197,7 +2233,11 @@ const DB = {
         "paymentDate": "2026-07-02",
         "sessionsLogged": 0,
         "sessionStartDate": "2026-07-14",
-        "paidAmount": 120
+        "paidAmount": 120,
+        "sessionDays": [
+          1,
+          4
+        ]
       },
       {
         "id": "pay_1783535463759_o0n0g",
@@ -2218,7 +2258,12 @@ const DB = {
         "sessionsLogged": 12,
         "sessionStartDate": "2026-06-17",
         "isManualSessions": true,
-        "isRenewed": true
+        "isRenewed": true,
+        "sessionDays": [
+          2,
+          4,
+          5
+        ]
       },
       {
         "id": "pay_1783535463759_ayax7",
@@ -2236,7 +2281,11 @@ const DB = {
         "dueDate": "2026-07-10",
         "paymentStatus": "Ödənildi",
         "paymentDate": "2026-06-26",
-        "sessionsLogged": 4
+        "sessionsLogged": 4,
+        "sessionDays": [
+          1,
+          4
+        ]
       },
       {
         "id": "pay_1783583787104_9vino",
@@ -2352,7 +2401,11 @@ const DB = {
         "paymentStatus": "Qismən ödənilib",
         "paymentDate": "2026-07-30",
         "sessionsLogged": 0,
-        "paidAmount": 60
+        "paidAmount": 60,
+        "sessionDays": [
+          1,
+          4
+        ]
       },
       {
         "id": "pay_1783615090018_ji5av",
@@ -2374,8 +2427,8 @@ const DB = {
         "sessionsLogged": 9,
         "paidAmount": 0,
         "sessionDays": [
-          2,
-          3
+          1,
+          4
         ],
         "isManualSessions": true
       },
@@ -2423,7 +2476,11 @@ const DB = {
         "sessionsLogged": 0,
         "paidAmount": 60,
         "sessionStartDate": "2026-07-14",
-        "isManualSessions": false
+        "isManualSessions": false,
+        "sessionDays": [
+          1,
+          4
+        ]
       },
       {
         "id": "pay_1784131042761_wizd1",
@@ -3533,7 +3590,7 @@ const DB = {
         "isManualSessions": false,
         "sessionDays": [
           2,
-          4
+          5
         ]
       },
       {
@@ -4048,8 +4105,8 @@ const DB = {
         "sessionsLogged": 0,
         "paidAmount": 0,
         "sessionDays": [
-          2,
-          3
+          1,
+          4
         ]
       },
       {
@@ -4074,7 +4131,7 @@ const DB = {
         "isManualSessions": false,
         "sessionDays": [
           2,
-          4
+          5
         ]
       },
       {

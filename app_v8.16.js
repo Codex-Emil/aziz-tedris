@@ -1064,7 +1064,6 @@ const App = {
     document.getElementById("dash-net-profit").textContent = formatAmount(netProfit) + " AZN";
 
     // 3. Bildirişlər və Gecikənlər siyahısı
-    const curMonth = window.DB.getCurrentMonth();
     const activeMonth = window.DB.getCurrentMonth();
     let today = getTodayStr();
     if (this.selectedMonth && this.selectedMonth !== activeMonth) {

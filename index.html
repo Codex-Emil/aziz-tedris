@@ -42,7 +42,7 @@
         <div id="login-error-msg" class="login-error" style="display: none; color: var(--danger); font-size: 0.8rem; margin-top: 0.75rem; text-align: center; font-weight: 600;">
           ❌ Daxil edilən şifrə yanlışdır!
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; height: 42px; font-size: 0.9rem; border-radius: 20px; font-weight: 600;">
+        <button type="submit" onclick="App.handleLogin(document.getElementById('login-password').value); return false;" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; height: 42px; font-size: 0.9rem; border-radius: 20px; font-weight: 600;">
           Sistemə Giriş 🔑
         </button>
       </form>

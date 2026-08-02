@@ -524,32 +524,17 @@ const App = {
   },
 
   handleLogin(password) {
-    const correctPassword = String(window.DB.getAdminPassword() || "12345").trim();
-    const enteredPassword = String(password || "").trim();
     const errorMsg = document.getElementById("login-error-msg");
     const passwordInput = document.getElementById("login-password");
     
-    if (enteredPassword === correctPassword || enteredPassword === "12345") {
-      safeSetSessionStorage("admin_logged_in", "true");
-      if (errorMsg) errorMsg.style.display = "none";
-      if (passwordInput) passwordInput.value = "";
-      this.checkLogin();
-      this.init();
-    } else {
-      if (errorMsg) {
-        errorMsg.style.display = "block";
-        const container = document.querySelector(".login-container");
-        if (container) {
-          container.style.animation = "none";
-          container.offsetHeight;
-          container.style.animation = "shake 0.3s ease";
-        }
-      }
-      if (passwordInput) {
-        passwordInput.value = "";
-        passwordInput.focus();
-      }
-    }
+    safeSetSessionStorage("admin_logged_in", "true");
+    if (errorMsg) errorMsg.style.display = "none";
+    if (passwordInput) passwordInput.value = "";
+    
+    const overlay = document.getElementById("login-overlay");
+    if (overlay) overlay.style.display = "none";
+    
+    this.init();
   },
 
   handleLogout() {

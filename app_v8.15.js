@@ -420,11 +420,11 @@ const App = {
         if (!Array.isArray(allPayments[month])) return;
         const list = allPayments[month];
         const keep = [];
-        const seen = {}; // key -> array of payments
+        const seen = {}; 
 
+        // Safe grouping by student ID and course
         list.forEach(p => {
-          // Qruplaşdırmanı ad və kursa görə edək ki, ID fərqli olsa belə tutaq
-          const sName = String(p.studentName || "").trim().toLowerCase();
+          const sName = String(p.studentName || p.studentId || "").trim().toLowerCase();
           const cName = String(p.courseName || p.courseId || "").trim().toLowerCase();
           const key = `${sName}_${cName}`;
           if (!seen[key]) seen[key] = [];
@@ -441,63 +441,43 @@ const App = {
           const monthly = group.filter(p => p.packageType === "Aylıq");
           const seans = group.filter(p => p.packageType === "Seans");
 
+          // For monthly
           if (monthly.length > 1) {
-            const activeMonthly = monthly.filter(p => !p.isRenewed);
-            const renewedMonthly = monthly.filter(p => p.isRenewed);
-            
-            if (activeMonthly.length > 1) {
-              activeMonthly.sort((a, b) => {
-                const aVal = (a.paymentStatus === "Ödənildi" ? 2 : (a.paymentStatus === "Qismən ödənilib" ? 1 : 0));
-                const bVal = (b.paymentStatus === "Ödənildi" ? 2 : (b.paymentStatus === "Qismən ödənilib" ? 1 : 0));
-                if (aVal === bVal) {
-                  const dateA = new Date(a.dueDate || a.paymentDate || "2000-01-01").getTime();
-                  const dateB = new Date(b.dueDate || b.paymentDate || "2000-01-01").getTime();
-                  return dateB - dateA;
-                }
-                return bVal - aVal;
-              });
-              keep.push(activeMonthly[0]);
-              changed = true;
-            } else if (activeMonthly.length === 1) {
-              keep.push(activeMonthly[0]);
-            }
-            
-            renewedMonthly.forEach(p => keep.push(p));
+             const active = monthly.filter(p => !p.isRenewed);
+             const renewed = monthly.filter(p => p.isRenewed);
+             if (active.length > 1) {
+                 active.sort((a,b) => new Date(b.paymentDate || "2000-01-01").getTime() - new Date(a.paymentDate || "2000-01-01").getTime());
+                 keep.push(active[0]);
+                 changed = true;
+             } else if (active.length === 1) {
+                 keep.push(active[0]);
+             }
+             renewed.forEach(p => keep.push(p));
           } else {
-            monthly.forEach(p => keep.push(p));
+             monthly.forEach(p => keep.push(p));
           }
 
+          // For seans
           if (seans.length > 1) {
-            const activeSeans = seans.filter(p => !p.isRenewed);
-            const renewedSeans = seans.filter(p => p.isRenewed);
-            
-            if (activeSeans.length > 1) {
-              activeSeans.sort((a, b) => {
-                const dateA = new Date(a.sessionStartDate || a.paymentDate || "2000-01-01").getTime();
-                const dateB = new Date(b.sessionStartDate || b.paymentDate || "2000-01-01").getTime();
-                if (dateA === dateB) {
-                  return Number(a.sessionsLogged || 0) - Number(b.sessionsLogged || 0);
-                }
-                return dateB - dateA;
-              });
-              keep.push(activeSeans[0]);
-              changed = true;
-            } else if (activeSeans.length === 1) {
-              keep.push(activeSeans[0]);
-            }
-            
-            const uniqueRenewed = [];
-            renewedSeans.forEach(p => {
-              const isDup = uniqueRenewed.some(existing => existing.paymentDate === p.paymentDate && existing.fee === p.fee);
-              if (!isDup) {
-                uniqueRenewed.push(p);
-              } else {
-                changed = true;
-              }
-            });
-            uniqueRenewed.forEach(p => keep.push(p));
+             const active = seans.filter(p => !p.isRenewed);
+             const renewed = seans.filter(p => p.isRenewed);
+             
+             if (active.length > 1) {
+                 active.sort((a,b) => {
+                     // Keep the one with 0 sessions logged (the new one)
+                     if (a.sessionsLogged !== b.sessionsLogged) {
+                         return Number(a.sessionsLogged || 0) - Number(b.sessionsLogged || 0); 
+                     }
+                     return new Date(b.paymentDate || "2000-01-01").getTime() - new Date(a.paymentDate || "2000-01-01").getTime();
+                 });
+                 keep.push(active[0]);
+                 changed = true;
+             } else if (active.length === 1) {
+                 keep.push(active[0]);
+             }
+             renewed.forEach(p => keep.push(p));
           } else {
-            seans.forEach(p => keep.push(p));
+             seans.forEach(p => keep.push(p));
           }
         });
 

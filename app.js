@@ -2796,9 +2796,15 @@ const App = {
       return;
     }
 
+    const prevMonth = this.selectedMonth;
+
     months.forEach(m => {
       select.innerHTML += `<option value="${m}">${formatMonth(m)}</option>`;
     });
+
+    if (prevMonth && months.includes(prevMonth)) {
+      select.value = prevMonth;
+    }
 
     // Seçilmiş ayın hesabatlarını göstər
     const loadArchiveData = (month) => {
@@ -2827,6 +2833,9 @@ const App = {
           <td><span class="badge ${p.paymentStatus === 'Ödənildi' ? 'badge-paid' : (p.paymentStatus === 'Qismən ödənilib' ? 'badge-partial' : 'badge-unpaid')}">
             ${p.paymentStatus === 'Qismən ödənilib' ? `Qismən (${p.paidAmount || 0}/${p.fee} AZN)` : p.paymentStatus} ${p.paymentDate ? `(${p.paymentDate})` : ""}
           </span></td>
+          <td>
+            <button class="btn btn-danger btn-sm" onclick="App.deletePaymentRecord('${p.id}')">Sil</button>
+          </td>
         `;
         payBody.appendChild(tr);
       });

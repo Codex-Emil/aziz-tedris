@@ -676,6 +676,10 @@ const App = {
         p.weeklyFrequency = Number(document.getElementById("edit-pay-weekly-freq-session").value);
         p.sessionsCount = Number(document.getElementById("edit-pay-sessions-count").value) || 8;
         p.sessionsLogged = Number(document.getElementById("edit-pay-sessions-logged").value) || 0;
+        
+        const manualSessCheckbox = document.getElementById("edit-pay-is-manual-sessions");
+        p.isManualSessions = manualSessCheckbox ? manualSessCheckbox.checked : false;
+
         p.sessionStartDate = document.getElementById("edit-pay-session-start-date").value || null;
         
         const sessionDays = [];
@@ -2145,6 +2149,10 @@ const App = {
     const freqMonthly = document.getElementById("edit-pay-freq-monthly-group");
     const sessCount = document.getElementById("edit-pay-sessions-count-group");
     const sessLogged = document.getElementById("edit-pay-sessions-logged-group");
+    const manualSessCheckbox = document.getElementById("edit-pay-is-manual-sessions");
+    if (manualSessCheckbox) {
+      manualSessCheckbox.checked = !!p.isManualSessions;
+    }
     const sessFreq = document.getElementById("edit-pay-freq-session-group");
     const sessStartGroup = document.getElementById("edit-pay-session-start-group");
     const dateGroup = document.getElementById("edit-pay-date-group");

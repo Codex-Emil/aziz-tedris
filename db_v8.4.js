@@ -3876,17 +3876,18 @@ const DB = {
         "weeklyFrequency": 2,
         "fee": 40,
         "paymentStatus": "Ödənildi",
-        "paymentDate": "2026-07-07",
+        "paymentDate": "2026-08-04",
         "paidAmount": 40,
         "notes": "",
         "sessionsCount": 8,
-        "sessionStartDate": "2026-07-07",
+        "sessionStartDate": "2026-08-04",
         "sessionsLogged": 0,
         "isManualSessions": false,
         "sessionDays": [
           2,
           5
-        ]
+        ],
+        "isRenewed": false
       },
       {
         "id": "pay_202608_pay_1783446522079_imhe9",

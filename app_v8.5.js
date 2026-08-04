@@ -451,8 +451,14 @@ const App = {
           }
 
           if (seans.length > 1) {
+            const hasActive = seans.some(p => !p.isRenewed);
+            const filteredSeans = seans.filter(p => {
+              if (hasActive && p.isRenewed) return false;
+              return true;
+            });
+            
             const uniqueSeans = [];
-            seans.forEach(p => {
+            filteredSeans.forEach(p => {
               const isDup = uniqueSeans.some(existing => 
                 existing.fee === p.fee &&
                 existing.paymentStatus === p.paymentStatus &&
@@ -902,6 +908,7 @@ const App = {
 
       window.DB.savePaymentAnyMonth(oldPay);
       window.DB.savePayment(newPay, newMonth);
+      App.cleanDuplicatePayments();
       App.closeModal("modal-renew-package");
       App.refreshCurrentScreen();
     });
@@ -1631,8 +1638,8 @@ const App = {
     const filtered = payments.filter(p => {
       // 1. Əgər artıq yenilənibsə (isRenewed) və eyni ay daxilində daha yeni bir paket varsa, köhnəsini cədvəldə gizlət
       if (p.isRenewed) {
-        const hasNewerInSameMonth = payments.some(p2 => p2.studentId === p.studentId && (p2.courseId === p.courseId || p2.courseName === p.courseName) && p2.id > p.id);
-        if (hasNewerInSameMonth) return false;
+        const hasActiveNewer = payments.some(p2 => p2.studentId === p.studentId && (p2.courseId === p.courseId || p2.courseName === p.courseName) && p2.id !== p.id && !p2.isRenewed);
+        if (hasActiveNewer) return false;
       }
 
       // 2. Əgər seansı bitibsə və verilənlər bazasında eyni uşaq və fənn üçün daha yeni bir ödəniş paketi varsa, 

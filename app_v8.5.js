@@ -435,12 +435,10 @@ const App = {
             return;
           }
 
-          // Aylıq və Seans paketlərinə görə ayrılıqda yoxlayaq
           const monthly = group.filter(p => p.packageType === "Aylıq");
           const seans = group.filter(p => p.packageType === "Seans");
 
           if (monthly.length > 1) {
-            // Aylıq ödənişlərdə ən çox ödənmiş/aktiv olanı saxla, digər unpaid dublikatları sil
             monthly.sort((a, b) => {
               const aVal = (a.paymentStatus === "Ödənildi" ? 2 : (a.paymentStatus === "Qismən ödənilib" ? 1 : 0));
               const bVal = (b.paymentStatus === "Ödənildi" ? 2 : (b.paymentStatus === "Qismən ödənilib" ? 1 : 0));
@@ -453,15 +451,13 @@ const App = {
           }
 
           if (seans.length > 1) {
-            // Seans paketlərində eyni start tarixi, ödəniş statusu və seans sayı olan eyni dublikat nüsxələri silirik
             const uniqueSeans = [];
             seans.forEach(p => {
               const isDup = uniqueSeans.some(existing => 
                 existing.fee === p.fee &&
                 existing.paymentStatus === p.paymentStatus &&
-                existing.sessionsLogged === p.sessionsLogged &&
-                existing.sessionStartDate === p.sessionStartDate &&
-                existing.paymentDate === p.paymentDate
+                existing.paidAmount === p.paidAmount &&
+                (existing.sessionStartDate === p.sessionStartDate || existing.paymentDate === p.paymentDate)
               );
               if (!isDup) {
                 uniqueSeans.push(p);

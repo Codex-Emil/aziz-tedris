@@ -3851,17 +3851,18 @@ const DB = {
         "weeklyFrequency": 2,
         "fee": 30,
         "paymentStatus": "Ödənildi",
-        "paymentDate": "2026-07-07",
+        "paymentDate": "2026-08-04",
         "paidAmount": 30,
         "notes": "",
         "sessionsCount": 8,
-        "sessionStartDate": "2026-07-07",
+        "sessionStartDate": "2026-08-04",
         "sessionsLogged": 0,
         "isManualSessions": false,
         "sessionDays": [
           2,
           5
-        ]
+        ],
+        "isRenewed": false
       },
       {
         "id": "pay_202608_pay_1783446336579_209gh",
@@ -5406,11 +5407,13 @@ const DB = {
     const allPayments = this._get("payments", {});
     if (!allPayments[month]) allPayments[month] = [];
     
+    if (!payment.id) {
+      payment.id = "pay_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+    }
     const index = allPayments[month].findIndex(p => p.id === payment.id);
     if (index > -1) {
       allPayments[month][index] = payment;
     } else {
-      payment.id = "pay_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
       allPayments[month].push(payment);
     }
     this._set("payments", allPayments);

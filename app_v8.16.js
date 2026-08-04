@@ -423,7 +423,10 @@ const App = {
         const seen = {}; // key -> array of payments
 
         list.forEach(p => {
-          const key = `${p.studentId}_${p.courseId || p.courseName}`;
+          // Qruplaşdırmanı ad və kursa görə edək ki, ID fərqli olsa belə tutaq
+          const sName = String(p.studentName || "").trim().toLowerCase();
+          const cName = String(p.courseName || p.courseId || "").trim().toLowerCase();
+          const key = `${sName}_${cName}`;
           if (!seen[key]) seen[key] = [];
           seen[key].push(p);
         });

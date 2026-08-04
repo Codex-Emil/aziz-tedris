@@ -576,19 +576,18 @@ const App = {
     // Ödəniş redaktə modalının köməkçi listenerləri
     const updateEditPayFormSessionDays = () => {
       const type = document.getElementById("edit-pay-package-type").value;
-      const freq = Number(document.getElementById("edit-pay-weekly-freq-session").value) || 2;
-      const editDaysGrp = document.getElementById("edit-pay-session-days-group");
+      const freq = type === "Seans"
+        ? (Number(document.getElementById("edit-pay-weekly-freq-session").value) || 2)
+        : (Number(document.getElementById("edit-pay-weekly-freq-monthly").value) || 2);
       
-      if (type === "Seans") {
-        editDaysGrp.style.display = "block";
-        const payId = document.getElementById("edit-pay-id").value;
-        const allPaymentsFlat = window.DB.getAllPaymentsFlat();
-        const p = allPaymentsFlat.find(pay => pay.id === payId);
-        const teacherId = p ? p.teacherId : null;
-        autoSelectPaymentSessionDays("edit-pay", teacherId, freq);
-      } else {
-        editDaysGrp.style.display = "none";
-      }
+      const editDaysGrp = document.getElementById("edit-pay-session-days-group");
+      editDaysGrp.style.display = "block";
+      
+      const payId = document.getElementById("edit-pay-id").value;
+      const allPaymentsFlat = window.DB.getAllPaymentsFlat();
+      const p = allPaymentsFlat.find(pay => String(pay.id) === String(payId));
+      const teacherId = p ? p.teacherId : null;
+      autoSelectPaymentSessionDays("edit-pay", teacherId, freq);
     };
 
     document.getElementById("edit-pay-package-type").addEventListener("change", (e) => {
@@ -616,6 +615,9 @@ const App = {
     });
 
     document.getElementById("edit-pay-weekly-freq-session").addEventListener("change", () => {
+      updateEditPayFormSessionDays();
+    });
+    document.getElementById("edit-pay-weekly-freq-monthly").addEventListener("change", () => {
       updateEditPayFormSessionDays();
     });
 
@@ -1839,18 +1841,17 @@ const App = {
     const updatePayFormSessionDays = () => {
       const courseId = document.getElementById("pay-course-select").value;
       const packageType = document.getElementById("pay-package-type").value;
-      const freq = Number(document.getElementById("pay-weekly-freq-session").value) || 2;
+      const freq = packageType === "Seans"
+        ? (Number(document.getElementById("pay-weekly-freq-session").value) || 2)
+        : (Number(document.getElementById("pay-weekly-freq-monthly").value) || 2);
       
       const sessionDaysGrp = document.getElementById("pay-session-days-group");
-      if (packageType === "Seans") {
-        sessionDaysGrp.style.display = "block";
-        const courses = window.DB.getCourses();
-        const course = courses.find(c => c.id === courseId);
-        const teacherId = course ? course.teacherId : null;
-        autoSelectPaymentSessionDays("pay", teacherId, freq);
-      } else {
-        sessionDaysGrp.style.display = "none";
-      }
+      sessionDaysGrp.style.display = "block";
+      
+      const courses = window.DB.getCourses();
+      const course = courses.find(c => c.id === courseId);
+      const teacherId = course ? course.teacherId : null;
+      autoSelectPaymentSessionDays("pay", teacherId, freq);
     };
 
     // Fənn seçildikdə müəllimə adını, qiyməti və seans günlərini avtomatik yüklə
@@ -1894,12 +1895,18 @@ const App = {
     document.getElementById("pay-weekly-freq-session").onchange = () => {
       updatePayFormSessionDays();
     };
+    
+    document.getElementById("pay-weekly-freq-monthly").onchange = () => {
+      updatePayFormSessionDays();
+    };
 
     // Ödəniş statusu seçildikdə tarix sahəsini göstər/gizlət
     document.getElementById("pay-status").onchange = (e) => {
       const status = e.target.value;
+      const dateInput = document.getElementById("pay-date");
       if (status === "Ödənildi") {
         document.getElementById("pay-date-group").style.display = "block";
+        if (!dateInput.value) dateInput.value = getTodayStr();
       } else {
         document.getElementById("pay-date-group").style.display = "none";
       }

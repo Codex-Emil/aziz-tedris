@@ -2128,6 +2128,76 @@ const App = {
 
     this.openModal("modal-renew-package");
   },
+  printPayments() {
+    const courseId = document.getElementById("filter-payments-course").value;
+    if (!courseId) {
+      alert("Zəhmət olmasa çap etmək üçün tədris növü (fənn) seçin.");
+      return;
+    }
+    
+    const courses = window.DB.getCourses();
+    const course = courses.find(c => c.id === courseId);
+    if (!course) return;
+    
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert("Zəhmət olmasa popup (yeni pəncərə) açılmasına icazə verin.");
+      return;
+    }
+    
+    // Klounlama edib sonuncu (Əməliyyatlar) sütununu silirik
+    const originalTable = document.getElementById("payments-table").cloneNode(true);
+    const ths = originalTable.querySelectorAll("th");
+    if (ths.length > 0) ths[ths.length - 1].remove();
+    originalTable.querySelectorAll("tr").forEach(tr => {
+      const tds = tr.querySelectorAll("td");
+      if (tds.length > 0) tds[tds.length - 1].remove();
+    });
+    
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${course.name} - Ödənişlər</title>
+        <style>
+          body { font-family: sans-serif; padding: 20px; color: #000; background: #fff; }
+          h2 { text-align: center; margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+          th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+          th { background-color: #f2f2f2; font-weight: 600; }
+          .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500; }
+          .badge-paid { color: #059669; background: #d1fae5; }
+          .badge-partial { color: #d97706; background: #fef3c7; }
+          .badge-unpaid { color: #dc2626; background: #fee2e2; }
+          .badge-info { color: #2563eb; background: #dbeafe; }
+          .badge-warning { color: #d97706; background: #fef3c7; }
+          .badge-danger { color: #dc2626; background: #fee2e2; }
+          .badge-secondary { color: #4b5563; background: #f3f4f6; }
+          .progress-dots { display: flex; gap: 2px; flex-wrap: wrap; margin-top: 4px; }
+          .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+          .dot-filled { background-color: #3b82f6; }
+          .dot-empty { background-color: #e5e7eb; border: 1px solid #ccc; }
+        </style>
+      </head>
+      <body>
+        <h2>${course.name} - Uşaqların Ödəniş və Seans Vəziyyəti</h2>
+        <p><strong>Tarix:</strong> ${new Date().toLocaleDateString('az-AZ')}</p>
+        ${originalTable.outerHTML}
+        <script>
+          window.onload = function() {
+            setTimeout(() => {
+              window.print();
+              window.close();
+            }, 300);
+          }
+        </script>
+      </body>
+      </html>
+    `;
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+  },
 
   deletePaymentRecord(id) {
     if (confirm("Bu ödəniş qeydini cədvəldən silmək istədiyinizdən əminsiniz?")) {
